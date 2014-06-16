@@ -16,7 +16,7 @@ public class AssignmentOperatorEvaluator implements PrismsItemEvaluator<ParsedAs
 				item.getVariable().getMatch().index);
 		Assignable a = (Assignable) item.getVariable();
 
-		EvaluationResult opType = item.getOperand() == null ? null : item.getOperand().evaluate(env, false, withValues);
+		EvaluationResult opType = item.getOperand() == null ? null : eval.evaluate(item.getOperand(), env, false, withValues);
 		if(opType != null) {
 			if(opType.getPackageName() != null)
 				throw new EvaluationException(opType.getFirstVar() + " cannot be resolved to a variable", item, item.getVariable()
@@ -28,23 +28,28 @@ public class AssignmentOperatorEvaluator implements PrismsItemEvaluator<ParsedAs
 				throw new EvaluationException("Syntax error: misplaced construct", item, item.getStored("name").index);
 		}
 
+		String name = item.getName();
 		EvaluationResult preRes;
-		if(!withValues || theName.equals("="))
-			preRes = a.evaluate(env, false, false);
-		else
-			preRes = a.getValue(env, this);
+		if(!withValues || name.equals("="))
+			preRes = eval.evaluate(a, env, false, false);
+		else {
+			if(!(eval.getEvaluatorFor(a.getClass()) instanceof AssignableEvaluator))
+				throw new EvaluationException("No assignable evaluator configured for " + a.getClass().getName(), item, a.getMatch().index);
+			AssignableEvaluator<Assignable> evaluator = (AssignableEvaluator<Assignable>) eval.getEvaluatorFor(a.getClass());
+			preRes = evaluator.getValue(a, eval, env, item);
+		}
 
 		Object ret;
 		Object toSet;
-		if("=".equals(theName)) {
+		if("=".equals(name)) {
 			if(preRes != null && !preRes.getType().isAssignable(opType.getType()))
 				throw new EvaluationException("Type mismatch: Cannot convert from " + opType.getType() + " to " + preRes.typeString(),
-					this, theOperand.getMatch().index);
+					item, item.getOperand().getMatch().index);
 			ret = toSet = withValues ? opType.getValue() : null;
-		} else if("++".equals(theName) || "--".equals(theName)) {
+		} else if("++".equals(name) || "--".equals(name)) {
 			ret = preRes.getValue();
 			int adjust = 1;
-			if("--".equals(theName))
+			if("--".equals(name))
 				adjust = -adjust;
 			if(Character.TYPE.equals(preRes))
 				toSet = withValues ? Character.valueOf((char) (((Character) ret).charValue() + adjust)) : null;
@@ -65,14 +70,14 @@ public class AssignmentOperatorEvaluator implements PrismsItemEvaluator<ParsedAs
 					else if(ret instanceof Byte)
 						toSet = withValues ? Byte.valueOf((byte) (num.byteValue() + adjust)) : null;
 						else
-							throw new EvaluationException("The operator " + theName + " is not defined for type " + preRes, this,
-								getStored("name").index);
+							throw new EvaluationException("The operator " + name + " is not defined for type " + preRes, item,
+								item.getStored("name").index);
 				} else
-					throw new EvaluationException("The operator " + theName + " is not defined for type " + preRes.typeString(), this,
-						getStored("name").index);
-			if(isPrefix)
+					throw new EvaluationException("The operator " + name + " is not defined for type " + preRes.typeString(), item,
+						item.getStored("name").index);
+			if(item.isPrefix())
 				ret = toSet;
-		} else if("+=".equals(theName) || "-=".equals(theName) || "*=".equals(theName) || "/=".equals(theName) || "%".equals(theName)) {
+		} else if("+=".equals(name) || "-=".equals(name) || "*=".equals(name) || "/=".equals(name) || "%".equals(name)) {
 			if(preRes.getType().isPrimitive() && !Boolean.TYPE.equals(preRes.getType().getBaseType()) && opType.getType().isPrimitive()
 				&& !Boolean.TYPE.equals(opType.getType().getBaseType())) {
 				ret = preRes.getValue();
@@ -87,29 +92,29 @@ public class AssignmentOperatorEvaluator implements PrismsItemEvaluator<ParsedAs
 					op2 = (Number) opType.getValue();
 				if(withValues) {
 					if(preRes.getType().getBaseType().equals(Double.TYPE))
-						ret = Double.valueOf(ParsedBinaryOp.mathF(theName, op1, op2));
+						ret = Double.valueOf(ParsedBinaryOp.mathF(name, op1, op2));
 					else if(preRes.getType().getBaseType().equals(Float.TYPE))
-						ret = Float.valueOf((float) ParsedBinaryOp.mathF(theName, op1, op2));
+						ret = Float.valueOf((float) ParsedBinaryOp.mathF(name, op1, op2));
 					else if(preRes.getType().getBaseType().equals(Long.TYPE))
-						ret = Long.valueOf(ParsedBinaryOp.mathI(preRes.getType().getBaseType(), theName, op1, op2));
+						ret = Long.valueOf(ParsedBinaryOp.mathI(preRes.getType().getBaseType(), name, op1, op2));
 					else if(preRes.getType().getBaseType().equals(Integer.TYPE))
-						ret = Integer.valueOf((int) ParsedBinaryOp.mathI(preRes.getType().getBaseType(), theName, op1, op2));
+						ret = Integer.valueOf((int) ParsedBinaryOp.mathI(preRes.getType().getBaseType(), name, op1, op2));
 					else if(preRes.getType().getBaseType().equals(Character.TYPE))
-						ret = Integer.valueOf((int) ParsedBinaryOp.mathI(preRes.getType().getBaseType(), theName, op1, op2));
+						ret = Integer.valueOf((int) ParsedBinaryOp.mathI(preRes.getType().getBaseType(), name, op1, op2));
 					else if(preRes.getType().getBaseType().equals(Short.TYPE))
-						ret = Short.valueOf((short) ParsedBinaryOp.mathI(preRes.getType().getBaseType(), theName, op1, op2));
+						ret = Short.valueOf((short) ParsedBinaryOp.mathI(preRes.getType().getBaseType(), name, op1, op2));
 					else if(preRes.getType().getBaseType().equals(Byte.TYPE))
-						ret = Byte.valueOf((byte) ParsedBinaryOp.mathI(preRes.getType().getBaseType(), theName, op1, op2));
+						ret = Byte.valueOf((byte) ParsedBinaryOp.mathI(preRes.getType().getBaseType(), name, op1, op2));
 					else
-						throw new EvaluationException("The operator " + theName + " is not defined for type " + preRes.typeString(), this,
-							getStored("name").index);
+						throw new EvaluationException("The operator " + name + " is not defined for type " + preRes.typeString(), item,
+							item.getStored("name").index);
 				} else
 					ret = null;
 				toSet = ret;
 			} else
-				throw new EvaluationException("The operator " + theName + " is not defined for type " + preRes.typeString(), this,
-					getStored("name").index);
-		} else if("|=".equals(theName) || "&=".equals(theName) || "^=".equals(theName)) {
+				throw new EvaluationException("The operator " + name + " is not defined for type " + preRes.typeString(), item,
+					item.getStored("name").index);
+		} else if("|=".equals(name) || "&=".equals(name) || "^=".equals(name)) {
 			if(preRes.isIntType() && opType.isIntType()) {
 				if(withValues) {
 					Number op1 = Character.TYPE.equals(preRes.getType().getBaseType()) ? Integer.valueOf(((Character) preRes.getValue())
@@ -117,9 +122,9 @@ public class AssignmentOperatorEvaluator implements PrismsItemEvaluator<ParsedAs
 					Number op2 = Character.TYPE.equals(opType.getType().getBaseType()) ? Integer.valueOf(((Character) opType.getValue())
 						.charValue()) : (Number) opType.getValue();
 					long val;
-					if("|=".equals(theName))
+					if("|=".equals(name))
 						val = op1.longValue() | op2.longValue();
-					else if("&=".equals(theName))
+					else if("&=".equals(name))
 						val = op1.longValue() & op2.longValue();
 					else
 						val = op1.longValue() ^ op2.longValue();
@@ -134,30 +139,30 @@ public class AssignmentOperatorEvaluator implements PrismsItemEvaluator<ParsedAs
 					else if(Character.TYPE.equals(preRes.getType().getBaseType()))
 						ret = toSet = Character.valueOf((char) val);
 					else
-						throw new EvaluationException("The operator " + theName + " is not defined for types " + preRes + ", " + opType,
-							this, getStored("name").index);
+						throw new EvaluationException("The operator " + name + " is not defined for types " + preRes + ", " + opType, item,
+							item.getStored("name").index);
 				} else
 					ret = toSet = null;
 			} else if(Boolean.TYPE.equals(preRes.getType().getBaseType()) && Boolean.TYPE.equals(opType.getType().getBaseType())) {
 				boolean val;
-				if("|=".equals(theName))
+				if("|=".equals(name))
 					val = ((Boolean) preRes.getValue()).booleanValue() | ((Boolean) opType.getValue()).booleanValue();
-				else if("&=".equals(theName))
+				else if("&=".equals(name))
 					val = ((Boolean) preRes.getValue()).booleanValue() & ((Boolean) opType.getValue()).booleanValue();
 				else
 					val = ((Boolean) preRes.getValue()).booleanValue() ^ ((Boolean) opType.getValue()).booleanValue();
 				ret = toSet = Boolean.valueOf(val);
 			} else
-				throw new EvaluationException("The operator " + theName + " is not defined for type " + preRes, this,
-					getStored("name").index);
-		} else if("<<=".equals(theName) || ">>=".equals(theName) || ">>>=".equals(theName)) {
+				throw new EvaluationException("The operator " + name + " is not defined for type " + preRes, item,
+					item.getStored("name").index);
+		} else if("<<=".equals(name) || ">>=".equals(name) || ">>>=".equals(name)) {
 			if(preRes.isIntType() && opType.isIntType()) {
 				if(withValues) {
 					Number op1 = Character.TYPE.equals(preRes.getType().getBaseType()) ? Integer.valueOf(((Character) preRes.getValue())
 						.charValue()) : (Number) preRes.getValue();
 					Number op2 = Character.TYPE.equals(opType.getType().getBaseType()) ? Integer.valueOf(((Character) opType.getValue())
 						.charValue()) : (Number) opType.getValue();
-					if("<<=".equals(theName)) {
+					if("<<=".equals(name)) {
 						if(Long.TYPE.equals(preRes.getType().getBaseType()))
 							ret = toSet = Long.valueOf(op1.longValue() << op2.longValue());
 						else if(Integer.TYPE.equals(preRes.getType().getBaseType()))
@@ -169,10 +174,9 @@ public class AssignmentOperatorEvaluator implements PrismsItemEvaluator<ParsedAs
 						else if(Character.TYPE.equals(preRes.getType().getBaseType()))
 							ret = toSet = Character.valueOf((char) (op1.shortValue() << op2.shortValue()));
 						else
-							throw new EvaluationException(
-								"The operator " + theName + " is not defined for types " + preRes + ", " + opType, this,
-								getStored("name").index);
-					} else if(">>=".equals(theName)) {
+							throw new EvaluationException("The operator " + name + " is not defined for types " + preRes + ", " + opType,
+								item, item.getStored("name").index);
+					} else if(">>=".equals(name)) {
 						if(Long.TYPE.equals(preRes.getType().getBaseType()))
 							ret = toSet = Long.valueOf(op1.longValue() >> op2.longValue());
 						else if(Integer.TYPE.equals(preRes.getType().getBaseType()))
@@ -184,9 +188,8 @@ public class AssignmentOperatorEvaluator implements PrismsItemEvaluator<ParsedAs
 						else if(Character.TYPE.equals(preRes.getType().getBaseType()))
 							ret = toSet = Character.valueOf((char) (op1.shortValue() >> op2.shortValue()));
 						else
-							throw new EvaluationException(
-								"The operator " + theName + " is not defined for types " + preRes + ", " + opType, this,
-								getStored("name").index);
+							throw new EvaluationException("The operator " + name + " is not defined for types " + preRes + ", " + opType,
+								item, item.getStored("name").index);
 					} else {
 						if(Long.TYPE.equals(preRes.getType().getBaseType()))
 							ret = toSet = Long.valueOf(op1.longValue() >>> op2.longValue());
@@ -199,23 +202,25 @@ public class AssignmentOperatorEvaluator implements PrismsItemEvaluator<ParsedAs
 						else if(Character.TYPE.equals(preRes.getType().getBaseType()))
 							ret = toSet = Character.valueOf((char) (op1.shortValue() >>> op2.shortValue()));
 						else
-							throw new EvaluationException(
-								"The operator " + theName + " is not defined for types " + preRes + ", " + opType, this,
-								getStored("name").index);
+							throw new EvaluationException("The operator " + name + " is not defined for types " + preRes + ", " + opType,
+								item, item.getStored("name").index);
 					}
 				} else
 					ret = toSet = null;
 			} else
-				throw new EvaluationException("The operator " + theName + " is not defined for type " + preRes, this,
-					getStored("name").index);
+				throw new EvaluationException("The operator " + name + " is not defined for type " + preRes, item,
+					item.getStored("name").index);
 		} else
-			throw new EvaluationException("Assignment operator " + theName + " not recognized", this, getStored("name").index);
+			throw new EvaluationException("Assignment operator " + name + " not recognized", item, item.getStored("name").index);
 
 		if(!withValues)
 			return preRes;
 		if(preRes == null)
 			preRes = opType;
-		a.assign(new EvaluationResult(preRes.getType(), toSet), env, this);
+		if(!(eval.getEvaluatorFor(a.getClass()) instanceof AssignableEvaluator))
+			throw new EvaluationException("No assignable evaluator configured for " + a.getClass().getName(), item, a.getMatch().index);
+		AssignableEvaluator<Assignable> evaluator = (AssignableEvaluator<Assignable>) eval.getEvaluatorFor(a.getClass());
+		evaluator.assign(a, new EvaluationResult(preRes.getType(), toSet), eval, env, item);
 		return new EvaluationResult(preRes.getType(), ret);
 	}
 }

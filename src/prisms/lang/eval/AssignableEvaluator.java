@@ -5,6 +5,7 @@ import prisms.lang.EvaluationEnvironment;
 import prisms.lang.EvaluationException;
 import prisms.lang.EvaluationResult;
 import prisms.lang.types.Assignable;
+import prisms.lang.types.ParsedAssignmentOperator;
 
 /**
  * Marks a parsed item as being capable of being assigned to a value
@@ -21,7 +22,7 @@ public interface AssignableEvaluator<T extends Assignable> extends PrismsItemEva
 	 * @return The current value of the variable being assigned
 	 * @throws prisms.lang.EvaluationException If an error occurs getting the current value
 	 */
-	EvaluationResult getValue(T item, PrismsEvaluator eval, EvaluationEnvironment env, AssignmentOperatorEvaluator assign)
+	EvaluationResult getValue(T item, PrismsEvaluator eval, EvaluationEnvironment env, ParsedAssignmentOperator assign)
 		throws EvaluationException;
 
 	/**
@@ -32,6 +33,6 @@ public interface AssignableEvaluator<T extends Assignable> extends PrismsItemEva
 	 * @param assign The assignment operator that is assigning the variable
 	 * @throws prisms.lang.EvaluationException If an error occurs assigning the value
 	 */
-	void assign(T item, EvaluationResult value, PrismsEvaluator eval, EvaluationEnvironment env, AssignmentOperatorEvaluator assign)
+	void assign(T item, EvaluationResult value, PrismsEvaluator eval, EvaluationEnvironment env, ParsedAssignmentOperator assign)
 		throws EvaluationException;
 }

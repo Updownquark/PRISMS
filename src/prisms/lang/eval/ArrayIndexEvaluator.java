@@ -4,6 +4,7 @@ import prisms.lang.EvaluationEnvironment;
 import prisms.lang.EvaluationException;
 import prisms.lang.EvaluationResult;
 import prisms.lang.types.ParsedArrayIndex;
+import prisms.lang.types.ParsedAssignmentOperator;
 
 /** Parses an array index operation */
 public class ArrayIndexEvaluator implements AssignableEvaluator<ParsedArrayIndex> {
@@ -26,14 +27,14 @@ public class ArrayIndexEvaluator implements AssignableEvaluator<ParsedArrayIndex
 	}
 
 	@Override
-	public EvaluationResult getValue(ParsedArrayIndex item, PrismsEvaluator eval, EvaluationEnvironment env, AssignmentOperatorEvaluator assign)
+	public EvaluationResult getValue(ParsedArrayIndex item, PrismsEvaluator eval, EvaluationEnvironment env, ParsedAssignmentOperator assign)
 		throws EvaluationException {
 		return evaluate(item, eval, env, false, true);
 	}
 
 	@Override
 	public void assign(ParsedArrayIndex item, EvaluationResult value, PrismsEvaluator eval, EvaluationEnvironment env,
-		AssignmentOperatorEvaluator assign) throws EvaluationException {
+		ParsedAssignmentOperator assign) throws EvaluationException {
 		int index = ((Number) eval.evaluate(item.getIndex(), env, false, true).getValue()).intValue();
 		EvaluationResult res = eval.evaluate(item.getArray(), env, false, true);
 		java.lang.reflect.Array.set(res.getValue(), index, value.getValue());
