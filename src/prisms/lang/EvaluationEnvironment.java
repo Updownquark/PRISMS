@@ -149,7 +149,7 @@ public interface EvaluationEnvironment
 
 	/**
 	 * Stores a function for later use
-	 * 
+	 *
 	 * @param function The function to store
 	 */
 	void declareFunction(prisms.lang.types.ParsedFunctionDeclaration function);
@@ -207,14 +207,14 @@ public interface EvaluationEnvironment
 
 	/**
 	 * Allows types to be imported so they can be referred to by name instead of fully-qualified
-	 * 
+	 *
 	 * @param type The type to import
 	 */
 	void addImportType(Class<?> type);
 
 	/**
 	 * Allows all classes in a package to be imported so they can be referred to by name instead of fully-qualified
-	 * 
+	 *
 	 * @param packageName The name of the package to import
 	 */
 	void addImportPackage(String packageName);
@@ -239,7 +239,7 @@ public interface EvaluationEnvironment
 
 	/**
 	 * Allows a static method to be imported so it can be referred to by name without a class name qualifier
-	 * 
+	 *
 	 * @param type The type that the method belongs to
 	 * @param method The name of the method to import
 	 */
@@ -259,7 +259,7 @@ public interface EvaluationEnvironment
 
 	/**
 	 * Creates a new scope or subscope with this environment as a parent
-	 * 
+	 *
 	 * @param dependent Whether the new scope can use variables from this scope dynamically. If this is false, only
 	 *        those variables that are declared as final and have been initialized will be copied into the new
 	 *        environment.
@@ -270,7 +270,7 @@ public interface EvaluationEnvironment
 	/**
 	 * Creates a new evaluation environment that is a copy of this one, where modifications can be done without
 	 * affecting this environment.
-	 * 
+	 *
 	 * @return The transaction environment
 	 */
 	EvaluationEnvironment transact();
@@ -289,7 +289,7 @@ public interface EvaluationEnvironment
 
 	/**
 	 * Saves this environment to a stream
-	 * 
+	 *
 	 * @param out The stream to write this environment to
 	 * @return Variables that failed to serialize
 	 * @throws java.io.IOException If an error occurs serializing this environment
@@ -298,10 +298,11 @@ public interface EvaluationEnvironment
 
 	/**
 	 * Populates this environment's data from a stream
-	 * 
-	 * @param in The stream to read this environment's data fro,
+	 *
+	 * @param in The stream to read this environment's data for,
 	 * @param parser The parser to parse serialized expressions with
+	 * @param eval The evaluator to evaluate serialized variables with
 	 * @throws java.io.IOException If an error occurs deserializing the environment
 	 */
-	void load(java.io.InputStream in, PrismsParser parser) throws java.io.IOException;
+	void load(java.io.InputStream in, PrismsParser parser, prisms.lang.eval.PrismsEvaluator eval) throws java.io.IOException;
 }

@@ -199,15 +199,4 @@ public abstract class ParsedItem
 	 * @throws IllegalArgumentException If the given dependent cannot be replaced or the given replacement cannot replace the dependent
 	 */
 	public abstract void replace(ParsedItem dependent, ParsedItem toReplace) throws IllegalArgumentException;
-
-	/**
-	 * Validates or evaluates this expression. This method should never be called if this item's match is incomplete.
-	 * 
-	 * @param env The evaluation environment to execute in
-	 * @param asType Whether the result should be a type if possible
-	 * @param withValues Whether to evaluate the value of the expression, or simply validate it and return its type
-	 * @return The result of the expression
-	 * @throws EvaluationException If an error occurs evaluating the expression
-	 */
-	public abstract EvaluationResult evaluate(EvaluationEnvironment env, boolean asType, boolean withValues) throws EvaluationException;
 }

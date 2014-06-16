@@ -955,6 +955,8 @@ public class PrismsParser {
 		System.out.println("Finished configuring parser");
 		parser.validateConfig();
 		System.out.println("Parser configuration validated");
+		prisms.lang.eval.PrismsEvaluator eval = new prisms.lang.eval.PrismsEvaluator();
+		prisms.lang.eval.DefaultEvaluation.initializeDefaults(eval);
 		EvaluationEnvironment env = new DefaultEvaluationEnvironment();
 		StringBuilder line = new StringBuilder();
 		try (Reader reader = new java.io.InputStreamReader(PrismsParser.class.getResourceAsStream("UnitTest.txt"))) {
@@ -979,8 +981,8 @@ public class PrismsParser {
 						ParsedItem [] items = parser.parseStructures(new ParseStructRoot(line.toString()), matches);
 
 						for(ParsedItem item : items) {
-							item.evaluate(env.transact(), false, false);
-							EvaluationResult result = item.evaluate(env, false, true);
+							eval.evaluate(item, env.transact(), false, false);
+							EvaluationResult result = eval.evaluate(item, env, false, true);
 							if(result != null && !Void.TYPE.equals(result.getType())) {
 								System.out.println(ArrayUtils.toString(result.getValue()));
 								if(!(item instanceof prisms.lang.types.ParsedPreviousAnswer))

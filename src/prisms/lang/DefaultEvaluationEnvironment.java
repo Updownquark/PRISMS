@@ -5,6 +5,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import prisms.lang.eval.PrismsEvaluator;
 import prisms.lang.types.ParsedFunctionDeclaration;
 import prisms.util.ProgramTracker;
 import prisms.util.json.JsonSerialReader.StructState;
@@ -66,11 +67,11 @@ public class DefaultEvaluationEnvironment implements EvaluationEnvironment {
 			theClassGetter = cg;
 		if(canOverride)
 			theHistory = new ArrayList<>();
-			if(canOverride || transaction) {
-				theImportTypes = new HashMap<>();
-				theImportMethods = new HashMap<>();
-				theImportPackages = new java.util.HashSet<>();
-			}
+		if(canOverride || transaction) {
+			theImportTypes = new HashMap<>();
+			theImportMethods = new HashMap<>();
+			theImportPackages = new java.util.HashSet<>();
+		}
 	}
 
 	/** @param publicOnly Whether evaluations in this environment should see only public methods */
@@ -99,7 +100,7 @@ public class DefaultEvaluationEnvironment implements EvaluationEnvironment {
 
 	/**
 	 * Checks for a variable within or beyond the current scope, which may still be larger than just this instance
-	 * 
+	 *
 	 * @param name The name of the variable to get the type of
 	 * @param lookBack Whether to look beyond the current scope
 	 * @return The type of the variable, or null if none has been declared
@@ -608,7 +609,7 @@ public class DefaultEvaluationEnvironment implements EvaluationEnvironment {
 	}
 
 	@Override
-	public void load(InputStream in, PrismsParser parser) throws IOException {
+	public void load(InputStream in, PrismsParser parser, PrismsEvaluator eval) throws IOException {
 		java.io.InputStreamReader charReader = new java.io.InputStreamReader(in);
 		prisms.util.json.JsonSerialReader jsonReader = new prisms.util.json.JsonSerialReader(charReader);
 
@@ -620,7 +621,7 @@ public class DefaultEvaluationEnvironment implements EvaluationEnvironment {
 			while(jsonReader.getNextItem(true, false) instanceof prisms.util.json.JsonSerialReader.ObjectItem) {
 				StructState varState = jsonReader.save();
 				try {
-					Variable var = parseNextVariable(jsonReader, hexReader, parser);
+					Variable var = parseNextVariable(jsonReader, hexReader, parser, eval);
 					theVariables.put(var.getName(), var);
 				} catch(IOException e) {
 					e.printStackTrace();
@@ -701,7 +702,7 @@ public class DefaultEvaluationEnvironment implements EvaluationEnvironment {
 			while(jsonReader.getNextItem(true, false) instanceof prisms.util.json.JsonSerialReader.ObjectItem) {
 				StructState histState = jsonReader.save();
 				try {
-					Variable var = parseNextVariable(jsonReader, hexReader, parser);
+					Variable var = parseNextVariable(jsonReader, hexReader, parser, eval);
 					theHistory.add(var);
 				} catch(IOException e) {
 					e.printStackTrace();
@@ -719,7 +720,7 @@ public class DefaultEvaluationEnvironment implements EvaluationEnvironment {
 	}
 
 	private Variable parseNextVariable(prisms.util.json.JsonSerialReader jsonReader, prisms.util.HexStreamReader hexReader,
-		PrismsParser parser) throws IOException, prisms.util.json.SAJParser.ParseException {
+		PrismsParser parser, PrismsEvaluator eval) throws IOException, prisms.util.json.SAJParser.ParseException {
 		if(!"name".equals(jsonReader.getNextProperty()))
 			throw new IOException("Unrecognizable JSON stream--variable has no name");
 		String name = jsonReader.parseString();
@@ -729,7 +730,7 @@ public class DefaultEvaluationEnvironment implements EvaluationEnvironment {
 		ParseStructRoot root = new ParseStructRoot(typeName);
 		Type type;
 		try {
-			type = parser.parseStructures(root, parser.parseMatches(typeName))[0].evaluate(this, true, false).getType();
+			type = eval.evaluate(parser.parseStructures(root, parser.parseMatches(typeName))[0], this, true, false).getType();
 		} catch(ParseException e) {
 			throw new IOException("Could not parse type \"" + typeName + "\" of variable " + name, e);
 		} catch(EvaluationException e) {
