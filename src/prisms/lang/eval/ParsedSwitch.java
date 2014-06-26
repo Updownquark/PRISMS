@@ -178,7 +178,7 @@ public class ParsedSwitch extends ParsedItem
 				}
 				else if(case_c instanceof ParsedNull)
 					throw new prisms.lang.EvaluationException("Null not allowed for case statement", this, case_c.getMatch().index);
-				else if(case_c instanceof ParsedBoolean)
+				else if(case_c instanceof PrimitiveEvaluator)
 				{
 					throw new prisms.lang.EvaluationException("type mismatch: cannot convert from boolean to " + var.getType(), case_c,
 						case_c.getMatch().index);

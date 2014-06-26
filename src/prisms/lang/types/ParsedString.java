@@ -1,32 +1,22 @@
-/*
- * ParsedString.java Created Nov 11, 2011 by Andrew Butler, PSL
- */
+/* ParsedString.java Created Nov 11, 2011 by Andrew Butler, PSL */
 package prisms.lang.types;
 
-import prisms.lang.ParsedItem;
+import prisms.lang.ParseException;
 
 /** Represents a character string */
-public class ParsedString extends prisms.lang.ParsedItem
-{
-	private String theValue;
-
+public class ParsedString extends ParsedPrimitive {
 	@Override
-	public void setup(prisms.lang.PrismsParser parser, prisms.lang.ParsedItem parent, prisms.lang.ParseMatch match)
-		throws prisms.lang.ParseException
-	{
-		super.setup(parser, parent, match);
-		String val = getStored("value").text;
-		theValue = unescape(val);
+	public Object parseValue(String text) throws ParseException {
+		return unescape(text);
 	}
 
 	/** @return The parsed string that this structure represents */
-	public String getValue()
-	{
-		return theValue;
+	@Override
+	public String getValue() {
+		return (String) super.getValue();
 	}
 
-	static String unescape(String str)
-	{
+	static String unescape(String str) {
 		StringBuilder ret = new StringBuilder(str);
 		prisms.util.PrismsUtils.replaceAll(ret, "\\\"", "\"");
 		prisms.util.PrismsUtils.replaceAll(ret, "\\n", "\n");
@@ -34,8 +24,7 @@ public class ParsedString extends prisms.lang.ParsedItem
 		return prisms.util.PrismsUtils.decodeUnicode(ret.toString());
 	}
 
-	static String escape(String str)
-	{
+	static String escape(String str) {
 		StringBuilder ret = new StringBuilder(str);
 		prisms.util.PrismsUtils.replaceAll(ret, "\"", "\\\"");
 		prisms.util.PrismsUtils.replaceAll(ret, "\n", "\\n");
@@ -45,26 +34,7 @@ public class ParsedString extends prisms.lang.ParsedItem
 	}
 
 	@Override
-	public prisms.lang.ParsedItem[] getDependents()
-	{
-		return new prisms.lang.ParsedItem [0];
-	}
-
-	@Override
-	public void replace(ParsedItem dependent, ParsedItem toReplace) throws IllegalArgumentException {
-		throw new IllegalArgumentException("No such dependent " + dependent);
-	}
-
-	@Override
-	public String toString()
-	{
-		return "\"" + escape(theValue) + "\"";
-	}
-
-	@Override
-	public prisms.lang.EvaluationResult evaluate(prisms.lang.EvaluationEnvironment env, boolean asType,
-		boolean withValues) throws prisms.lang.EvaluationException
-	{
-		return new prisms.lang.EvaluationResult(new prisms.lang.Type(String.class), theValue);
+	public String toString() {
+		return "\"" + escape(getValue()) + "\"";
 	}
 }

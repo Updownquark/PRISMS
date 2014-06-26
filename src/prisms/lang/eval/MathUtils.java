@@ -1,36 +1,85 @@
-package prisms.lang;
+package prisms.lang.eval;
+
+import prisms.lang.Type;
 
 public class MathUtils {
 	public static Number unaryOp(String op, Object value) {
-		if("+".equals(op))
+		switch (op) {
+		case "+":
 			return posit(value);
-		else if("-".equals(op))
+		case "-":
 			return negate(value);
-		else if("~".equals(op))
+		case "~":
 			return complement(value);
-		else
-			throw new IllegalArgumentException("Unrecognized operator: " + op);
+		}
+		throw new IllegalArgumentException("Unrecognized operator: " + op);
 	}
 
-	public static Number binaryOp(String op, Type t1, Object value1, Type t2, Object value2) {
-		if("+".equals(op))
+	public static Number binaryMathOp(String op, Type t1, Object value1, Type t2, Object value2) {
+		switch (op) {
+		case "+":
 			return add(t1, value1, t2, value2);
-		else if("-".equals(op))
+		case "-":
 			return subtract(t1, value1, t2, value2);
-		else if("*".equals(op))
+		case "*":
 			return multiply(t1, value1, t2, value2);
-		else if("/".equals(op))
+		case "/":
 			return divide(t1, value1, t2, value2);
-		else if("%".equals(op))
+		case "%":
 			return modulo(t1, value1, t2, value2);
-		else if("<<".equals(op))
+		case "<<":
 			return leftShift(t1, value1, t2, value2);
-		else if(">>".equals(op))
+		case ">>":
 			return rightShift(t1, value1, t2, value2);
-		else if(">>>".equals(op))
+		case ">>>":
 			return rightShiftUnsigned(t1, value1, t2, value2);
-		else
-			throw new IllegalArgumentException("Unrecognized operator: " + op);
+		}
+		throw new IllegalArgumentException("Unrecognized operator: " + op);
+	}
+
+	public static boolean compare(String op, Type t1, Object v1, Type t2, Object v2) {
+		int comp = compare(t1, v1, t2, v2);
+		switch (op) {
+		case ">":
+			return comp > 0;
+		case ">=":
+			return comp >= 0;
+		case "<":
+			return comp < 0;
+		case "<=":
+			return comp <= 0;
+		case "==":
+			return comp == 0;
+		case "!=":
+			return comp != 0;
+		}
+		throw new IllegalArgumentException("Unrecognized comparison operatior: " + op);
+	}
+
+	public static int compare(Type t1, Object v1, Type t2, Object v2) {
+		if(t1 == null)
+			t1 = new Type(Type.getPrimitiveType(v1.getClass()));
+		if(t2 == null)
+			t2 = new Type(Type.getPrimitiveType(v2.getClass()));
+		if(t1.canAssignTo(Integer.TYPE) && t2.canAssignTo(Integer.TYPE)) {
+			Type intType = new Type(Integer.TYPE);
+			int diff = ((Number) intType.cast(v1)).intValue() - ((Number) intType.cast(v2)).intValue();
+			return diff > 0 ? 1 : (diff < 0 ? -1 : 0);
+		} else if(t1.canAssignTo(Long.TYPE) && t2.canAssignTo(Long.TYPE)) {
+			Type longType = new Type(Long.TYPE);
+			long diff = ((Number) longType.cast(v1)).longValue() - ((Number) longType.cast(v2)).longValue();
+			return diff > 0 ? 1 : (diff < 0 ? -1 : 0);
+		} else if(t1.canAssignTo(Float.TYPE) && t2.canAssignTo(Float.TYPE)) {
+			Type floatType = new Type(Float.TYPE);
+			float diff = ((Number) floatType.cast(v1)).floatValue() - ((Number) floatType.cast(v2)).floatValue();
+			return diff > 0 ? 1 : (diff < 0 ? -1 : 0);
+		} else if(t1.canAssignTo(Double.TYPE) && t2.canAssignTo(Double.TYPE)) {
+			Type doubleType = new Type(Double.TYPE);
+			double diff = ((Number) doubleType.cast(v1)).doubleValue() - ((Number) doubleType.cast(v2)).doubleValue();
+			return diff > 0 ? 1 : (diff < 0 ? -1 : 0);
+		} else
+			throw new IllegalArgumentException("MathUtils.compare() cannot be applied to operand types " + t1 + " and " + t2);
+
 	}
 
 	public static Number posit(Object value) {

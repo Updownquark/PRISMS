@@ -1,57 +1,27 @@
-/*
- * ParsedChar.java Created Nov 15, 2011 by Andrew Butler, PSL
- */
+/* ParsedChar.java Created Nov 15, 2011 by Andrew Butler, PSL */
 package prisms.lang.types;
 
-import prisms.lang.ParsedItem;
+import prisms.lang.ParseException;
 
 /** Represents a character literal */
-public class ParsedChar extends prisms.lang.ParsedItem
-{
-	private char theValue;
-
+public class ParsedChar extends ParsedPrimitive {
 	@Override
-	public void setup(prisms.lang.PrismsParser parser, prisms.lang.ParsedItem parent, prisms.lang.ParseMatch match)
-		throws prisms.lang.ParseException
-	{
-		super.setup(parser, parent, match);
-		String value = getStored("value").text;
-		value = prisms.util.PrismsUtils.decodeUnicode(value);
-		if(value.length() != 1)
-			throw new prisms.lang.ParseException("Invalid character constant", getRoot().getFullCommand(),
-				getStored("value").index);
-		theValue = value.charAt(0);
-	}
-
-	/** @return The value of this character */
-	public char getValue()
-	{
-		return theValue;
+	public Object parseValue(String text) throws ParseException {
+		text = prisms.util.PrismsUtils.decodeUnicode(text);
+		if(text.length() != 1)
+			throw new ParseException("Invalid character constant", getRoot().getFullCommand(), getStored("value").index);
+		return text.charAt(0);
 	}
 
 	@Override
-	public prisms.lang.ParsedItem[] getDependents()
-	{
-		return new prisms.lang.ParsedItem [0];
+	public Character getValue() {
+		return (Character) super.getValue();
 	}
 
 	@Override
-	public void replace(ParsedItem dependent, ParsedItem toReplace) throws IllegalArgumentException {
-		throw new IllegalArgumentException("No such dependent " + dependent);
-	}
-
-	@Override
-	public String toString()
-	{
-		StringBuilder ret = new StringBuilder('\'').append(theValue).append('\'');
+	public String toString() {
+		StringBuilder ret = new StringBuilder('\'').append(getValue().charValue()).append('\'');
 		prisms.util.PrismsUtils.encodeUnicode(ret);
 		return ret.toString();
-	}
-
-	@Override
-	public prisms.lang.EvaluationResult evaluate(prisms.lang.EvaluationEnvironment env, boolean asType,
-		boolean withValues) throws prisms.lang.EvaluationException
-	{
-		return new prisms.lang.EvaluationResult(new prisms.lang.Type(Character.TYPE), Character.valueOf(theValue));
 	}
 }

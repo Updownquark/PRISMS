@@ -3,7 +3,6 @@ package prisms.lang.eval;
 
 import prisms.lang.EvaluationException;
 import prisms.lang.EvaluationResult;
-import prisms.lang.MathUtils;
 import prisms.lang.types.Assignable;
 import prisms.lang.types.ParsedAssignmentOperator;
 
@@ -82,7 +81,7 @@ public class AssignmentOperatorEvaluator implements PrismsItemEvaluator<ParsedAs
 			if(preRes.getType().isMathable() && opType.getType().isMathable()) {
 				if(withValues)
 					try {
-						ret = MathUtils.binaryOp(name.substring(1), preRes.getType(), preRes.getValue(), opType.getType(),
+						ret = MathUtils.binaryMathOp(name.substring(1), preRes.getType(), preRes.getValue(), opType.getType(),
 							opType.getValue());
 					} catch(RuntimeException e) {
 						throw new EvaluationException(e.getMessage(), e, item, item.getStored("name").index);
@@ -138,7 +137,7 @@ public class AssignmentOperatorEvaluator implements PrismsItemEvaluator<ParsedAs
 			if(preRes.getType().isIntMathable() && opType.getType().isIntMathable()) {
 				if(withValues) {
 					try {
-						ret = toSet = MathUtils.binaryOp(name.substring(1), preRes.getType(), preRes.getValue(), opType.getType(),
+						ret = toSet = MathUtils.binaryMathOp(name.substring(1), preRes.getType(), preRes.getValue(), opType.getType(),
 							opType.getValue());
 					} catch(RuntimeException e) {
 						throw new EvaluationException(e.getMessage(), e, item, item.getStored("name").index);
