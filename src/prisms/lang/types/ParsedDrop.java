@@ -19,28 +19,6 @@ public class ParsedDrop extends ParsedItem {
 		}
 	}
 
-	@Override
-	public prisms.lang.EvaluationResult evaluate(prisms.lang.EvaluationEnvironment env, boolean asType, boolean withValues)
-		throws prisms.lang.EvaluationException {
-		if(theParamTypes == null) {
-			env.dropVariable(theName, this, getStored("name").index);
-			return null;
-		} else {
-			for(ParsedFunctionDeclaration func : env.getDeclaredFunctions()) {
-				if(!func.getName().equals(theName))
-					continue;
-				if(func.getParameters().length != theParamTypes.length)
-					continue;
-				for(int i = 0; i < theParamTypes.length; i++)
-					if(!func.getParameters()[i].evaluateType(env).equals(theParamTypes[i].evaluate(env, true, withValues).getType()))
-						continue;
-				env.dropFunction(func, this, getStored("name").index);
-				return null;
-			}
-			throw new prisms.lang.EvaluationException("No such function " + this, this, getStored("name").index);
-		}
-	}
-
 	/** @return The name of the variable or function to drop */
 	public String getName() {
 		return theName;

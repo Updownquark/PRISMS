@@ -3,14 +3,33 @@ package prisms.lang.types;
 
 import prisms.lang.ParseException;
 import prisms.lang.ParseMatch;
+import prisms.lang.Type;
 
 /** Represents a number literal */
-public class ParsedNumber extends ParsedPrimitive {
+public class ParsedNumber extends ParsedLiteral {
 	private static String MAX_LONG = "" + Long.MAX_VALUE;
 
 	private static String MAX_INT = "" + Integer.MAX_VALUE;
 
 	private boolean isScientific;
+
+	@Override
+	public Type getType() {
+		if(getValue() instanceof Double)
+			return new Type(Double.TYPE);
+		else if(getValue() instanceof Float)
+			return new Type(Float.TYPE);
+		else if(getValue() instanceof Long)
+			return new Type(Long.TYPE);
+		else if(getValue() instanceof Integer)
+			return new Type(Integer.TYPE);
+		else if(getValue() instanceof Short)
+			return new Type(Short.TYPE);
+		else if(getValue() instanceof Byte)
+			return new Type(Byte.TYPE);
+		else
+			throw new IllegalStateException("Unrecognized number type: " + getValue().getClass().getName());
+	}
 
 	@Override
 	public Object parseValue(String text) throws ParseException {

@@ -3,15 +3,11 @@ package prisms.lang.eval;
 
 import java.lang.reflect.Modifier;
 
-import prisms.lang.EvaluationEnvironment;
-import prisms.lang.EvaluationException;
-import prisms.lang.EvaluationResult;
-import prisms.lang.ExecutionException;
-import prisms.lang.ParseException;
-import prisms.lang.ParseMatch;
-import prisms.lang.ParsedItem;
-import prisms.lang.PrismsParser;
-import prisms.lang.Type;
+import prisms.lang.*;
+import prisms.lang.types.ParsedAssignmentOperator;
+import prisms.lang.types.ParsedDeclaration;
+import prisms.lang.types.ParsedFunctionDeclaration;
+import prisms.lang.types.ParsedMethod;
 
 /**
  * Represents one of:
@@ -21,94 +17,23 @@ import prisms.lang.Type;
  * <li><b>A method:</b> An operation with a context, in the form of ctx.fn(arg1, arg2...)</li>
  * </ul>
  */
-public class ParsedMethod extends AssignableEvaluator {
-	private String theName;
-
-	private boolean isMethod;
-
-	private prisms.lang.ParsedItem theContext;
-
-	private prisms.lang.ParsedItem[] theArguments;
-
+public class MethodEvaluator implements AssignableEvaluator<ParsedMethod> {
 	@Override
-	public void setup(PrismsParser parser, ParsedItem parent, ParseMatch match) throws ParseException {
-		super.setup(parser, parent, match);
-		theName = getStored("name").text;
-		isMethod = getStored("method") != null;
-		ParseMatch miMatch = getStored("context");
-		if(miMatch != null)
-			theContext = parser.parseStructures(this, miMatch)[0];
-		theArguments = parser.parseStructures(this, getAllStored("parameter"));
-	}
-
-	/** @return The name of this field or method */
-	public String getName() {
-		return theName;
-	}
-
-	/** @return Whether this represents a method or a field */
-	public boolean isMethod() {
-		return isMethod;
-	}
-
-	/** @return The instance on which this field or method was invoked */
-	public ParsedItem getContext() {
-		return theContext;
-	}
-
-	/** @return The arguments to this method */
-	public ParsedItem [] getArguments() {
-		return theArguments;
-	}
-
-	@Override
-	public ParsedItem [] getDependents() {
-		ParsedItem [] ret = theArguments;
-		if(theContext != null)
-			ret = prisms.util.ArrayUtils.add(theArguments, theContext, 0);
-		return ret;
-	}
-
-	@Override
-	public void replace(ParsedItem dependent, ParsedItem toReplace) throws IllegalArgumentException {
-		for(int i = 0; i < theArguments.length; i++)
-			if(theArguments[i] == dependent) {
-				theArguments[i] = toReplace;
-				return;
-			}
-		throw new IllegalArgumentException("No such dependent " + dependent);
-	}
-
-	@Override
-	public String toString() {
-		StringBuilder ret = new StringBuilder();
-		if(theContext != null)
-			ret.append(theContext.toString()).append('.');
-		ret.append(theName);
-		if(isMethod) {
-			ret.append('(');
-			for(int i = 0; i < theArguments.length; i++) {
-				if(i > 0)
-					ret.append(", ");
-				ret.append(theArguments[i].toString());
-			}
-			ret.append(')');
-		}
-		return ret.toString();
-	}
-
-	@Override
-	public EvaluationResult evaluate(EvaluationEnvironment env, boolean asType, boolean withValues) throws EvaluationException {
+	public EvaluationResult evaluate(ParsedMethod item, PrismsEvaluator evaluator, EvaluationEnvironment env, boolean asType,
+		boolean withValues) throws EvaluationException {
+		DeclarationEvaluator decEval = new DeclarationEvaluator();
+		FunctionDeclarationEvaluator funcEval = new FunctionDeclarationEvaluator();
+		String name = item.getName();
 		EvaluationResult ctxType;
-		EvaluationResult [] argRes = new EvaluationResult[theArguments.length];
+		EvaluationResult [] argRes = new EvaluationResult[item.getArguments().length];
 		for(int i = 0; i < argRes.length; i++) {
-			argRes[i] = theArguments[i].evaluate(env, false, withValues);
+			argRes[i] = evaluator.evaluate(item.getArguments()[i], env, false, withValues);
 			if(argRes[i].getPackageName() != null || argRes[i].isType())
-				throw new EvaluationException(argRes[i].getFirstVar() + " cannot be resolved to a variable", this,
-					theArguments[i].getMatch().index);
+				throw new EvaluationException(argRes[i].getFirstVar() + " cannot be resolved to a variable", item,
+					item.getArguments()[i].getMatch().index);
 		}
-		if(theContext == null) {
-			Class<?> c = env.getImportMethodType(theName);
+		if(item.getContext() == null) {
+			Class<?> c = env.getImportMethodType(name);
 			if(c != null)
 				ctxType = new EvaluationResult(new Type(c));
 			else {
@@ -116,7 +41,7 @@ public class ParsedMethod extends AssignableEvaluator {
 				ParsedFunctionDeclaration goodTarget = null;
 				ParsedFunctionDeclaration badTarget = null;
 				for(ParsedFunctionDeclaration func : funcs) {
-					if(!func.getName().equals(theName))
+					if(!func.getName().equals(name))
 						continue;
 
 					Type [] paramTypes;
@@ -124,7 +49,7 @@ public class ParsedMethod extends AssignableEvaluator {
 					ParsedDeclaration [] _paramTypes = func.getParameters();
 					paramTypes = new Type[_paramTypes.length];
 					for(p = 0; p < paramTypes.length; p++)
-						paramTypes[p] = _paramTypes[p].evaluateType(env);
+						paramTypes[p] = decEval.evaluateType(_paramTypes[p], evaluator, env);
 					if(!func.isVarArgs() && paramTypes.length != argRes.length)
 						continue;
 					if(paramTypes.length > argRes.length + 1)
@@ -175,20 +100,21 @@ public class ParsedMethod extends AssignableEvaluator {
 					break;
 				}
 				if(goodTarget != null)
-					return goodTarget.execute(env, argRes, withValues);
+					return funcEval.execute(goodTarget, evaluator, env, argRes, withValues);
 				else if(badTarget != null) {
 					StringBuilder msg = new StringBuilder();
-					msg.append(theName).append('(');
+					msg.append(name).append('(');
 					ParsedDeclaration [] paramTypes = badTarget.getParameters();
 					int p;
 					for(p = 0; p < paramTypes.length - 1; p++) {
-						msg.append(paramTypes[p].getType().evaluate(env, true, withValues).getType());
+						msg.append(evaluator.evaluate(paramTypes[p].getType(), env, true, withValues).getType());
 						msg.append(", ");
 					}
 					if(badTarget.isVarArgs())
-						msg.append(paramTypes[p].getType().evaluate(env, true, withValues).getType().getComponentType()).append("...");
+						msg.append(evaluator.evaluate(paramTypes[p].getType(), env, true, withValues).getType().getComponentType()).append(
+							"...");
 					else
-						msg.append(paramTypes[p].getType().evaluate(env, true, withValues).getType());
+						msg.append(evaluator.evaluate(paramTypes[p].getType(), env, true, withValues).getType());
 					msg.append(')');
 					StringBuilder types = new StringBuilder();
 					for(p = 0; p < argRes.length; p++) {
@@ -196,64 +122,64 @@ public class ParsedMethod extends AssignableEvaluator {
 							types.append(", ");
 						types.append(argRes[p].getType());
 					}
-					throw new EvaluationException("The function " + msg + " is undefined for parameter types " + types, this,
-						getStored("name").index);
+					throw new EvaluationException("The function " + msg + " is undefined for parameter types " + types, item,
+						item.getStored("name").index);
 				} else
-					throw new EvaluationException((isMethod ? "Method " : "Field ") + theName + " unrecognized", this,
-						getStored("name").index);
+					throw new EvaluationException((item.isMethod() ? "Method " : "Field ") + name + " unrecognized", item,
+						item.getStored("name").index);
 			}
 		} else
-			ctxType = theContext.evaluate(env, false, withValues);
+			ctxType = evaluator.evaluate(item.getContext(), env, false, withValues);
 		if(ctxType == null)
-			throw new EvaluationException("No value for context to " + (isMethod ? "method " : "field ") + theName, this,
-				theContext.getMatch().index);
+			throw new EvaluationException("No value for context to " + (item.isMethod() ? "method " : "field ") + name, item, item
+				.getContext().getMatch().index);
 		boolean isStatic = ctxType.isType();
-		if(!isMethod) {
+		if(!item.isMethod()) {
 			if(ctxType.getPackageName() != null || ctxType.isType()) {
 				// Could be a class name or a more specific package name
-				String name;
+				String typeName;
 				if(ctxType.getPackageName() != null)
-					name = ctxType.getPackageName() + "." + theName;
+					typeName = ctxType.getPackageName() + "." + name;
 				else
-					name = ctxType.getType().toString() + "$" + theName;
-				java.lang.Class<?> clazz = env.getClassGetter().getClass(name);
+					typeName = ctxType.getType().toString() + "$" + name;
+				java.lang.Class<?> clazz = env.getClassGetter().getClass(typeName);
 				if(clazz != null)
 					return new EvaluationResult(new Type(clazz));
-				if(env.getClassGetter().isPackage(name))
-					return new EvaluationResult(name);
+				if(env.getClassGetter().isPackage(typeName))
+					return new EvaluationResult(typeName);
 				if(!ctxType.isType())
-					throw new EvaluationException(ctxType.getFirstVar() + " cannot be resolved to a variable", this,
-						theContext.getMatch().index);
+					throw new EvaluationException(ctxType.getFirstVar() + " cannot be resolved to a variable", item, item.getContext()
+						.getMatch().index);
 			}
 			if(!ctxType.isType() && ctxType.getType().isPrimitive())
 				throw new EvaluationException("The primitive type " + ctxType.getType().getBaseType().getName() + " does not have a field "
-					+ theName, this, theContext.getMatch().index + theContext.getMatch().text.length());
-			if(theName.equals("length") && ctxType.getType().isArray())
+					+ name, item, item.getContext().getMatch().index + item.getContext().getMatch().text.length());
+			if(name.equals("length") && ctxType.getType().isArray())
 				return new EvaluationResult(new Type(Integer.TYPE), withValues ? Integer.valueOf(java.lang.reflect.Array.getLength(ctxType
 					.getValue())) : null);
-			else if(theName.equals("class") && ctxType.isType())
+			else if(name.equals("class") && ctxType.isType())
 				return new EvaluationResult(new Type(Class.class, ctxType.getType()), ctxType.getType().getBaseType());
 			java.lang.reflect.Field field;
 			try {
-				field = ctxType.getType().getBaseType().getField(theName);
+				field = ctxType.getType().getBaseType().getField(name);
 			} catch(Exception e) {
-				throw new EvaluationException("Could not access field " + theName + " on type " + ctxType.typeString(), e, this,
-					getStored("name").index);
+				throw new EvaluationException("Could not access field " + name + " on type " + ctxType.typeString(), e, item,
+					item.getStored("name").index);
 			}
 			if(field == null)
-				throw new EvaluationException(ctxType.typeString() + "." + theName + " cannot be resolved or is not a field", this,
-					getStored("name").index);
+				throw new EvaluationException(ctxType.typeString() + "." + name + " cannot be resolved or is not a field", item,
+					item.getStored("name").index);
 			if(env.usePublicOnly() && (field.getModifiers() & Modifier.PUBLIC) == 0)
-				throw new EvaluationException(ctxType.typeString() + "." + theName + " is not visible", this, getStored("name").index);
+				throw new EvaluationException(ctxType.typeString() + "." + name + " is not visible", item, item.getStored("name").index);
 			if(isStatic && (field.getModifiers() & Modifier.STATIC) == 0)
-				throw new EvaluationException("Cannot make a static reference to non-static field " + theName + " from the type "
-					+ ctxType.typeString() + "." + theName + " is not static", this, getStored("name").index);
+				throw new EvaluationException("Cannot make a static reference to non-static field " + name + " from the type "
+					+ ctxType.typeString() + "." + name + " is not static", item, item.getStored("name").index);
 			if(withValues && !field.isAccessible() && !env.usePublicOnly()) {
 				try {
 					field.setAccessible(true);
 				} catch(SecurityException e) {
 					throw new EvaluationException("Field " + field.getName() + " of type " + field.getDeclaringClass().getName()
-						+ " cannot be accessed from the current security context", this, getStored("name").index);
+						+ " cannot be accessed from the current security context", item, item.getStored("name").index);
 				}
 			}
 			try {
@@ -261,15 +187,15 @@ public class ParsedMethod extends AssignableEvaluator {
 					new java.lang.reflect.Type[0], new Type[0]), withValues ? field.get(ctxType.getValue()) : null);
 			} catch(Exception e) {
 				throw new EvaluationException("Retrieval of field " + field.getName() + " of type " + field.getDeclaringClass().getName()
-					+ " failed", e, this, getStored("name").index);
+					+ " failed", e, item, item.getStored("name").index);
 			}
 		} else {
 			if(ctxType.getPackageName() != null)
-				throw new EvaluationException(ctxType.getFirstVar() + " cannot be resolved to a variable", this,
-					theContext.getMatch().index);
+				throw new EvaluationException(ctxType.getFirstVar() + " cannot be resolved to a variable", item, item.getContext()
+					.getMatch().index);
 			if(!ctxType.isType() && ctxType.getType().isPrimitive()) {
 				StringBuilder msg = new StringBuilder();
-				msg.append(theName).append('(');
+				msg.append(name).append('(');
 				int p;
 				for(p = 0; p < argRes.length; p++) {
 					if(p > 0)
@@ -277,20 +203,20 @@ public class ParsedMethod extends AssignableEvaluator {
 					msg.append(argRes[p].typeString());
 				}
 				msg.append(')');
-				throw new EvaluationException("Cannot invoke " + msg + " on primitive type " + ctxType.getType(), this,
-					theContext.getMatch().index + theContext.getMatch().text.length());
+				throw new EvaluationException("Cannot invoke " + msg + " on primitive type " + ctxType.getType(), item, item.getContext()
+					.getMatch().index + item.getContext().getMatch().text.length());
 			}
-			if("getClass".equals(theName)) {
+			if("getClass".equals(name)) {
 				if(isStatic)
-					throw new EvaluationException("Cannot access the non-static getClass() method from a static context", this,
-						getStored("name").index);
+					throw new EvaluationException("Cannot access the non-static getClass() method from a static context", item,
+						item.getStored("name").index);
 				try {
 					return new EvaluationResult(new Type(Class.class, ctxType.getType()), withValues ? ctxType.getValue().getClass() : null);
 				} catch(NullPointerException e) {
-					throw new EvaluationException("Argument to getClass() is null", e, this, getStored("dot").index);
+					throw new EvaluationException("Argument to getClass() is null", e, item, item.getStored("dot").index);
 				}
 			}
-			java.lang.reflect.Method[] methods;
+			java.lang.reflect.Method [] methods;
 			if(ctxType.getType() == Type.NULL)
 				methods = Object.class.getMethods();
 			else
@@ -305,10 +231,10 @@ public class ParsedMethod extends AssignableEvaluator {
 			for(int i = 0; i < argTypes.length; i++)
 				argTypes[i] = argRes[i].getType();
 			for(java.lang.reflect.Method m : methods) {
-				if(!m.getName().equals(theName) || m.isSynthetic())
+				if(!m.getName().equals(name) || m.isSynthetic())
 					continue;
 
-				java.lang.reflect.Type[] _paramTypes = m.getGenericParameterTypes();
+				java.lang.reflect.Type [] _paramTypes = m.getGenericParameterTypes();
 				Type [] paramTypes = new Type[_paramTypes.length];
 				for(int p = 0; p < paramTypes.length; p++)
 					paramTypes[p] = ctxType.getType().resolve(_paramTypes[p], m.getDeclaringClass(), null, m.getGenericParameterTypes(),
@@ -374,7 +300,7 @@ public class ParsedMethod extends AssignableEvaluator {
 					Type ct = ctxType.getType().resolve(c, goodTarget.getDeclaringClass(), inferred, goodTarget.getGenericParameterTypes(),
 						argTypes);
 					if(!env.canHandle(ct))
-						throw new prisms.lang.EvaluationException("Unhandled exception type " + ct, this, getStored("name").index);
+						throw new prisms.lang.EvaluationException("Unhandled exception type " + ct, item, item.getStored("name").index);
 				}
 				Class<?> [] paramTypes = goodTarget.getParameterTypes();
 				Object [] args = new Object[paramTypes.length];
@@ -386,15 +312,15 @@ public class ParsedMethod extends AssignableEvaluator {
 				} else
 					args[args.length - 1] = argRes[argRes.length - 1].getValue();
 				if(withValues && !isStatic && !Modifier.isStatic(goodTarget.getModifiers()) && ctxType.getValue() == null)
-					throw new ExecutionException(new Type(NullPointerException.class), new NullPointerException(), theContext,
-						theContext.getMatch().index);
+					throw new ExecutionException(new Type(NullPointerException.class), new NullPointerException(), item.getContext(), item
+						.getContext().getMatch().index);
 				if(withValues && !goodTarget.isAccessible() && !env.usePublicOnly()) {
 					try {
 						goodTarget.setAccessible(true);
 					} catch(SecurityException e) {
 						throw new EvaluationException("Method " + goodTarget.getName() + " of type "
-							+ goodTarget.getDeclaringClass().getName() + " cannot be accessed from the current security context", this,
-							getStored("name").index);
+							+ goodTarget.getDeclaringClass().getName() + " cannot be accessed from the current security context", item,
+							item.getStored("name").index);
 					}
 				}
 				try {
@@ -402,15 +328,15 @@ public class ParsedMethod extends AssignableEvaluator {
 						goodTarget.getGenericParameterTypes(), argTypes);
 					return new EvaluationResult(retType, withValues ? goodTarget.invoke(ctxType.getValue(), args) : null);
 				} catch(java.lang.reflect.InvocationTargetException e) {
-					throw new ExecutionException(new Type(e.getCause().getClass()), e.getCause(), this, getStored("name").index);
+					throw new ExecutionException(new Type(e.getCause().getClass()), e.getCause(), item, item.getStored("name").index);
 				} catch(Exception e) {
-					throw new EvaluationException("Could not invoke method " + theName + " of class " + ctxType.typeString(), e, this,
-						getStored("name").index);
+					throw new EvaluationException("Could not invoke method " + name + " of class " + ctxType.typeString(), e, item,
+						item.getStored("name").index);
 				}
 			} else if(badTarget != null) {
 				StringBuilder msg = new StringBuilder();
-				msg.append(theName).append('(');
-				java.lang.reflect.Type[] paramTypes = badTarget.getGenericParameterTypes();
+				msg.append(name).append('(');
+				java.lang.reflect.Type [] paramTypes = badTarget.getGenericParameterTypes();
 				int p;
 				for(p = 0; p < paramTypes.length - 1; p++) {
 					msg.append(new Type(paramTypes[p]));
@@ -422,11 +348,11 @@ public class ParsedMethod extends AssignableEvaluator {
 					msg.append(new Type(paramTypes[p]));
 				msg.append(')');
 				if(env.usePublicOnly() && (badTarget.getModifiers() & Modifier.PUBLIC) == 0)
-					throw new EvaluationException("The method " + msg + " from the type " + ctxType.typeString() + "." + theName
-						+ " is not visible", this, getStored("name").index);
+					throw new EvaluationException("The method " + msg + " from the type " + ctxType.typeString() + "." + name
+						+ " is not visible", item, item.getStored("name").index);
 				if(isStatic && (badTarget.getModifiers() & Modifier.STATIC) == 0)
 					throw new EvaluationException("Cannot make a static reference to the non-static method " + msg + " from the type "
-						+ ctxType.typeString(), this, getStored("name").index);
+						+ ctxType.typeString(), item, item.getStored("name").index);
 				else {
 					StringBuilder types = new StringBuilder();
 					for(p = 0; p < argRes.length; p++) {
@@ -435,11 +361,11 @@ public class ParsedMethod extends AssignableEvaluator {
 						types.append(argRes[p].getType());
 					}
 					throw new EvaluationException("The method " + ctxType.getType() + "." + msg + " is undefined for parameter types "
-						+ types, this, getStored("name").index);
+						+ types, item, item.getStored("name").index);
 				}
 			} else {
 				StringBuilder msg = new StringBuilder();
-				msg.append(theName).append('(');
+				msg.append(name).append('(');
 				int a;
 				for(a = 0; a < argRes.length; a++) {
 					msg.append(argRes[a].typeString());
@@ -447,8 +373,8 @@ public class ParsedMethod extends AssignableEvaluator {
 						msg.append(", ");
 				}
 				msg.append(')');
-				throw new EvaluationException("The method " + msg + " is undefined for the type " + ctxType.typeString(), this,
-					getStored("name").index);
+				throw new EvaluationException("The method " + msg + " is undefined for the type " + ctxType.typeString(), item,
+					item.getStored("name").index);
 			}
 		}
 	}
@@ -462,7 +388,7 @@ public class ParsedMethod extends AssignableEvaluator {
 	 */
 	public static void inferMethodTypes(java.util.Map<String, Type> inferred, java.lang.reflect.Method method, Type [] argTypes) {
 		java.lang.reflect.TypeVariable<?> [] typeParams = method.getTypeParameters();
-		java.lang.reflect.Type[] paramTypes = method.getGenericParameterTypes();
+		java.lang.reflect.Type [] paramTypes = method.getGenericParameterTypes();
 		for(int t = 0; t < typeParams.length; t++) {
 			Type type = null;
 			for(int p = 0; p < paramTypes.length && p < argTypes.length; p++) {
@@ -508,84 +434,88 @@ public class ParsedMethod extends AssignableEvaluator {
 	}
 
 	@Override
-	public EvaluationResult getValue(EvaluationEnvironment env, AssignmentOperatorEvaluator assign) throws EvaluationException {
-		if(isMethod)
-			throw new EvaluationException("Invalid argument for operator " + theName, this, getMatch().index);
+	public EvaluationResult getValue(ParsedMethod item, PrismsEvaluator eval, EvaluationEnvironment env, ParsedAssignmentOperator assign)
+		throws EvaluationException {
+		String name = item.getName();
+		if(item.isMethod())
+			throw new EvaluationException("Invalid argument for operator " + name, item, item.getMatch().index);
 		EvaluationResult ctxType;
-		if(theContext == null) {
-			Class<?> c = env.getImportMethodType(getName());
+		if(item.getContext() == null) {
+			Class<?> c = env.getImportMethodType(name);
 			if(c == null)
-				throw new EvaluationException(getName() + " cannot be resolved or is not a field", this, getStored("name").index);
-			ctxType = new EvaluationResult(new Type(env.getImportMethodType(getName())));
+				throw new EvaluationException(name + " cannot be resolved or is not a field", item, item.getStored("name").index);
+			ctxType = new EvaluationResult(new Type(env.getImportMethodType(name)));
 		} else
-			ctxType = theContext.evaluate(env, false, true);
+			ctxType = eval.evaluate(item.getContext(), env, false, true);
 		boolean isStatic = ctxType.isType();
-		if(getName().equals("length") && ctxType.getType().isArray())
-			throw new EvaluationException("The final field array.length cannot be assigned", this, getStored("name").index);
+		if(name.equals("length") && ctxType.getType().isArray())
+			throw new EvaluationException("The final field array.length cannot be assigned", item, item.getStored("name").index);
 		java.lang.reflect.Field field;
 		try {
-			field = ctxType.getType().getBaseType().getField(theName);
+			field = ctxType.getType().getBaseType().getField(name);
 		} catch(Exception e) {
-			throw new EvaluationException("Could not access field " + getName() + " on type " + ctxType.typeString(), e, this,
-				getStored("name").index);
+			throw new EvaluationException("Could not access field " + name + " on type " + ctxType.typeString(), e, item,
+				item.getStored("name").index);
 		}
 		if(field == null)
-			throw new EvaluationException(ctxType.typeString() + "." + getName() + " cannot be resolved or is not a field", this,
-				getStored("name").index);
+			throw new EvaluationException(ctxType.typeString() + "." + name + " cannot be resolved or is not a field", item,
+				item.getStored("name").index);
 		if(env.usePublicOnly() && (field.getModifiers() & Modifier.PUBLIC) == 0)
-			throw new EvaluationException(ctxType.typeString() + "." + theName + " is not visible", this, this.getStored("name").index);
+			throw new EvaluationException(ctxType.typeString() + "." + name + " is not visible", item, item.getStored("name").index);
 		if(isStatic && (field.getModifiers() & Modifier.STATIC) == 0)
-			throw new EvaluationException("Cannot make a static reference to non-static field " + theName + " from the type "
-				+ ctxType.typeString() + "." + theName + " is not static", this, getStored("name").index);
+			throw new EvaluationException("Cannot make a static reference to non-static field " + name + " from the type "
+				+ ctxType.typeString() + "." + name + " is not static", item, item.getStored("name").index);
 		if((field.getModifiers() & Modifier.FINAL) != 0)
-			throw new EvaluationException("The final field " + ctxType.typeString() + "." + theName + " cannot be assigned", this,
-				getStored("name").index);
+			throw new EvaluationException("The final field " + ctxType.typeString() + "." + name + " cannot be assigned", item,
+				item.getStored("name").index);
 		try {
 			return new EvaluationResult(new Type(field.getGenericType()), field.get(ctxType.getValue()));
 		} catch(Exception e) {
 			throw new EvaluationException("Could not access field " + field.getName() + " of class " + field.getDeclaringClass().getName(),
-				e, this, getStored("name").index);
+				e, item, item.getStored("name").index);
 		}
 	}
 
 	@Override
-	public void assign(EvaluationResult value, EvaluationEnvironment env, AssignmentOperatorEvaluator assign) throws EvaluationException {
-		if(isMethod)
-			throw new EvaluationException("Invalid argument for operator " + theName, this, getMatch().index);
+	public void assign(ParsedMethod item, EvaluationResult value, PrismsEvaluator eval, EvaluationEnvironment env,
+		ParsedAssignmentOperator assign) throws EvaluationException {
+		String name = item.getName();
+		if(item.isMethod())
+			throw new EvaluationException("Invalid argument for operator " + name, item, item.getMatch().index);
 		EvaluationResult ctxType;
-		if(theContext == null) {
-			Class<?> c = env.getImportMethodType(getName());
+		if(item.getContext() == null) {
+			Class<?> c = env.getImportMethodType(name);
 			if(c == null)
-				throw new EvaluationException(getName() + " cannot be resolved or is not a field", this, getStored("name").index);
-			ctxType = new EvaluationResult(new Type(env.getImportMethodType(getName())));
+				throw new EvaluationException(name + " cannot be resolved or is not a field", item, item.getStored("name").index);
+			ctxType = new EvaluationResult(new Type(env.getImportMethodType(name)));
 		} else
-			ctxType = theContext.evaluate(env, false, true);
+			ctxType = eval.evaluate(item.getContext(), env, false, true);
 		boolean isStatic = ctxType.isType();
-		if(getName().equals("length") && ctxType.getType().isArray())
-			throw new EvaluationException("The final field array.length cannot be assigned", this, getStored("name").index);
+		if(name.equals("length") && ctxType.getType().isArray())
+			throw new EvaluationException("The final field array.length cannot be assigned", item, item.getStored("name").index);
 		java.lang.reflect.Field field;
 		try {
-			field = ctxType.getType().getBaseType().getField(theName);
+			field = ctxType.getType().getBaseType().getField(name);
 		} catch(Exception e) {
-			throw new EvaluationException("Could not access field " + getName() + " on type " + ctxType.typeString(), e, this,
-				getStored("name").index);
+			throw new EvaluationException("Could not access field " + name + " on type " + ctxType.typeString(), e, item,
+				item.getStored("name").index);
 		}
 		if(field == null)
-			throw new EvaluationException(ctxType.typeString() + "." + getName() + " cannot be resolved or is not a field", this,
-				getStored("name").index);
+			throw new EvaluationException(ctxType.typeString() + "." + name + " cannot be resolved or is not a field", item,
+				item.getStored("name").index);
 		if(env.usePublicOnly() && (field.getModifiers() & Modifier.PUBLIC) == 0)
-			throw new EvaluationException(ctxType.typeString() + "." + theName + " is not visible", this, this.getStored("name").index);
+			throw new EvaluationException(ctxType.typeString() + "." + name + " is not visible", item, item.getStored("name").index);
 		if(isStatic && (field.getModifiers() & Modifier.STATIC) == 0)
-			throw new EvaluationException("Cannot make a static reference to non-static field " + theName + " from the type "
-				+ ctxType.typeString() + "." + theName + " is not static", this, getStored("name").index);
+			throw new EvaluationException("Cannot make a static reference to non-static field " + name + " from the type "
+				+ ctxType.typeString() + "." + name + " is not static", item, item.getStored("name").index);
 		if((field.getModifiers() & Modifier.FINAL) != 0)
-			throw new EvaluationException("The final field " + ctxType.typeString() + "." + theName + " cannot be assigned", this,
-				getStored("name").index);
+			throw new EvaluationException("The final field " + ctxType.typeString() + "." + name + " cannot be assigned", item,
+				item.getStored("name").index);
 		try {
 			field.set(ctxType.getValue(), value.getValue());
 		} catch(Exception e) {
 			throw new EvaluationException("Could not assign field " + field.getName() + " of class " + field.getDeclaringClass().getName(),
-				e, this, getStored("name").index);
+				e, item, item.getStored("name").index);
 		}
 	}
 }

@@ -17,6 +17,8 @@ public interface AssignableEvaluator<T extends Assignable> extends PrismsItemEva
 	 * Retrieves the current value of the variable being assigned. This is used for assignment operators such as "+=" where the initial
 	 * value is used to compute the value assigned.
 	 *
+	 * @param item The item to evaluate
+	 * @param eval The evaluator to use to evaluate dependencies
 	 * @param env The environment to get the value from
 	 * @param assign The assignment operator that the assignment is for
 	 * @return The current value of the variable being assigned
@@ -28,7 +30,9 @@ public interface AssignableEvaluator<T extends Assignable> extends PrismsItemEva
 	/**
 	 * Assigns the value to the variable
 	 *
+	 * @param item Assignable to peform the assignment on
 	 * @param value The type and value to assign
+	 * @param eval The evaluator to use to evaluate dependencies
 	 * @param env The environment to assign the variable in
 	 * @param assign The assignment operator that is assigning the variable
 	 * @throws prisms.lang.EvaluationException If an error occurs assigning the value

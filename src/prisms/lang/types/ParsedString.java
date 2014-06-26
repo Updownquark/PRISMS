@@ -2,12 +2,18 @@
 package prisms.lang.types;
 
 import prisms.lang.ParseException;
+import prisms.lang.Type;
 
 /** Represents a character string */
-public class ParsedString extends ParsedPrimitive {
+public class ParsedString extends ParsedLiteral {
 	@Override
 	public Object parseValue(String text) throws ParseException {
 		return unescape(text);
+	}
+
+	@Override
+	public Type getType() {
+		return new Type(String.class);
 	}
 
 	/** @return The parsed string that this structure represents */

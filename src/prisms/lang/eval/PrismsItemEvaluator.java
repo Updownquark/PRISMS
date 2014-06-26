@@ -5,6 +5,11 @@ import prisms.lang.EvaluationException;
 import prisms.lang.EvaluationResult;
 import prisms.lang.ParsedItem;
 
+/**
+ * An evaluator for a particular type
+ * 
+ * @param <T> The type of item that this evaluator knows how to evaluate
+ */
 public interface PrismsItemEvaluator<T extends ParsedItem> {
 	/**
 	 * Validates or evaluates an expression. This method should not be called if the item's match is incomplete.

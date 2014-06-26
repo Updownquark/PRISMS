@@ -12,7 +12,7 @@ public class ArrayInitializerEvaluator implements PrismsItemEvaluator<ParsedArra
 	@Override
 	public EvaluationResult evaluate(final ParsedArrayInitializer item, PrismsEvaluator eval, EvaluationEnvironment env, boolean asType,
 		boolean withValues) throws EvaluationException {
-		prisms.lang.EvaluationResult typeEval = item.getType().evaluate(env, true, false);
+		prisms.lang.EvaluationResult typeEval = eval.evaluate(item.getType(), env, true, false);
 		if(!typeEval.isType())
 			throw new EvaluationException("Unrecognized type " + item.getType().getMatch().text, item, item.getType().getMatch().index);
 		prisms.lang.Type type = typeEval.getType();

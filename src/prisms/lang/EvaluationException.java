@@ -4,8 +4,9 @@
 package prisms.lang;
 
 /**
- * Thrown from {@link ParsedItem#evaluate(EvaluationEnvironment, boolean, boolean)} if evaluation of a parsed structure
- * fails
+ * Thrown from
+ * {@link prisms.lang.eval.PrismsItemEvaluator#evaluate(ParsedItem, prisms.lang.eval.PrismsEvaluator, EvaluationEnvironment, boolean, boolean)}
+ * if evaluation of a parsed structure fails
  */
 public class EvaluationException extends Exception
 {
@@ -19,7 +20,7 @@ public class EvaluationException extends Exception
 
 	/**
 	 * Creates an evaluation exception without a cause
-	 * 
+	 *
 	 * @param message The message as to what went wrong with the evaluation
 	 * @param struct The parsed structure where the evaluation failed
 	 * @param index The index within the full command where the problem occurred
@@ -47,7 +48,7 @@ public class EvaluationException extends Exception
 
 	/**
 	 * Creates an evaluation exception with a cause
-	 * 
+	 *
 	 * @param message The message as to what went wrong with the evaluation
 	 * @param cause The exception that caused this evaluation exception
 	 * @param struct The parsed structure where the evaluation failed

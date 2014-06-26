@@ -2,9 +2,10 @@ package prisms.lang.types;
 
 import prisms.lang.ParseException;
 import prisms.lang.ParsedItem;
+import prisms.lang.Type;
 
 /** An immutable, constant value parsed from an expression */
-public abstract class ParsedPrimitive extends ParsedItem {
+public abstract class ParsedLiteral extends ParsedItem {
 	private Object theValue;
 
 	@Override
@@ -14,9 +15,12 @@ public abstract class ParsedPrimitive extends ParsedItem {
 		theValue = parseValue(getStored("value").text);
 	}
 
+	/** @return The type of this literal */
+	public abstract Type getType();
+
 	/**
 	 * @param text The text to parse
-	 * @return The value of this primitive given the text
+	 * @return The value of this literal given the text
 	 * @throws ParseException If the value cannot be parsed
 	 */
 	public abstract Object parseValue(String text) throws ParseException;

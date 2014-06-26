@@ -1,14 +1,10 @@
 /* ParsedDeclaration.java Created Nov 14, 2011 by Andrew Butler, PSL */
 package prisms.lang.types;
 
-import prisms.lang.EvaluationEnvironment;
-import prisms.lang.EvaluationException;
-import prisms.lang.EvaluationResult;
 import prisms.lang.ParseException;
 import prisms.lang.ParseMatch;
 import prisms.lang.ParsedItem;
 import prisms.lang.PrismsParser;
-import prisms.lang.Type;
 
 /** Represents a typed, parsed declaration */
 public class ParsedDeclaration extends Assignable {
@@ -99,48 +95,6 @@ public class ParsedDeclaration extends Assignable {
 		}
 	}
 
-	/**
-	 * @param env The evaluation environment to use to evaluate this declaration's type
-	 * @return The type of this declaration
-	 * @throws EvaluationException If the type cannot be evaluated
-	 */
-	public Type evaluateType(EvaluationEnvironment env) throws EvaluationException {
-		EvaluationResult res = theType.evaluate(env, true, false);
-		if(!res.isType())
-			throw new EvaluationException(theType.getMatch().text + " cannot be resolved to a type", this, theType.getMatch().index);
-		Type ret = res.getType();
-		if(theParamTypes.length > 0) {
-			Type [] ptTypes = new Type[theParamTypes.length];
-			for(int p = 0; p < ptTypes.length; p++)
-				ptTypes[p] = theParamTypes[p].evaluate(env, true, true).getType();
-			if(ptTypes.length > 0 && ret.getBaseType().getTypeParameters().length == 0) {
-				String args = prisms.util.ArrayUtils.toString(ptTypes);
-				args = args.substring(1, args.length() - 1);
-				int index = theType.getMatch().index + theType.getMatch().text.length();
-				throw new prisms.lang.EvaluationException("The type " + ret
-					+ " is not generic; it cannot be parameterized with arguments <" + args + ">", theType, index);
-			}
-			if(ptTypes.length > 0 && ptTypes.length != ret.getBaseType().getTypeParameters().length) {
-				String type = ret.getBaseType().getName() + "<";
-				for(java.lang.reflect.Type t : ret.getBaseType().getTypeParameters())
-					type += t + ", ";
-				type = type.substring(0, type.length() - 2);
-				type += ">";
-				String args = prisms.util.ArrayUtils.toString(ptTypes);
-				args = args.substring(1, args.length() - 1);
-				int index = theType.getMatch().index + theType.getMatch().text.length();
-				throw new prisms.lang.EvaluationException("Incorrect number of arguments for type " + type
-					+ "; it cannot be parameterized with arguments <" + args + ">", theType, index);
-			}
-			ret = new Type(ret.getBaseType(), ptTypes);
-		}
-		if(theArrayDimension > 0) {
-			for(int i = 0; i < theArrayDimension; i++)
-				ret = ret.getArrayType();
-		}
-		return ret;
-	}
-
 	@Override
 	public String toString() {
 		StringBuilder ret = new StringBuilder();
@@ -158,29 +112,5 @@ public class ParsedDeclaration extends Assignable {
 			ret.append("...");
 		ret.append(' ').append(theName);
 		return ret.toString();
-	}
-
-	@Override
-	public prisms.lang.EvaluationResult evaluate(prisms.lang.EvaluationEnvironment env, boolean asType, boolean withValues)
-		throws EvaluationException {
-		Type type = evaluateType(env);
-		env.declareVariable(theName, type, isFinal, this, getStored("name").index);
-		return null;
-	}
-
-	@Override
-	public EvaluationResult getValue(EvaluationEnvironment env, ParsedAssignmentOperator assign) throws EvaluationException {
-		evaluate(env, false, false);
-		throw new EvaluationException("Syntax error: " + theName + " has not been assigned", this, getStored("name").index);
-	}
-
-	@Override
-	public void assign(EvaluationResult value, EvaluationEnvironment env, ParsedAssignmentOperator assign) throws EvaluationException {
-		Type type = evaluateType(env);
-
-		if(!type.isAssignable(value.getType()))
-			throw new EvaluationException("Type mismatch: Cannot convert from " + value.getType() + " to " + type, this, assign
-				.getOperand().getMatch().index);
-		env.setVariable(theName, value.getValue(), assign, assign.getStored("name").index);
 	}
 }

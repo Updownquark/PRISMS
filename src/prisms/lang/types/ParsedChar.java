@@ -2,9 +2,15 @@
 package prisms.lang.types;
 
 import prisms.lang.ParseException;
+import prisms.lang.Type;
 
 /** Represents a character literal */
-public class ParsedChar extends ParsedPrimitive {
+public class ParsedChar extends ParsedLiteral {
+	@Override
+	public Type getType() {
+		return new Type(Character.TYPE);
+	}
+
 	@Override
 	public Object parseValue(String text) throws ParseException {
 		text = prisms.util.PrismsUtils.decodeUnicode(text);

@@ -3,7 +3,7 @@
  */
 package prisms.lang.types;
 
-import prisms.lang.*;
+import prisms.lang.ParsedItem;
 
 /** Represents a parenthetic expression */
 public class ParsedParenthetic extends Assignable
@@ -42,32 +42,5 @@ public class ParsedParenthetic extends Assignable
 	public String toString()
 	{
 		return "(" + theContent + ")";
-	}
-
-	@Override
-	public prisms.lang.EvaluationResult evaluate(prisms.lang.EvaluationEnvironment env, boolean asType,
-		boolean withValues) throws prisms.lang.EvaluationException
-	{
-		return theContent.evaluate(env, asType, withValues);
-	}
-
-	@Override
-	public EvaluationResult getValue(EvaluationEnvironment env, ParsedAssignmentOperator assign)
-		throws EvaluationException
-	{
-		if(!(theContent instanceof Assignable))
-			throw new EvaluationException("Invalid argument for assignment operator " + assign.getName(), this,
-				theContent.getMatch().index);
-		return ((Assignable) theContent).getValue(env, assign);
-	}
-
-	@Override
-	public void assign(EvaluationResult value, EvaluationEnvironment env, ParsedAssignmentOperator assign)
-		throws EvaluationException
-	{
-		if(!(theContent instanceof Assignable))
-			throw new EvaluationException("Invalid argument for assignment operator " + assign.getName(), this,
-				theContent.getMatch().index);
-		((Assignable) theContent).assign(value, env, assign);
 	}
 }
