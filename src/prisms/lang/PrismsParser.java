@@ -2,7 +2,10 @@
 package prisms.lang;
 
 import java.io.Reader;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import java.util.SortedSet;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
@@ -111,13 +114,13 @@ public class PrismsParser {
 		}
 	}
 
-	private java.util.List<PrismsConfig> theOperators;
+	private SortedSet<PrismsConfig> theOperators;
 
 	private Map<String, PrismsConfig> theOpsByName;
 
-	private String [] theIgnorables;
+	private List<String> theIgnorables;
 
-	private java.util.List<String> theTerminators;
+	private List<String> theTerminators;
 
 	private boolean isValidated;
 
@@ -125,9 +128,14 @@ public class PrismsParser {
 
 	/** Creates a parser */
 	public PrismsParser() {
-		theOperators = new java.util.ArrayList<>();
+		theOperators = new java.util.TreeSet<>(new java.util.Comparator<PrismsConfig>() {
+			@Override
+			public int compare(PrismsConfig o1, PrismsConfig o2) {
+				return o2.getInt("priority", 0) - o1.getInt("priority", 0);
+			}
+		});
 		theOpsByName = new java.util.HashMap<>();
-		theIgnorables = new String[0];
+		theIgnorables = new java.util.ArrayList<>();
 		theTerminators = new java.util.ArrayList<>();
 		addTerminator("\n");
 		addTerminator(";");
@@ -146,11 +154,15 @@ public class PrismsParser {
 
 	/** @param terminator The terminator string to accept as a boundary between successive matches */
 	public void addTerminator(String terminator) {
+		if(isValidated)
+			throw new IllegalStateException("Additional configuration cannot be performed after validation, which occurs at first parsing");
 		theTerminators.add(terminator);
 	}
 
 	/** @param terminator The terminator string to not accept for a boundary between successive matchess */
 	public void removeTerminator(String terminator) {
+		if(isValidated)
+			throw new IllegalStateException("Additional configuration cannot be performed after validation, which occurs at first parsing");
 		theTerminators.remove(terminator);
 	}
 
@@ -160,8 +172,16 @@ public class PrismsParser {
 	}
 
 	/** @return All terminator strings that are accepted by this parser as boundaries between successive matches */
-	public String [] getTerminators() {
-		return theTerminators.toArray(new String[theTerminators.size()]);
+	public List<String> getTerminators() {
+		List<String> ret = theTerminators;
+		if(!isValidated)
+			ret = Collections.unmodifiableList(theTerminators);
+		return ret;
+	}
+
+	/** @return The list of operator types classified as ignorable, that is, they can occur anywhere without affecting syntax */
+	public List<String> getIgnorables() {
+		return theIgnorables;
 	}
 
 	/**
@@ -187,30 +207,39 @@ public class PrismsParser {
 	}
 
 	/** @return The list of operators this parser uses to match text against */
-	public java.util.List<PrismsConfig> getOperators() {
-		return java.util.Collections.unmodifiableList(theOperators);
+	public SortedSet<PrismsConfig> getOperators() {
+		SortedSet<PrismsConfig> ret = theOperators;
+		if(!isValidated)
+			ret = Collections.unmodifiableSortedSet(ret);
+		return ret;
 	}
 
-	void insertOperator(PrismsConfig op) {
+	/**
+	 * @param name The name of the operator
+	 * @return The operator in this parser with the given name, or null if none exists
+	 */
+	public PrismsConfig getOperator(String name) {
+		return theOpsByName.get(name);
+	}
+
+	/** @param op The new operator to allow parsing against */
+	public void insertOperator(PrismsConfig op) {
+		if(isValidated)
+			throw new IllegalStateException("Additional configuration cannot be performed after validation, which occurs at first parsing");
 		validateOperator(op);
-		int pri = op.getInt("order", 0);
-		int min = 0, max = theOperators.size();
-		while(max > min) {
-			int mid = (min + max) / 2;
-			if(mid == theOperators.size()) {
-				min = mid;
-				break;
-			}
-			int testPri = theOperators.get(mid).getInt("order", 0);
-			if(pri > testPri)
-				min = mid + 1;
-			else
-				max = mid;
-		}
-		theOperators.add(min, op);
+		operatorAdded(op);
+	}
+
+	/**
+	 * Internal post-validation add method
+	 *
+	 * @param op The operator to add to this parser
+	 */
+	protected void operatorAdded(PrismsConfig op) {
+		theOperators.add(op);
 		theOpsByName.put(op.get("name"), op);
 		if(op.is("ignorable", false))
-			theIgnorables = ArrayUtils.add(theIgnorables, op.get("name"));
+			theIgnorables.add(op.get("name"));
 	}
 
 	void validateOperator(PrismsConfig op) throws IllegalArgumentException {
@@ -311,19 +340,14 @@ public class PrismsParser {
 	public void validateConfig() throws IllegalArgumentException {
 		if(isValidated)
 			return;
-		for(PrismsConfig op : theOperators) {
+		for(PrismsConfig op : getOperators()) {
 			try {
 				checkReferences(op);
 			} catch(IllegalArgumentException e) {
 				throw new IllegalArgumentException(op.getName() + " \"" + op.get("name") + "\":", e);
 			}
 		}
-		java.util.Collections.sort(theOperators, new java.util.Comparator<PrismsConfig>() {
-			@Override
-			public int compare(PrismsConfig o1, PrismsConfig o2) {
-				return o2.getInt("priority", 0) - o1.getInt("priority", 0);
-			}
-		});
+		theOperators = Collections.unmodifiableSortedSet(theOperators);
 		isValidated = true;
 		theDebugger.init(this);
 	}
@@ -332,7 +356,7 @@ public class PrismsParser {
 		if("op".equals(op.getName()) && op.get("type") != null) {
 			String [] types = op.get("type").split("\\|");
 			for(String type : types) {
-				if(!theOpsByName.containsKey(type.trim()))
+				if(getOperator(type.trim()) == null)
 					throw new IllegalArgumentException("Type \"" + type + "\" not recognized");
 			}
 		}
@@ -515,7 +539,7 @@ public class PrismsParser {
 				try {
 					ParseMatch bestComplete = cache.getFound(index, null);
 					boolean usedCache = true;
-					for(PrismsConfig op : theOperators) {
+					for(PrismsConfig op : getOperators()) {
 						if(op.getInt("priority", 0) < 0)
 							break;
 						String name = op.get("name");
@@ -785,7 +809,7 @@ public class PrismsParser {
 			if(!firstRound)
 				index++; // Pass white space character and try again
 			firstRound = false;
-			for(String term : theTerminators) {
+			for(String term : getTerminators()) {
 				if(index + term.length() > sb.length())
 					continue;
 				boolean matches = true;
@@ -803,9 +827,11 @@ public class PrismsParser {
 	private ParseMatch [] parseIgnorables(StringBuilder sb, int index, ParseSessionCache cache, boolean withWS) {
 		ParseMatch [] ret = null;
 		ParseMatch match;
+		List<String> igList = getIgnorables();
+		String [] ignorables = igList.toArray(new String[igList.size()]);
 		do {
 			match = null;
-			match = getBestMatch(sb, index, cache, true, theIgnorables);
+			match = getBestMatch(sb, index, cache, true, ignorables);
 			if(match == null && withWS)
 				match = parseWhiteSpace(sb, index);
 			if(match != null) {
