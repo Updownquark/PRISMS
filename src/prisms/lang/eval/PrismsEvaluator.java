@@ -6,8 +6,10 @@ import prisms.lang.EvaluationResult;
 import prisms.lang.ParsedItem;
 
 /** A collection of {@link PrismsItemEvaluator}s for evaluating any of a large set of types of expressions */
-public class PrismsEvaluator {
+public class PrismsEvaluator implements prisms.util.Sealable {
 	private prisms.util.SubClassMap<ParsedItem, PrismsItemEvaluator<?>> theEvaluators;
+
+	private boolean isSealed;
 
 	/** Creates the evaluator */
 	public PrismsEvaluator() {
@@ -15,14 +17,19 @@ public class PrismsEvaluator {
 	}
 
 	/**
+	 * @param <T> The type of the item to add evaluation support for
 	 * @param type The type of item to support evaluation for
 	 * @param evaluator The evaluator for the given type
+	 * @throws SealedException If this evaluator has been {@link #seal() sealed}
 	 */
-	public <T extends ParsedItem> void addEvaluator(Class<T> type, PrismsItemEvaluator<? super T> evaluator) {
+	public <T extends ParsedItem> void addEvaluator(Class<T> type, PrismsItemEvaluator<? super T> evaluator) throws SealedException {
+		if(isSealed)
+			throw new SealedException(this);
 		theEvaluators.put(type, evaluator);
 	}
 
 	/**
+	 * @param <T> The type of the item to get evaluation support for
 	 * @param type The type to get evaluation support for
 	 * @return The evaluator for the given type
 	 */
@@ -32,7 +39,7 @@ public class PrismsEvaluator {
 
 	/**
 	 * Evaluates an item
-	 * 
+	 *
 	 * @param item The item to evaluate
 	 * @param env The evaluation environment to use during evaluation
 	 * @param asType Whether the result is expected to be a type as opposed to a value
@@ -46,5 +53,15 @@ public class PrismsEvaluator {
 		if(eval == null)
 			throw new EvaluationException("No evaluator configured for item type " + item.getClass().getName(), item, 0);
 		return ((PrismsItemEvaluator<ParsedItem>) eval).evaluate(item, this, env, asType, withValues);
+	}
+
+	@Override
+	public boolean isSealed() {
+		return isSealed;
+	}
+
+	@Override
+	public void seal() {
+		isSealed = true;
 	}
 }
