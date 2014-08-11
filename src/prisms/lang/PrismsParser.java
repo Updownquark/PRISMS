@@ -3,9 +3,9 @@ package prisms.lang;
 
 import java.io.Reader;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedSet;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
@@ -114,7 +114,15 @@ public class PrismsParser {
 		}
 	}
 
-	private SortedSet<PrismsConfig> theOperators;
+	/** Compares operators by priority */
+	protected static final Comparator<PrismsConfig> operatorCompare = new java.util.Comparator<PrismsConfig>() {
+		@Override
+		public int compare(PrismsConfig o1, PrismsConfig o2) {
+			return getPriority(o2) - getPriority(o1);
+		}
+	};
+
+	private List<PrismsConfig> theOperators;
 
 	private Map<String, PrismsConfig> theOpsByName;
 
@@ -128,12 +136,7 @@ public class PrismsParser {
 
 	/** Creates a parser */
 	public PrismsParser() {
-		theOperators = new java.util.TreeSet<>(new java.util.Comparator<PrismsConfig>() {
-			@Override
-			public int compare(PrismsConfig o1, PrismsConfig o2) {
-				return o2.getInt("priority", 0) - o1.getInt("priority", 0);
-			}
-		});
+		theOperators = new java.util.ArrayList<>();
 		theOpsByName = new java.util.HashMap<>();
 		theIgnorables = new java.util.ArrayList<>();
 		theTerminators = new java.util.ArrayList<>();
@@ -207,10 +210,10 @@ public class PrismsParser {
 	}
 
 	/** @return The list of operators this parser uses to match text against */
-	public SortedSet<PrismsConfig> getOperators() {
-		SortedSet<PrismsConfig> ret = theOperators;
+	public List<PrismsConfig> getOperators() {
+		List<PrismsConfig> ret = theOperators;
 		if(!isValidated)
-			ret = Collections.unmodifiableSortedSet(ret);
+			ret = Collections.unmodifiableList(ret);
 		return ret;
 	}
 
@@ -236,7 +239,12 @@ public class PrismsParser {
 	 * @param op The operator to add to this parser
 	 */
 	protected void operatorAdded(PrismsConfig op) {
-		theOperators.add(op);
+		int index = Collections.binarySearch(theOperators, op, operatorCompare);
+		if(index >= 0) {
+			for(; index < theOperators.size() && operatorCompare.compare(theOperators.get(index), op) == 0; index++);
+		} else
+			index = -(index + 1);
+		theOperators.add(index, op);
 		theOpsByName.put(op.get("name"), op);
 		if(op.is("ignorable", false))
 			theIgnorables.add(op.get("name"));
@@ -248,7 +256,7 @@ public class PrismsParser {
 		for(PrismsConfig sub : op.subConfigs()) {
 			switch (sub.getName()) {
 			case "name":
-				if(theOpsByName.containsKey(sub.getValue()))
+				if(getOperator(sub.getValue()) != null)
 					throw new IllegalArgumentException("Duplicate operators named \"" + sub.getValue() + "\"");
 				break;
 			case "order":
@@ -347,7 +355,7 @@ public class PrismsParser {
 				throw new IllegalArgumentException(op.getName() + " \"" + op.get("name") + "\":", e);
 			}
 		}
-		theOperators = Collections.unmodifiableSortedSet(theOperators);
+		theOperators = Collections.unmodifiableList(theOperators);
 		isValidated = true;
 		theDebugger.init(this);
 	}
@@ -498,19 +506,14 @@ public class PrismsParser {
 					if(cache.isFinding(index, type))
 						continue;
 					ParseMatch match;
-					if(useCache && cache.isFound(index, type))
-					{
-						if(firstRound) {
-							match = cache.getFound(index, type);
-							theDebugger.usedCache(match);
-						}
-						else
-							continue;
+					if(useCache && firstRound && cache.isFound(index, type)) {
+						match = cache.getFound(index, type);
+						theDebugger.usedCache(match);
 					}
 					else {
 						cache.addFinding(index, type);
 						try {
-							match = parseTypedMatch(sb, index, cache, theOpsByName.get(type), true);
+							match = parseTypedMatch(sb, index, cache, getOperator(type), true);
 						} finally {
 							cache.stopFinding(index, type);
 						}
@@ -518,6 +521,10 @@ public class PrismsParser {
 							ParseMatch cached = cache.getFound(index, type);
 							if(isBetter(cached, match))
 								cache.addFound(index, type, match);
+
+							cached = cache.getFound(index, null);
+							if(isBetter(cached, match))
+								cache.addFound(index, null, match);
 						}
 					}
 					if(match != null && (ret == null || !ret.isComplete() || match.isComplete()) && isBetter(ret, match)) {
@@ -568,7 +575,7 @@ public class PrismsParser {
 						} else if(match != null)
 							theDebugger.matchDiscarded(match);
 					}
-					if(usedCache)
+					if(usedCache && ret!=null)
 						theDebugger.usedCache(ret);
 				} finally {
 					cache.stopFinding(index, null);
@@ -577,6 +584,10 @@ public class PrismsParser {
 			firstRound = false;
 		}
 		return ret;
+	}
+
+	static int getPriority(PrismsConfig op) {
+		return op.getInt("priority", 0);
 	}
 
 	/** @return Whether o2 is better than o1 */
@@ -709,11 +720,13 @@ public class PrismsParser {
 						match = new ParseMatch(sub, "", index, null, false, "At least " + min + " \"" + name + "\" occurrence"
 							+ (min > 1 ? "s" : "") + " expected");
 					}
+					theDebugger.postParse(sb, optStartIndex, sub, match);
 					break; // handle this outside the switch
 				}
 				if(sub.getName().equals("forbid") && optionMatches != null) {
 					match = new ParseMatch(sub, sb.substring(preOptionIndex, index), preOptionIndex, optionMatches, true,
 						"Forbidden content present");
+					theDebugger.postParse(sb, optStartIndex, sub, match);
 					break;
 				}
 				// For option, add the content and continue the loop
@@ -778,7 +791,8 @@ public class PrismsParser {
 					match = badOption;
 			}
 			if(match == null || (!match.isComplete() && match.text.length() == 0 && subMatches.length == 0)) {
-				theDebugger.postParse(sb, startIndex, op, null);
+				if(reportRoot)
+					theDebugger.postParse(sb, startIndex, op, null);
 				return null;
 			}
 			if(ignores != null)
@@ -787,7 +801,8 @@ public class PrismsParser {
 			index = match.index + match.text.length();
 			if(!match.isComplete()) {
 				ParseMatch ret = new ParseMatch(op, sb.substring(startIndex, index), startIndex, subMatches, true, null);
-				theDebugger.postParse(sb, startIndex, op, ret);
+				if(reportRoot)
+					theDebugger.postParse(sb, startIndex, op, ret);
 				return ret;
 			}
 		}

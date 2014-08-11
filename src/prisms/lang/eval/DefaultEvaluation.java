@@ -7,6 +7,7 @@ public class DefaultEvaluation {
 	public static void initializeBasics(PrismsEvaluator evaluator) {
 		evaluator.addEvaluator(NoOpItem.class, new NoOpEvaluator());
 		evaluator.addEvaluator(ParsedLiteral.class, new LiteralEvaluator());
+		evaluator.addEvaluator(ParsedType.class, new TypeEvaluator());
 		evaluator.addEvaluator(ParsedCast.class, new CastEvaluator());
 		evaluator.addEvaluator(ParsedInstanceofOp.class, new InstanceofEvaluator());
 		evaluator.addEvaluator(ParsedConditional.class, new ConditionalEvaluator());
@@ -48,6 +49,9 @@ public class DefaultEvaluation {
 	public static void initializeDefaults(PrismsEvaluator evaluator) {
 		initializeBasics(evaluator);
 		initializeConstructors(evaluator);
+		initializeControl(evaluator);
+		initializeDeclarations(evaluator);
+		initializeAssignment(evaluator);
 		evaluator.addEvaluator(ParsedSyncBlock.class, new SyncBlockEvaluator());
 		evaluator.addEvaluator(ParsedImport.class, new ImportEvaluator());
 		evaluator.addEvaluator(ParsedPreviousAnswer.class, new PreviousAnswerEvaluator());

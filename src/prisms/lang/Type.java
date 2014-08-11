@@ -41,6 +41,14 @@ public class Type
 	}
 
 	/**
+	 * @param bound The bounding type
+	 * @param upper Whether the type is upper- or lower- bound
+	 */
+	public Type(Class<?> bound, boolean upper) {
+		this(new Type(bound), upper);
+	}
+
+	/**
 	 * Parses a type from a java.lang.reflect.Type
 	 *
 	 * @param type The reflected type to represent

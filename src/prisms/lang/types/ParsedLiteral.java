@@ -12,7 +12,8 @@ public abstract class ParsedLiteral extends ParsedItem {
 	public void setup(prisms.lang.PrismsParser parser, prisms.lang.ParsedItem parent, prisms.lang.ParseMatch match)
 		throws prisms.lang.ParseException {
 		super.setup(parser, parent, match);
-		theValue = parseValue(getStored("value").text);
+		prisms.lang.ParseMatch value = getStored("value");
+		theValue = parseValue(value == null ? null : value.text);
 	}
 
 	/** @return The type of this literal */

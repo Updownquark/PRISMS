@@ -69,7 +69,7 @@ public class PrismsParserDebugGUI extends JPanel implements PrismsParserDebugger
 
 	/**
 	 * Creates a debug GUI
-	 * 
+	 *
 	 * @param configFile The config file to use
 	 */
 	public PrismsParserDebugGUI(File configFile) {
@@ -372,8 +372,13 @@ public class PrismsParserDebugGUI extends JPanel implements PrismsParserDebugger
 		} else if(inIgnorable > 0) {
 			return;
 		}
+		if(op != theTreeModel.getCursor().theOp) {
+			System.out.println("Bad!");
+			return;
+		}
+
 		boolean isOnStepTarget = false;
-		if(theStepTarget != null && theStepTarget == theTreeModel.getCursor())
+		if(theStepTarget == theTreeModel.getCursor())
 			isOnStepTarget = true;
 
 		theTreeModel.finish(match);
@@ -494,12 +499,12 @@ public class PrismsParserDebugGUI extends JPanel implements PrismsParserDebugger
 			});
 			while(isSuspended) {
 				try {
-					Thread.sleep(50); // Here is where to put a breakpoint in order to start java debugging from a suspended debug session
+					Thread.sleep(50);
 				} catch(InterruptedException e) {
 				}
 			}
 		} finally {
-			isHolding = false;
+			isHolding = false; // Here is where to put a breakpoint in order to start java debugging from a suspended debug session
 		}
 	}
 
@@ -576,7 +581,7 @@ public class PrismsParserDebugGUI extends JPanel implements PrismsParserDebugger
 
 	/**
 	 * Creates a frame containing the given debugger panel
-	 * 
+	 *
 	 * @param debugger The debugger to frame
 	 * @return The frame containing the given debugger
 	 */
@@ -597,7 +602,7 @@ public class PrismsParserDebugGUI extends JPanel implements PrismsParserDebugger
 
 	/**
 	 * Pops up the GUI, allowing the user to create breakpoints and configure settings outside of a parsing environment
-	 * 
+	 *
 	 * @param args If none, the default config file is used. Otherwise, the first argument is used as the location of the config file to
 	 *            use.
 	 */
@@ -901,6 +906,18 @@ public class PrismsParserDebugGUI extends JPanel implements PrismsParserDebugger
 					});
 				}
 			});
+			thePostField.addKeyListener(new java.awt.event.KeyAdapter() {
+				@Override
+				public void keyTyped(KeyEvent e) {
+					super.keyTyped(e);
+					EventQueue.invokeLater(new Runnable() {
+						@Override
+						public void run() {
+							checkPattern(thePostField);
+						}
+					});
+				}
+			});
 		}
 
 		private void checkPattern(JTextField field) {
@@ -1170,7 +1187,7 @@ public class PrismsParserDebugGUI extends JPanel implements PrismsParserDebugger
 				}
 				if(value.theOp.getValue() != null && value.theOp.getValue().length() > 0) {
 					text.append("<font color=\"blue\">&gt;</font>");
-					text.append(value.theOp.getValue());
+					text.append(value.theOp.getValue().replaceAll("<", "&amp;lt;").replaceAll(">", "&amp;gt;"));
 					if(needsEnding) {
 						text.append("<font color=\"blue\">&lt;/</font><font color=\"red\">");
 						text.append(value.theOp.getName()).append("</font>");

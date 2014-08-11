@@ -894,31 +894,18 @@
 	<operator name="member" order="50" priority="250" impl="prisms.lang.types.ParsedMethod">
 		<op storeAs="context" />
 		<literal storeAs="dot">.</literal>
-		<select>
-			<option>
-				<op type="identifier" storeAs="name" />
-			</option>
-			<option>
-				<literal storeAs="name">class</literal>
-			</option>
-			<option>
-				<literal storeAs="name">this</literal>
-			</option>
-		</select>
-	</operator>
-	<operator name="member method" order="50" priority="250" impl="prisms.lang.types.ParsedMethod">
-		<op storeAs="context" />
-		<literal storeAs="dot">.</literal>
-		<op type="identifier|keyword" storeAs="name" />
-		<literal storeAs="method">(</literal>
+		<op type="identifier" storeAs="name" />
 		<option>
-			<op storeAs="parameter" />
-			<option min="0">
-				<literal>,</literal>
+			<literal storeAs="method">(</literal>
+			<option>
 				<op storeAs="parameter" />
+				<option min="0">
+					<literal>,</literal>
+					<op storeAs="parameter" />
+				</option>
 			</option>
+			<literal>)</literal>
 		</option>
-		<literal>)</literal>
 	</operator>
 
 </grammar>
