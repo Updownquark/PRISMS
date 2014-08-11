@@ -373,7 +373,7 @@ public class PrismsParserDebugGUI extends JPanel implements PrismsParserDebugger
 			return;
 		}
 		if(op != theTreeModel.getCursor().theOp) {
-			System.out.println("Bad!");
+			System.out.println("Post-parse for an operator that was not pre-parsed or has already been post-parsed!");
 			return;
 		}
 

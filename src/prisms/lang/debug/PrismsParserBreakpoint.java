@@ -46,4 +46,21 @@ public class PrismsParserBreakpoint {
 	public void setEnabled(boolean enabled) {
 		isEnabled = enabled;
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder ret = new StringBuilder();
+		ret.append('[');
+		if(isEnabled)
+			ret.append('X');
+		ret.append(']');
+		if(thePreCursorText != null)
+			ret.append('(').append(thePreCursorText).append(')');
+		ret.append('.');
+		if(thePostCursorText != null)
+			ret.append('(').append(thePostCursorText).append(')');
+		if(theOpName != null)
+			ret.append(" for ").append(theOpName);
+		return ret.toString();
+	}
 }

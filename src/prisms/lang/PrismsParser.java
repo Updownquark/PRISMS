@@ -145,6 +145,11 @@ public class PrismsParser {
 		theDebugger = new NullDebugger();
 	}
 
+	/** @return The debugger used by this parser */
+	public PrismsParserDebugger getDebugger() {
+		return theDebugger;
+	}
+
 	/** @param debugger The debugger to use in debugging parsing */
 	public void setDebugger(PrismsParserDebugger debugger) {
 		if(debugger != null)
@@ -846,7 +851,8 @@ public class PrismsParser {
 		String [] ignorables = igList.toArray(new String[igList.size()]);
 		do {
 			match = null;
-			match = getBestMatch(sb, index, cache, true, ignorables);
+			if(ignorables.length > 0)
+				match = getBestMatch(sb, index, cache, true, ignorables);
 			if(match == null && withWS)
 				match = parseWhiteSpace(sb, index);
 			if(match != null) {

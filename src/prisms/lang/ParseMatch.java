@@ -84,6 +84,20 @@ public class ParseMatch implements Iterable<ParseMatch>
 		return null;
 	}
 
+	/** @return The match in this structure that is incomplete */
+	public ParseMatch getIncompleteMatch() {
+		if(!isComplete)
+			return this;
+		if(parsed == null || parsed.length == 0)
+			return null;
+		for(ParseMatch sub : parsed) {
+			ParseMatch err = sub.getIncompleteMatch();
+			if(err != null)
+				return err;
+		}
+		return null;
+	}
+
 	/** Implements a depth-first iteration over this match's structure. The first match returned will be {@code this}. */
 	@Override
 	public java.util.Iterator<ParseMatch> iterator()
