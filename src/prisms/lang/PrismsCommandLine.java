@@ -40,7 +40,7 @@ public class PrismsCommandLine {
 	 * @param value The value for the variable
 	 */
 	public <T> void setVariable(String name, Class<T> type, boolean isFinal, T value) {
-		EvaluationEnvironment.Variable var = theEnv.getDeclaredVariable(name);
+		Variable var = theEnv.getDeclaredVariable(name);
 		try {
 			if(var == null)
 				theEnv.declareVariable(name, new Type(type), isFinal, null, 0);

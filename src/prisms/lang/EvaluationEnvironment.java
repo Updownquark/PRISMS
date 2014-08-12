@@ -4,27 +4,27 @@
 package prisms.lang;
 
 /** An environment for parsing. Allows state to be kept between evaluations. */
-public interface EvaluationEnvironment
+public interface EvaluationEnvironment extends VariableSource
 {
 	/** Represents a variable declared within an evaluation environment */
-	public static class Variable
+	public static class VariableImpl implements Variable
 	{
-		final Type theType;
+		private final Type theType;
 
-		final String theName;
+		private final String theName;
 
-		final boolean isFinal;
+		private final boolean isFinal;
 
-		boolean isInitialized;
+		private boolean isInitialized;
 
-		Object theValue;
+		private Object theValue;
 
 		/**
 		 * @param type The type of the variable
 		 * @param name The name for the variable
 		 * @param _final Whether the variable is declared as final
 		 */
-		public Variable(Type type, String name, boolean _final)
+		public VariableImpl(Type type, String name, boolean _final)
 		{
 			theType = type;
 			theName = name;
@@ -32,33 +32,49 @@ public interface EvaluationEnvironment
 		}
 
 		/** @return The name of the variable */
+		@Override
 		public String getName()
 		{
 			return theName;
 		}
 
 		/** @return The type of the variable */
+		@Override
 		public Type getType()
 		{
 			return theType;
 		}
 
 		/** @return Whether this variable is final or not */
+		@Override
 		public boolean isFinal()
 		{
 			return isFinal;
 		}
 
 		/** @return Whether this variable has been initialized with a value or not */
+		@Override
 		public boolean isInitialized()
 		{
 			return isInitialized;
 		}
 
 		/** @return The value currently assigned to the variable */
+		@Override
 		public Object getValue()
 		{
 			return theValue;
+		}
+
+		/** @param value The value to set for this variable */
+		public void setValue(Object value) {
+			isInitialized = true;
+			theValue = value;
+		}
+
+		/** @param init Whether this variable is to be marked as initialized or not */
+		public void setInitialized(boolean init) {
+			isInitialized = init;
 		}
 
 		@Override
@@ -136,16 +152,6 @@ public interface EvaluationEnvironment
 	 * @throws EvaluationException If the variable cannot be assigned to the given value for any reason
 	 */
 	void dropVariable(String name, ParsedItem struct, int index) throws EvaluationException;
-
-	/** @return All variables that have been declared in this environment */
-	Variable [] getDeclaredVariables();
-
-	/**
-	 * @param name The name of the variable to get the declaration of
-	 * @return All metadata associated with a variable in this environment, or null if the variable has not been
-	 *         declared or has been dropped from this environment
-	 */
-	Variable getDeclaredVariable(String name);
 
 	/**
 	 * Stores a function for later use
@@ -294,7 +300,7 @@ public interface EvaluationEnvironment
 	 * @return Variables that failed to serialize
 	 * @throws java.io.IOException If an error occurs serializing this environment
 	 */
-	Variable [] save(java.io.OutputStream out) throws java.io.IOException;
+	VariableImpl [] save(java.io.OutputStream out) throws java.io.IOException;
 
 	/**
 	 * Populates this environment's data from a stream

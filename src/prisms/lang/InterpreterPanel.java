@@ -8,7 +8,6 @@ import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
 
-import prisms.lang.EvaluationEnvironment.Variable;
 import prisms.lang.eval.DefaultEvaluation;
 import prisms.lang.eval.PrismsEvaluator;
 import prisms.lang.types.*;
@@ -588,7 +587,7 @@ public class InterpreterPanel extends javax.swing.JPanel {
 	 * @param value The value for the variable
 	 */
 	public <T> void setVariable(String name, Class<T> type, boolean isFinal, T value) {
-		EvaluationEnvironment.Variable var = theEnv.getDeclaredVariable(name);
+		Variable var = theEnv.getDeclaredVariable(name);
 		try {
 			if(var == null)
 				theEnv.declareVariable(name, new Type(type), isFinal, null, 0);

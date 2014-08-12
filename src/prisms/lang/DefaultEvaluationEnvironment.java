@@ -22,9 +22,11 @@ public class DefaultEvaluationEnvironment implements EvaluationEnvironment {
 
 	private ClassGetter theClassGetter;
 
-	private HashMap<String, Variable> theVariables;
+	private HashMap<String, VariableImpl> theInternalVariables;
 
-	private ArrayList<Variable> theHistory;
+	private ArrayList<VariableSource> theExternalVariables;
+
+	private ArrayList<VariableImpl> theHistory;
 
 	private HashMap<String, Class<?>> theImportTypes;
 
@@ -48,7 +50,8 @@ public class DefaultEvaluationEnvironment implements EvaluationEnvironment {
 		isTransaction = false;
 		isPublic = true;
 		theClassGetter = new ClassGetter();
-		theVariables = new java.util.LinkedHashMap<>();
+		theInternalVariables = new java.util.LinkedHashMap<>();
+		theExternalVariables = new ArrayList<>();
 		theHistory = new ArrayList<>();
 		theImportTypes = new HashMap<>();
 		theImportMethods = new HashMap<>();
@@ -61,7 +64,8 @@ public class DefaultEvaluationEnvironment implements EvaluationEnvironment {
 		isTransaction = transaction;
 		isPublic = parent == null ? true : parent.isPublic;
 		canOverride = override;
-		theVariables = new HashMap<>();
+		theInternalVariables = new HashMap<>();
+		theExternalVariables = new ArrayList<>();
 		theFunctions = new ArrayList<>();
 		if(theParent == null)
 			theClassGetter = cg;
@@ -71,6 +75,20 @@ public class DefaultEvaluationEnvironment implements EvaluationEnvironment {
 			theImportTypes = new HashMap<>();
 			theImportMethods = new HashMap<>();
 			theImportPackages = new java.util.HashSet<>();
+		}
+	}
+
+	/** @param src A source to inject variables in this environment */
+	public void addVariableSource(VariableSource src) {
+		synchronized(theExternalVariables) {
+			theExternalVariables.add(src);
+		}
+	}
+
+	/** @param src The source to remove from this environment */
+	public void removeVariableSource(VariableSource src) {
+		synchronized(theExternalVariables) {
+			theExternalVariables.remove(src);
 		}
 	}
 
@@ -95,7 +113,7 @@ public class DefaultEvaluationEnvironment implements EvaluationEnvironment {
 	@Override
 	public Type getVariableType(String name) {
 		Variable vbl = getVariable(name, true);
-		return vbl == null ? null : vbl.theType;
+		return vbl == null ? null : vbl.getType();
 	}
 
 	/**
@@ -107,8 +125,17 @@ public class DefaultEvaluationEnvironment implements EvaluationEnvironment {
 	 */
 	protected Variable getVariable(String name, boolean lookBack) {
 		Variable vbl;
-		synchronized(theVariables) {
-			vbl = theVariables.get(name);
+		synchronized(theInternalVariables) {
+			vbl = theInternalVariables.get(name);
+		}
+		if(vbl == null) {
+			synchronized(theExternalVariables) {
+				for(VariableSource src : theExternalVariables) {
+					vbl = src.getDeclaredVariable(name);
+					if(vbl != null)
+						break;
+				}
+			}
 		}
 		if(vbl == null) {
 			if(theParent != null && (lookBack || !canOverride))
@@ -121,96 +148,99 @@ public class DefaultEvaluationEnvironment implements EvaluationEnvironment {
 
 	@Override
 	public Object getVariable(String name, ParsedItem struct, int index) throws EvaluationException {
-		Variable vbl;
-		synchronized(theVariables) {
-			vbl = theVariables.get(name);
-		}
-		if(vbl == null) {
-			if(theParent != null)
-				return theParent.getVariable(name, struct, index);
-			else
-				throw new EvaluationException(name + " has not been declared", struct, index);
-		}
-		if(!vbl.isInitialized)
+		Variable vbl = getVariable(name, true);
+		if(vbl == null)
+			throw new EvaluationException(name + " has not been declared", struct, index);
+		if(!vbl.isInitialized())
 			throw new EvaluationException("Variable " + name + " has not been intialized", struct, index);
-		return vbl.theValue;
+		return vbl.getValue();
 	}
 
 	@Override
 	public void declareVariable(String name, Type type, boolean isFinal, ParsedItem struct, int index) throws EvaluationException {
-		if(theParent != null && !canOverride) {
-			Variable parentVar = theParent.getVariable(name, false);
-			if(parentVar != null)
-				throw new EvaluationException("Duplicate local variable " + name, struct, index);
-		}
-		synchronized(theVariables) {
-			Variable vbl = theVariables.get(name);
-			if(vbl != null)
-				throw new EvaluationException("Duplicate local variable " + name, struct, index);
-			theVariables.put(name, new Variable(type, name, isFinal));
+		Variable vbl = getVariable(name, canOverride);
+		if(vbl != null)
+			throw new EvaluationException("Duplicate local variable " + name, struct, index);
+		synchronized(theInternalVariables) {
+			theInternalVariables.put(name, new VariableImpl(type, name, isFinal));
 		}
 	}
 
 	@Override
 	public void setVariable(String name, Object value, ParsedItem struct, int index) throws EvaluationException {
-		Variable vbl;
-		synchronized(theVariables) {
-			vbl = theVariables.get(name);
+		VariableImpl vbl;
+		synchronized(theInternalVariables) {
+			vbl = theInternalVariables.get(name);
 		}
+		if(vbl == null && getVariable(name, false) != null)
+			throw new EvaluationException("Cannot set values on variables from external sources: " + name, struct, index);
 		if(vbl == null && theParent != null) {
-			vbl = theParent.getVariable(name, true);
+			vbl = (VariableImpl) theParent.getVariable(name, true);
 			if(vbl != null && isTransaction)
-				vbl = new Variable(vbl.theType, vbl.theName, vbl.isFinal);
+				vbl = new VariableImpl(vbl.getType(), vbl.getName(), vbl.isFinal());
 		}
 		if(vbl == null)
 			throw new EvaluationException(name + " cannot be resolved to a variable ", struct, index);
-		if(vbl.theType.isPrimitive()) {
+		if(vbl.getType().isPrimitive()) {
 			if(value == null)
-				throw new EvaluationException("Variable of type " + vbl.theType.toString() + " cannot be assigned null", struct, index);
+				throw new EvaluationException("Variable of type " + vbl.getType().toString() + " cannot be assigned null", struct, index);
 			Class<?> prim = Type.getPrimitiveType(value.getClass());
-			if(prim == null || !vbl.theType.isAssignableFrom(prim))
-				throw new EvaluationException(Type.typeString(value.getClass()) + " cannot be cast to " + vbl.theType, struct, index);
+			if(prim == null || !vbl.getType().isAssignableFrom(prim))
+				throw new EvaluationException(Type.typeString(value.getClass()) + " cannot be cast to " + vbl.getType(), struct, index);
 		} else {
-			if(value != null && !vbl.theType.isAssignableFrom(value.getClass()))
-				throw new EvaluationException(Type.typeString(value.getClass()) + " cannot be cast to " + vbl.theType, struct, index);
+			if(value != null && !vbl.getType().isAssignableFrom(value.getClass()))
+				throw new EvaluationException(Type.typeString(value.getClass()) + " cannot be cast to " + vbl.getType(), struct, index);
 		}
-		if(vbl.isInitialized && vbl.isFinal)
+		if(vbl.isInitialized() && vbl.isFinal())
 			throw new EvaluationException("Final variable " + name + " has already been assigned", struct, index);
-		vbl.isInitialized = true;
-		vbl.theValue = value;
+		vbl.setValue(value);
 	}
 
 	@Override
 	public void dropVariable(String name, ParsedItem struct, int index) throws EvaluationException {
-		Variable vbl;
-		synchronized(theVariables) {
-			vbl = theVariables.get(name);
+		VariableImpl vbl;
+		synchronized(theInternalVariables) {
+			vbl = theInternalVariables.get(name);
 		}
 		if(vbl == null) {
-			if(getVariable(name, true) != null) {
+			if(theParent.getVariable(name, true) != null) {
 				if(isTransaction) {
 					theParent.dropVariable(name, struct, index);
 					return;
 				} else
 					throw new EvaluationException("Variable " + name + " can only be dropped from the scope in which it was declared",
 						struct, index);
-			} else
+			} else if(getVariable(name, false) != null)
+				throw new EvaluationException("Variable " + name + " can not be dropped from an external source", struct, index);
+			else
 				throw new EvaluationException("No such variable named " + name, struct, index);
 		}
-		if(vbl.isFinal)
+		if(vbl.isFinal())
 			throw new EvaluationException("The final variable " + name + " cannot be dropped", struct, index);
-		synchronized(theVariables) {
-			theVariables.remove(name);
+		synchronized(theInternalVariables) {
+			theInternalVariables.remove(name);
 		}
 	}
 
 	@Override
 	public Variable [] getDeclaredVariables() {
 		ArrayList<Variable> ret = new ArrayList<>();
-		DefaultEvaluationEnvironment env = this;
+		synchronized(theInternalVariables) {
+			for(Variable vbl : theInternalVariables.values()) {
+				if(!ret.contains(vbl))
+					ret.add(vbl);
+			}
+		}
+		synchronized(theExternalVariables) {
+			for(VariableSource src : theExternalVariables) {
+				for(Variable var : src.getDeclaredVariables())
+					ret.add(var);
+			}
+		}
+		DefaultEvaluationEnvironment env = theParent;
 		while(env != null) {
-			synchronized(env.theVariables) {
-				for(Variable vbl : env.theVariables.values()) {
+			synchronized(env.theInternalVariables) {
+				for(Variable vbl : env.theInternalVariables.values()) {
 					if(!ret.contains(vbl))
 						ret.add(vbl);
 				}
@@ -311,22 +341,22 @@ public class DefaultEvaluationEnvironment implements EvaluationEnvironment {
 	public Type getHistoryType(int index) {
 		if(theParent != null)
 			return theParent.getHistoryType(index);
-		Variable vbl;
+		VariableImpl vbl;
 		synchronized(theHistory) {
 			vbl = theHistory.get(theHistory.size() - index - 1);
 		}
-		return vbl.theType;
+		return vbl.getType();
 	}
 
 	@Override
 	public Object getHistory(int index) {
 		if(theParent != null)
 			return theParent.getHistory(index);
-		Variable vbl;
+		VariableImpl vbl;
 		synchronized(theHistory) {
 			vbl = theHistory.get(theHistory.size() - index - 1);
 		}
-		return vbl.theValue;
+		return vbl.getValue();
 	}
 
 	@Override
@@ -337,8 +367,8 @@ public class DefaultEvaluationEnvironment implements EvaluationEnvironment {
 			else
 				throw new IllegalStateException("History can only be added to a root-level evaluation environment");
 		}
-		Variable vbl = new Variable(type, "%", false);
-		vbl.theValue = result;
+		VariableImpl vbl = new VariableImpl(type, "%", false);
+		vbl.setValue(result);
 		synchronized(theHistory) {
 			theHistory.add(vbl);
 		}
@@ -467,15 +497,15 @@ public class DefaultEvaluationEnvironment implements EvaluationEnvironment {
 			ret.theImportTypes.put(entry.getKey(), entry.getValue());
 		for(java.util.Map.Entry<String, Class<?>> entry : root.theImportMethods.entrySet())
 			ret.theImportMethods.put(entry.getKey(), entry.getValue());
-		for(Variable var : root.theHistory)
+		for(VariableImpl var : root.theHistory)
 			ret.theHistory.add(var);
 		for(ParsedFunctionDeclaration func : getDeclaredFunctions())
 			ret.theFunctions.add(func);
 		root = this;
 		while(root != null) {
-			for(java.util.Map.Entry<String, Variable> var : root.theVariables.entrySet())
-				if(var.getValue().isFinal && var.getValue().isInitialized)
-					ret.theVariables.put(var.getKey(), var.getValue());
+			for(java.util.Map.Entry<String, VariableImpl> var : root.theInternalVariables.entrySet())
+				if(var.getValue().isFinal() && var.getValue().isInitialized())
+					ret.theInternalVariables.put(var.getKey(), var.getValue());
 			root = root.theParent;
 		}
 		ret.setTracker(theTracker);
@@ -513,7 +543,7 @@ public class DefaultEvaluationEnvironment implements EvaluationEnvironment {
 	}
 
 	@Override
-	public Variable [] save(OutputStream out) throws IOException {
+	public VariableImpl [] save(OutputStream out) throws IOException {
 		java.io.OutputStreamWriter charWriter = new java.io.OutputStreamWriter(out);
 		prisms.util.json.JsonStreamWriter jsonWriter = new prisms.util.json.JsonStreamWriter(charWriter);
 		prisms.util.HexStreamWriter hexWriter = new prisms.util.HexStreamWriter();
@@ -521,9 +551,9 @@ public class DefaultEvaluationEnvironment implements EvaluationEnvironment {
 		jsonWriter.startObject();
 		jsonWriter.startProperty("variables");
 		jsonWriter.startArray();
-		ArrayList<Variable> fails = new ArrayList<>();
-		for(Variable var : theVariables.values()) {
-			if(var.theValue != null && !(var.theValue instanceof java.io.Serializable)) {
+		ArrayList<VariableImpl> fails = new ArrayList<>();
+		for(VariableImpl var : theInternalVariables.values()) {
+			if(var.getValue() != null && !(var.getValue() instanceof java.io.Serializable)) {
 				fails.add(var);
 				continue;
 			}
@@ -568,8 +598,8 @@ public class DefaultEvaluationEnvironment implements EvaluationEnvironment {
 
 		jsonWriter.startProperty("history");
 		jsonWriter.startArray();
-		for(Variable var : theHistory) {
-			if(var.theValue != null && !(var.theValue instanceof java.io.Serializable)) {
+		for(VariableImpl var : theHistory) {
+			if(var.getValue() != null && !(var.getValue() instanceof java.io.Serializable)) {
 				fails.add(var);
 				continue;
 			}
@@ -584,26 +614,26 @@ public class DefaultEvaluationEnvironment implements EvaluationEnvironment {
 
 		jsonWriter.endObject();
 		charWriter.close();
-		return fails.toArray(new Variable[fails.size()]);
+		return fails.toArray(new VariableImpl[fails.size()]);
 	}
 
-	private void writeVar(Variable var, prisms.util.json.JsonStreamWriter jsonWriter, prisms.util.HexStreamWriter hexWriter,
+	private void writeVar(VariableImpl var, prisms.util.json.JsonStreamWriter jsonWriter, prisms.util.HexStreamWriter hexWriter,
 		java.io.Writer charWriter, boolean isShort) throws IOException {
 		jsonWriter.startObject();
 		jsonWriter.startProperty("name");
-		jsonWriter.writeString(var.theName);
+		jsonWriter.writeString(var.getName());
 		jsonWriter.startProperty("type");
-		jsonWriter.writeString(var.theType.toString());
+		jsonWriter.writeString(var.getType().toString());
 		if(!isShort) {
 			jsonWriter.startProperty("final");
-			jsonWriter.writeBoolean(var.isFinal);
+			jsonWriter.writeBoolean(var.isFinal());
 			jsonWriter.startProperty("initialized");
-			jsonWriter.writeBoolean(var.isInitialized);
+			jsonWriter.writeBoolean(var.isInitialized());
 		}
 		jsonWriter.startProperty("value");
 		hexWriter.setWrapped(jsonWriter.writeStringAsWriter());
 		ObjectOutputStream oos = new ObjectOutputStream(hexWriter);
-		oos.writeObject(var.theValue);
+		oos.writeObject(var.getValue());
 		oos.close();
 		jsonWriter.endObject();
 	}
@@ -621,8 +651,8 @@ public class DefaultEvaluationEnvironment implements EvaluationEnvironment {
 			while(jsonReader.getNextItem(true, false) instanceof prisms.util.json.JsonSerialReader.ObjectItem) {
 				StructState varState = jsonReader.save();
 				try {
-					Variable var = parseNextVariable(jsonReader, hexReader, parser, eval);
-					theVariables.put(var.getName(), var);
+					VariableImpl var = parseNextVariable(jsonReader, hexReader, parser, eval);
+					theInternalVariables.put(var.getName(), var);
 				} catch(IOException e) {
 					e.printStackTrace();
 				} finally {
@@ -702,7 +732,7 @@ public class DefaultEvaluationEnvironment implements EvaluationEnvironment {
 			while(jsonReader.getNextItem(true, false) instanceof prisms.util.json.JsonSerialReader.ObjectItem) {
 				StructState histState = jsonReader.save();
 				try {
-					Variable var = parseNextVariable(jsonReader, hexReader, parser, eval);
+					VariableImpl var = parseNextVariable(jsonReader, hexReader, parser, eval);
 					theHistory.add(var);
 				} catch(IOException e) {
 					e.printStackTrace();
@@ -719,7 +749,7 @@ public class DefaultEvaluationEnvironment implements EvaluationEnvironment {
 		}
 	}
 
-	private Variable parseNextVariable(prisms.util.json.JsonSerialReader jsonReader, prisms.util.HexStreamReader hexReader,
+	private VariableImpl parseNextVariable(prisms.util.json.JsonSerialReader jsonReader, prisms.util.HexStreamReader hexReader,
 		PrismsParser parser, PrismsEvaluator eval) throws IOException, prisms.util.json.SAJParser.ParseException {
 		if(!"name".equals(jsonReader.getNextProperty()))
 			throw new IOException("Unrecognizable JSON stream--variable has no name");
@@ -756,9 +786,9 @@ public class DefaultEvaluationEnvironment implements EvaluationEnvironment {
 		} catch(Exception e) {
 			throw new IOException("Could not parse variable " + name, e);
 		}
-		Variable ret = new Variable(type, name, isFinal);
-		ret.theValue = value;
-		ret.isInitialized = initialized;
+		VariableImpl ret = new VariableImpl(type, name, isFinal);
+		ret.setValue(value);
+		ret.setInitialized(initialized);
 		return ret;
 	}
 }
