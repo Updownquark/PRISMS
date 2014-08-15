@@ -757,6 +757,22 @@ public class Type
 		return true;
 	}
 
+	@Override
+	public int hashCode() {
+		int ret = 0;
+		if(isBounded)
+			ret++;
+		if(theBaseType != null)
+			ret = ret * 5 * theBaseType.hashCode();
+		if(theBoundType != null)
+			ret = ret * 7 + theBoundType.hashCode() + (isUpperBound ? 1 : 0);
+		if(theName != null)
+			ret = ret * 13 + theName.hashCode();
+		if(theParamTypes != null)
+			ret = ret * 17 + prisms.util.ArrayUtils.hashCode(theParamTypes);
+		return ret;
+	}
+
 	/**
 	 * @param wrapper The wrapper for a primtive type
 	 * @return The wrapped primitive type, or null if the given type is not primitive or a primitive wrapper
