@@ -38,6 +38,7 @@ public class Type
 		isBounded = true;
 		theBoundType = bound;
 		isUpperBound = upper;
+		theParamTypes = new Type[0];
 	}
 
 	/**
