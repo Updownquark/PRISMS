@@ -221,6 +221,10 @@ public class Type
 	 */
 	public Object cast(Object o) throws IllegalArgumentException
 	{
+		if(theBoundType != null)
+			return theBoundType.cast(o);
+		else if(theBaseType == null)
+			throw new IllegalStateException("cast() can only be called on basic or bounded types");
 		if(isPrimitive())
 		{
 			if(o == null)
@@ -341,7 +345,7 @@ public class Type
 		java.lang.reflect.Type[] paramTypes, Type [] argTypes)
 	{
 		if(paramTypes.length > 0 && argTypes.length > 0 && methodTypes == null)
-			methodTypes = new java.util.HashMap<String, Type>();
+			methodTypes = new java.util.HashMap<>();
 		for(int p = 0; p < paramTypes.length; p++)
 		{
 			if(paramTypes[p] instanceof java.lang.reflect.TypeVariable)
