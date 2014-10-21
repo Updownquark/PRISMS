@@ -22,8 +22,16 @@ public class ParsedType extends prisms.lang.ParsedItem {
 		super.setup(parser, parent, match);
 		isBounded = false;
 		theParamTypes = new ParsedType[0];
-		if("basic type".equals(match.config.get("name"))) {
-			isBounded = false;
+		if(getStored("base") != null) {
+			ParsedItem base = parser.parseStructures(this, getStored("base"))[0];
+			if(base instanceof ParsedType)
+				theName = ((ParsedType) base).getName();
+			else if(base instanceof ParsedIdentifier)
+				theName = ((ParsedIdentifier) base).getName();
+			else
+				throw new prisms.lang.ParseException("Unrecognized base type for type: " + base.getClass().getName(), getRoot()
+					.getFullCommand(), base.getMatch().index);
+		} else {
 			String name = "";
 			for(prisms.lang.ParseMatch m : getAllStored("name")) {
 				if(name.length() > 0)
@@ -31,7 +39,8 @@ public class ParsedType extends prisms.lang.ParsedItem {
 				name += m.text;
 			}
 			theName = name;
-		} else if("wildcard type".equals(match.config.get("name"))) {
+		}
+		if("wildcard type".equals(match.config.get("name"))) {
 			isBounded = true;
 			if(getStored("wildcard") != null)
 				isUpperBound = true;
@@ -41,8 +50,6 @@ public class ParsedType extends prisms.lang.ParsedItem {
 			} else
 				setup(parser, parent, getStored("type"));
 		} else {
-			theName = ((ParsedType) parser.parseStructures(this, getStored("base"))[0]).getName();
-			isBounded = false;
 			ParsedItem [] pts = parser.parseStructures(this, getAllStored("paramType"));
 			theParamTypes = new ParsedType[pts.length];
 			System.arraycopy(pts, 0, theParamTypes, 0, pts.length);
