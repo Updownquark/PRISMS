@@ -12,7 +12,7 @@ public class IntellisenseMenu extends javax.swing.JDialog
 	{
 		/**
 		 * Called when an intellisense item is selected
-		 * 
+		 *
 		 * @param item The item selected by the user
 		 * @param text The append text for the item
 		 */
@@ -160,8 +160,8 @@ public class IntellisenseMenu extends javax.swing.JDialog
 		setAlwaysOnTop(true);
 		setIconImage(null);
 		setUndecorated(true);
-		theMenuItemCache = new java.util.ArrayList<IntellisenseMenuItem>();
-		theListeners = new java.util.ArrayList<IntellisenseListener>();
+		theMenuItemCache = new java.util.ArrayList<>();
+		theListeners = new java.util.ArrayList<>();
 
 		theNavListener = new java.awt.event.KeyAdapter()
 		{
@@ -196,7 +196,7 @@ public class IntellisenseMenu extends javax.swing.JDialog
 
 	/**
 	 * Adds a menu item to this menu
-	 * 
+	 *
 	 * @param type The type of the item. Not used yet. TODO
 	 * @param menuText The text to display for the menu item
 	 * @param item The item represented by the menu item
@@ -215,7 +215,7 @@ public class IntellisenseMenu extends javax.swing.JDialog
 
 	/**
 	 * Clears all menu items from this menu
-	 * 
+	 *
 	 * @param hide Whether to also hide the menu
 	 */
 	public void clear(boolean hide)
@@ -241,7 +241,7 @@ public class IntellisenseMenu extends javax.swing.JDialog
 
 	/**
 	 * Displays this menu
-	 * 
+	 *
 	 * @param c The component to display the menu over
 	 * @param pos The point on the component to display this menu over
 	 * @return Whether this menu was successfully displayed
@@ -270,7 +270,7 @@ public class IntellisenseMenu extends javax.swing.JDialog
 
 	/**
 	 * Displays this menu
-	 * 
+	 *
 	 * @param tc The text component to display the menu just under the caret position of
 	 * @return Whether this menu was successfully displayed
 	 */
