@@ -177,8 +177,10 @@ public class Type {
 				} else
 					return theBaseType == Object.class;
 			} else {
-				if(!isAssignable(theBaseType, t.theBaseType))
-					return false;
+				if(!isAssignable(theBaseType, t.theBaseType)){
+					if(!t.isPrimitive() || !isAssignable(theBaseType, getWrapperType(t.theBaseType)))
+						return false;
+				}
 				for(int p = 0; p < theParamTypes.length; p++)
 					if(!theParamTypes[p].isAssignable(t.resolve(theBaseType.getTypeParameters()[p], theBaseType, null,
 						new java.lang.reflect.Type[0], new Type[0])))
