@@ -7,14 +7,14 @@ package prisms.util;
  * <p>
  * Acts like an {@link java.util.ArrayList} but for primitive float values.
  * </p>
- * 
+ *
  * <p>
  * This class also has a sorted option that will cause the list to sort itself and maintain the
  * sorted order (ascending). If this option is set, calls to {@link #add(int, float)} will disregard
  * the index parameter to maintain correct order. Calls to {@link #set(int, float)} will behave the
  * same as successive calls to {@link #remove(int)} and {@link #add(float)}.
  * </p>
- * 
+ *
  * <p>
  * This class also has a unique option that will cause the list to contain at most one instance of
  * any value. If this option is set, calls to {@link #add(float)}, {@link #add(int, float)},
@@ -22,7 +22,7 @@ package prisms.util;
  * exist. The unique feature has better performance if used with the sorted feature, but both
  * features may be used independently.
  * </p>
- * 
+ *
  * <p>
  * This class is NOT thread-safe. If an instance of this class is accessed by multiple threads, it
  * MUST be synchronized externally.
@@ -49,7 +49,7 @@ public class FloatList implements Iterable<Float>, Sealable, Cloneable
 	/**
 	 * Creates a float list with the option of having the list sorted and/or unique-constrained
 	 * initially
-	 * 
+	 *
 	 * @param sorted Whether the list should be sorted
 	 * @param unique Whether the list should eliminate duplicate values
 	 */
@@ -62,7 +62,7 @@ public class FloatList implements Iterable<Float>, Sealable, Cloneable
 
 	/**
 	 * Creates a list with a set capacity
-	 * 
+	 *
 	 * @param size The initial capacity of the list
 	 */
 	public FloatList(int size)
@@ -72,7 +72,7 @@ public class FloatList implements Iterable<Float>, Sealable, Cloneable
 
 	/**
 	 * Creates a list with a set of values
-	 * 
+	 *
 	 * @param values The values for the list
 	 */
 	public FloatList(float [] values)
@@ -90,7 +90,7 @@ public class FloatList implements Iterable<Float>, Sealable, Cloneable
 	/**
 	 * Sets whether this list should keep itself sorted or not. If set to true, this method will
 	 * sort the current value set.
-	 * 
+	 *
 	 * @param sorted Whether the elements in this list should be sorted or not
 	 */
 	public void setSorted(boolean sorted)
@@ -127,7 +127,7 @@ public class FloatList implements Iterable<Float>, Sealable, Cloneable
 	/**
 	 * Sets whether this list should accept duplicate values. If set to true, this method will
 	 * eliminate duplicate values that may exist in the current set.
-	 * 
+	 *
 	 * @param unique Whether this list should eliminate duplicate values
 	 */
 	public void setUnique(boolean unique)
@@ -185,11 +185,13 @@ public class FloatList implements Iterable<Float>, Sealable, Cloneable
 		theSize = 0;
 	}
 
+	@Override
 	public boolean isSealed()
 	{
 		return isSealed;
 	}
 
+	@Override
 	public void seal()
 	{
 		trimToSize();
@@ -204,7 +206,7 @@ public class FloatList implements Iterable<Float>, Sealable, Cloneable
 
 	/**
 	 * Gets the value in the list at the given index
-	 * 
+	 *
 	 * @param index The index of the value to get
 	 * @return The value at the given index
 	 */
@@ -217,16 +219,16 @@ public class FloatList implements Iterable<Float>, Sealable, Cloneable
 
 	/**
 	 * Adds a value to this list.
-	 * 
+	 *
 	 * <p>
 	 * If this list is sorted, the value will be inserted at the index where it belongs; otherwise
 	 * the value will be added to the end of the list.
 	 * </p>
-	 * 
+	 *
 	 * <p>
 	 * If this list is unique, the value will not be added if it already exists in the list
 	 * </p>
-	 * 
+	 *
 	 * @param value The value to add to the list
 	 * @return Whether the value was added. This will only be false if this list is unique and the
 	 *         value already exists.
@@ -255,7 +257,7 @@ public class FloatList implements Iterable<Float>, Sealable, Cloneable
 	 * list. If there already exist more than one instance of the given value, the result will be
 	 * the index of one of these, but the exact index of the result is undetermined if more than one
 	 * instance exists.
-	 * 
+	 *
 	 * @param value The value to find the index for
 	 * @return The index at which the given value would be added into this array from an
 	 *         {@link #add(float) add} operation.
@@ -272,13 +274,13 @@ public class FloatList implements Iterable<Float>, Sealable, Cloneable
 		while(min < max)
 		{
 			int mid = (min + max) >>> 1;
-			int diff = compare(value, theValue[mid]);
-			if(diff > 0)
-				min = mid + 1;
-			else if(diff < 0)
-				max = mid;
-			else
-				return mid;
+		int diff = compare(value, theValue[mid]);
+		if(diff > 0)
+			min = mid + 1;
+		else if(diff < 0)
+			max = mid;
+		else
+			return mid;
 		}
 		if(compare(theValue[max], value) < 0)
 			max++;
@@ -287,7 +289,7 @@ public class FloatList implements Iterable<Float>, Sealable, Cloneable
 
 	/**
 	 * Compares two float values
-	 * 
+	 *
 	 * @param v1 The first value to compare
 	 * @param v2 The second value to compare
 	 * @return -1 if v1<v2, 1 if v1>v2, or 0 if the two are equivalent
@@ -300,16 +302,16 @@ public class FloatList implements Iterable<Float>, Sealable, Cloneable
 
 	/**
 	 * Adds a value to this list at the given index.
-	 * 
+	 *
 	 * <p>
 	 * If this list is sorted, the index parameter will be ignored and the value will be inserted at
 	 * the index where it belongs.
 	 * </p>
-	 * 
+	 *
 	 * <p>
 	 * If this list is unique, the value will not be added if it already exists in the list.
 	 * <p>
-	 * 
+	 *
 	 * @param index The index to add the value at
 	 * @param value The value to add to the list
 	 * @return Whether the value was added. This will only be false if this list is unique and the
@@ -337,17 +339,17 @@ public class FloatList implements Iterable<Float>, Sealable, Cloneable
 
 	/**
 	 * Adds an array of values to the end of this list.
-	 * 
+	 *
 	 * <p>
 	 * If this list is sorted, all values will be inserted into the indexes where they belong;
 	 * otherwise the values will be added to the end of this list.
 	 * </p>
-	 * 
+	 *
 	 * <p>
 	 * If this list is unique, each value will only be added if it does not already exist in the
 	 * list, and values that appear multiple times in the given set will be added once.
 	 * </p>
-	 * 
+	 *
 	 * @param value The values to add
 	 * @return The number of values added to this list
 	 */
@@ -358,17 +360,17 @@ public class FloatList implements Iterable<Float>, Sealable, Cloneable
 
 	/**
 	 * Adds all elements of the given array within the given range.
-	 * 
+	 *
 	 * <p>
 	 * If this list is sorted, all values will be inserted into the indexes where they belong;
 	 * otherwise the values will be added to the end of this list.
 	 * </p>
-	 * 
+	 *
 	 * <p>
 	 * If this list is unique, each value will only be added if it does not already exist in the
 	 * list, and values that appear multiple times in the given set will be added once.
 	 * </p>
-	 * 
+	 *
 	 * @param value The array with the values to add
 	 * @param start The starting index (inclusive) of the values in the array to add
 	 * @param end The end index (exclusive) of the value in the array to add
@@ -388,31 +390,33 @@ public class FloatList implements Iterable<Float>, Sealable, Cloneable
 		{
 			java.util.Arrays.sort(value, start, end);
 			int i1 = 0, i2 = start;
-			int ret;
+			int count;
 			if(isUnique)
 			{
-				ret = 0;
-				while(i2 < end)
-				{
-					while(i1 < theSize && theValue[i1] < value[i2])
-						i1++;
-					if(i2 < end && theValue[i1] != value[i2]
-						&& (i2 == 0 || value[i2] != value[i2 - 1]))
-						ret++;
-					i2++;
+				// Remove duplicates in the additions
+				float [] dup = new float[value.length];
+				int dupIdx = 0;
+				for(int i = 0; i < value.length; i++) {
+					if(i > 0 && value[i] == value[i - 1])
+						continue;
+					if(contains(value[i]))
+						continue;
+					dup[dupIdx++] = value[i];
 				}
+				count = dupIdx;
+				value = dup;
 			}
 			else
-				ret = end - start;
-			if(ret == 0)
+				count = end - start;
+			if(count == 0)
 				return 0;
-			ensureCapacity(theSize + ret);
+			ensureCapacity(theSize + count);
 
 			i1 = theSize - 1;
 			i2 = end - 1;
-			int i = theSize + ret - 1;
-			theSize += ret;
-			int ret2 = ret;
+			int i = theSize + count - 1;
+			theSize += count;
+			int ret2 = count;
 			while(i >= 0 && ret2 > 0 && (i1 >= 0 || i2 >= start))
 			{
 				if(i1 < 0)
@@ -436,7 +440,7 @@ public class FloatList implements Iterable<Float>, Sealable, Cloneable
 					i2--;
 				}
 			}
-			return ret;
+			return count;
 		}
 		else
 		{
@@ -470,17 +474,17 @@ public class FloatList implements Iterable<Float>, Sealable, Cloneable
 
 	/**
 	 * Adds a list of values to the end of this list
-	 * 
+	 *
 	 * <p>
 	 * If this list is sorted, all values will be inserted into the indexes where they belong;
 	 * otherwise the values will be added to the end of this list
 	 * </p>
-	 * 
+	 *
 	 * <p>
 	 * If this list is unique, each value will only be added if it does not already exist in the
 	 * list, and values that appear multiple times in the given set will be added once.
 	 * </p>
-	 * 
+	 *
 	 * @param list The list of values to add
 	 * @param insert The index to insert the values into. -1 inserts the values after the end. This
 	 *        parameter is ignored for sorted lists
@@ -495,17 +499,17 @@ public class FloatList implements Iterable<Float>, Sealable, Cloneable
 	 * <p>
 	 * Replaces a value in this list with another value.
 	 * </p>
-	 * 
+	 *
 	 * <p>
 	 * If this list is sorted, the value at the given index will be removed and the new value will
 	 * be inserted into the index where it belongs.
 	 * </p>
-	 * 
+	 *
 	 * <p>
 	 * If this list is unique, the value at the given index will be removed and the new value will
 	 * replace it ONLY if the value does not exist elsewhere in the list.
 	 * </p>
-	 * 
+	 *
 	 * @param index The index of the value to replace
 	 * @param value The value to replace the old value with
 	 * @return The old value at the given index
@@ -541,7 +545,7 @@ public class FloatList implements Iterable<Float>, Sealable, Cloneable
 
 	/**
 	 * Removes a value from this list
-	 * 
+	 *
 	 * @param index The index of the value to remove
 	 * @return The value that was removed
 	 */
@@ -559,7 +563,7 @@ public class FloatList implements Iterable<Float>, Sealable, Cloneable
 
 	/**
 	 * Removes a range of indices
-	 * 
+	 *
 	 * @param start The starting index of the range to remove (inclusive)
 	 * @param end The ending index of the range to remove (exclusive)
 	 */
@@ -578,7 +582,7 @@ public class FloatList implements Iterable<Float>, Sealable, Cloneable
 
 	/**
 	 * Removes a set of indices
-	 * 
+	 *
 	 * @param indices The indices to remove
 	 * @return The number of elements removed
 	 */
@@ -604,7 +608,7 @@ public class FloatList implements Iterable<Float>, Sealable, Cloneable
 
 	/**
 	 * Removes a value from this list
-	 * 
+	 *
 	 * @param value The value to remove
 	 * @return Whether the value was found and removed
 	 */
@@ -634,7 +638,7 @@ public class FloatList implements Iterable<Float>, Sealable, Cloneable
 	/**
 	 * Compares two floats for equality. Interprets all Float.NaN values as equal and interprets 0.0
 	 * and -0.0 as different.
-	 * 
+	 *
 	 * @param f1 The first float to compare
 	 * @param f2 The second float to compare
 	 * @return Whether the two float values are equivalent
@@ -652,7 +656,7 @@ public class FloatList implements Iterable<Float>, Sealable, Cloneable
 
 	/**
 	 * Removes all instances of the given value from this list
-	 * 
+	 *
 	 * @param value The value to remove
 	 * @return The number of times the value was removed
 	 */
@@ -667,8 +671,10 @@ public class FloatList implements Iterable<Float>, Sealable, Cloneable
 			if(idx < 0 || idx >= theSize || !equal(theValue[idx], value))
 				return 0;
 			int begin, end;
-			for(begin = idx; begin > 0 && equal(theValue[begin - 1], value); begin--);
-			for(end = idx + 1; end < theSize && equal(theValue[end], value); end++);
+			for(begin = idx; begin > 0 && equal(theValue[begin - 1], value); begin--) {
+			}
+			for(end = idx + 1; end < theSize && equal(theValue[end], value); end++) {
+			}
 			remove(begin, end);
 			return end - begin;
 		}
@@ -688,7 +694,7 @@ public class FloatList implements Iterable<Float>, Sealable, Cloneable
 
 	/**
 	 * Removes all values in this list that are present in the given list
-	 * 
+	 *
 	 * @param list The list whose values to remove from this list
 	 * @return The number of elements removed from this list as a result of this call
 	 */
@@ -725,7 +731,7 @@ public class FloatList implements Iterable<Float>, Sealable, Cloneable
 
 	/**
 	 * Switches the positions of two values
-	 * 
+	 *
 	 * @param idx1 The index of the first value to switch
 	 * @param idx2 The index of the second value to switch
 	 */
@@ -743,6 +749,7 @@ public class FloatList implements Iterable<Float>, Sealable, Cloneable
 		theValue[idx2] = temp;
 	}
 
+	@Override
 	public java.util.ListIterator<Float> iterator()
 	{
 		return new FloatListIterator(toArray());
@@ -750,12 +757,12 @@ public class FloatList implements Iterable<Float>, Sealable, Cloneable
 
 	/**
 	 * Adds all elements of an array that are not present in this list.
-	 * 
+	 *
 	 * <p>
 	 * If this list is sorted, the given list will be sorted and each value will be inserted at the
 	 * index where it belongs (assuming it is not already present in the list)
 	 * </p>
-	 * 
+	 *
 	 * @param list The list to add new values from
 	 * @return The number of values added to this list
 	 */
@@ -779,12 +786,12 @@ public class FloatList implements Iterable<Float>, Sealable, Cloneable
 
 	/**
 	 * Adds all elements of a new list that are not present in this list.
-	 * 
+	 *
 	 * <p>
 	 * If this list is sorted, the given list will be sorted and each value will be inserted at the
 	 * index where it belongs (assuming it is not already present in the list)
 	 * </p>
-	 * 
+	 *
 	 * @param list The list to add new values from
 	 * @return The number of values added to this list
 	 */
@@ -808,7 +815,7 @@ public class FloatList implements Iterable<Float>, Sealable, Cloneable
 
 	/**
 	 * Removes all elements of this list that are not present in the given list
-	 * 
+	 *
 	 * @param list The list to keep elements from
 	 * @return The number of elements removed from this lists
 	 */
@@ -833,7 +840,7 @@ public class FloatList implements Iterable<Float>, Sealable, Cloneable
 
 	/**
 	 * Determines if this list contains a given value
-	 * 
+	 *
 	 * @param value The value to find
 	 * @return Whether this list contains the given value
 	 */
@@ -849,7 +856,7 @@ public class FloatList implements Iterable<Float>, Sealable, Cloneable
 
 	/**
 	 * Counts the number of times a value is represented in this list
-	 * 
+	 *
 	 * @param value The value to count
 	 * @return The number of times the value appears in this list
 	 */
@@ -878,7 +885,7 @@ public class FloatList implements Iterable<Float>, Sealable, Cloneable
 
 	/**
 	 * Finds a value in this list
-	 * 
+	 *
 	 * @param value The value to find
 	 * @return The first index whose value is the given value
 	 */
@@ -902,7 +909,7 @@ public class FloatList implements Iterable<Float>, Sealable, Cloneable
 
 	/**
 	 * Finds a value in this list
-	 * 
+	 *
 	 * @param value The value to find
 	 * @return The last index whose value is the given value
 	 */
@@ -942,8 +949,8 @@ public class FloatList implements Iterable<Float>, Sealable, Cloneable
 	}
 
 	/**
-	 * Similary to {@link #toArray()} but creates an array of {@link Float} wrappers
-	 * 
+	 * Similar to {@link #toArray()} but creates an array of {@link Float} wrappers
+	 *
 	 * @return The list of values currently in this list
 	 */
 	public Float [] toObjectArray()
@@ -956,7 +963,7 @@ public class FloatList implements Iterable<Float>, Sealable, Cloneable
 
 	/**
 	 * Copies a subset of this list's data into an array
-	 * 
+	 *
 	 * @param srcPos The index in this list to start copying from
 	 * @param dest The array to copy the data into
 	 * @param destPos The index in the destination array to start copying to
@@ -969,7 +976,7 @@ public class FloatList implements Iterable<Float>, Sealable, Cloneable
 
 	/**
 	 * Copies a subset of this list's data into an array
-	 * 
+	 *
 	 * @param srcPos The index in this list to start copying from
 	 * @param dest The array to copy the data into
 	 * @param destPos The index in the destination array to start copying to
@@ -1026,7 +1033,7 @@ public class FloatList implements Iterable<Float>, Sealable, Cloneable
 
 	/**
 	 * Ensures that this list's capacity is at list the given value
-	 * 
+	 *
 	 * @param minCapacity The minimum capacity for the list
 	 */
 	public void ensureCapacity(int minCapacity)
@@ -1059,11 +1066,13 @@ public class FloatList implements Iterable<Float>, Sealable, Cloneable
 			theContent = content;
 		}
 
+		@Override
 		public boolean hasNext()
 		{
 			return theIndex < theContent.length;
 		}
 
+		@Override
 		public Float next()
 		{
 			Float ret = Float.valueOf(theContent[theIndex]);
@@ -1072,11 +1081,13 @@ public class FloatList implements Iterable<Float>, Sealable, Cloneable
 			return ret;
 		}
 
+		@Override
 		public boolean hasPrevious()
 		{
 			return theIndex > 0;
 		}
 
+		@Override
 		public Float previous()
 		{
 			Float ret = Float.valueOf(theContent[theIndex - 1]);
@@ -1085,16 +1096,19 @@ public class FloatList implements Iterable<Float>, Sealable, Cloneable
 			return ret;
 		}
 
+		@Override
 		public int nextIndex()
 		{
 			return theIndex;
 		}
 
+		@Override
 		public int previousIndex()
 		{
 			return theIndex - 1;
 		}
 
+		@Override
 		public void remove()
 		{
 			if(lastRemoved)
@@ -1112,6 +1126,7 @@ public class FloatList implements Iterable<Float>, Sealable, Cloneable
 			lastRemoved = true;
 		}
 
+		@Override
 		public void set(Float e)
 		{
 			if(lastRemoved)
@@ -1123,6 +1138,7 @@ public class FloatList implements Iterable<Float>, Sealable, Cloneable
 			FloatList.this.set(theIndex, e.floatValue());
 		}
 
+		@Override
 		public void add(Float e)
 		{
 			if(get(theIndex) != theContent[theIndex])
