@@ -7,7 +7,7 @@ package prisms.util;
  * <p>
  * Acts like an {@link java.util.ArrayList} but for primitive boolean values.
  * </p>
- * 
+ *
  * <p>
  * This class is NOT thread-safe. If an instance of this class is accessed by multiple threads and
  * may be modified by one or more of them, it MUST be synchronized externally.
@@ -29,7 +29,7 @@ public class BooleanList implements Iterable<Boolean>, Sealable, Cloneable
 
 	/**
 	 * Creates a list with a set capacity
-	 * 
+	 *
 	 * @param size The initial capacity of the list
 	 */
 	public BooleanList(int size)
@@ -39,7 +39,7 @@ public class BooleanList implements Iterable<Boolean>, Sealable, Cloneable
 
 	/**
 	 * Creates a list with a set of values
-	 * 
+	 *
 	 * @param values The values for the list
 	 */
 	public BooleanList(boolean [] values)
@@ -67,11 +67,13 @@ public class BooleanList implements Iterable<Boolean>, Sealable, Cloneable
 		theSize = 0;
 	}
 
+	@Override
 	public boolean isSealed()
 	{
 		return isSealed;
 	}
 
+	@Override
 	public void seal()
 	{
 		trimToSize();
@@ -86,7 +88,7 @@ public class BooleanList implements Iterable<Boolean>, Sealable, Cloneable
 
 	/**
 	 * Gets the value in the list at the given index
-	 * 
+	 *
 	 * @param index The index of the value to get
 	 * @return The value at the given index
 	 */
@@ -99,7 +101,7 @@ public class BooleanList implements Iterable<Boolean>, Sealable, Cloneable
 
 	/**
 	 * Adds a value to this list.
-	 * 
+	 *
 	 * @param value The value to add to the list
 	 */
 	public void add(boolean value)
@@ -111,7 +113,7 @@ public class BooleanList implements Iterable<Boolean>, Sealable, Cloneable
 
 	/**
 	 * Adds a value to this list at the given index.
-	 * 
+	 *
 	 * @param index The index to add the value at
 	 * @param value The value to add to the list
 	 */
@@ -129,7 +131,7 @@ public class BooleanList implements Iterable<Boolean>, Sealable, Cloneable
 
 	/**
 	 * Adds an array of values to the end of this list.
-	 * 
+	 *
 	 * @param value The values to add
 	 */
 	public void addAll(boolean... value)
@@ -139,7 +141,7 @@ public class BooleanList implements Iterable<Boolean>, Sealable, Cloneable
 
 	/**
 	 * Adds all elements of the given array within the given range.
-	 * 
+	 *
 	 * @param value The array with the values to add
 	 * @param start The starting index (inclusive) of the values in the array to add
 	 * @param end The end index (exclusive) of the value in the array to add
@@ -160,7 +162,7 @@ public class BooleanList implements Iterable<Boolean>, Sealable, Cloneable
 
 	/**
 	 * Adds a list of values to the end of this list
-	 * 
+	 *
 	 * @param list The list of values to add
 	 */
 	public void addAll(BooleanList list)
@@ -172,7 +174,7 @@ public class BooleanList implements Iterable<Boolean>, Sealable, Cloneable
 	 * <p>
 	 * Replaces a value in this list with another value.
 	 * </p>
-	 * 
+	 *
 	 * @param index The index of the value to replace
 	 * @param value The value to replace the old value with
 	 * @return The old value at the given index
@@ -189,7 +191,7 @@ public class BooleanList implements Iterable<Boolean>, Sealable, Cloneable
 
 	/**
 	 * Removes a value from this list
-	 * 
+	 *
 	 * @param index The index of the value to remove
 	 * @return The value that was removed
 	 */
@@ -207,7 +209,7 @@ public class BooleanList implements Iterable<Boolean>, Sealable, Cloneable
 
 	/**
 	 * Removes all instances of the given value from this list
-	 * 
+	 *
 	 * @param value The value to remove
 	 * @return The number of times the value was removed
 	 */
@@ -227,7 +229,7 @@ public class BooleanList implements Iterable<Boolean>, Sealable, Cloneable
 
 	/**
 	 * Switches the positions of two values
-	 * 
+	 *
 	 * @param idx1 The index of the first value to switch
 	 * @param idx2 The index of the second value to switch
 	 */
@@ -243,6 +245,7 @@ public class BooleanList implements Iterable<Boolean>, Sealable, Cloneable
 		theValue[idx2] = temp;
 	}
 
+	@Override
 	public java.util.ListIterator<Boolean> iterator()
 	{
 		return new BooleanListIterator(toArray());
@@ -250,7 +253,7 @@ public class BooleanList implements Iterable<Boolean>, Sealable, Cloneable
 
 	/**
 	 * Determines if this list contains a given value
-	 * 
+	 *
 	 * @param value The value to find
 	 * @return Whether this list contains the given value
 	 */
@@ -261,7 +264,7 @@ public class BooleanList implements Iterable<Boolean>, Sealable, Cloneable
 
 	/**
 	 * Counts the number of times a value is represented in this list
-	 * 
+	 *
 	 * @param value The value to count
 	 * @return The number of times the value appears in this list
 	 */
@@ -276,7 +279,7 @@ public class BooleanList implements Iterable<Boolean>, Sealable, Cloneable
 
 	/**
 	 * Finds a value in this list
-	 * 
+	 *
 	 * @param value The value to find
 	 * @return The first index whose value is the given value
 	 */
@@ -290,7 +293,7 @@ public class BooleanList implements Iterable<Boolean>, Sealable, Cloneable
 
 	/**
 	 * Finds a value in this list
-	 * 
+	 *
 	 * @param value The value to find
 	 * @return The last index whose value is the given value
 	 */
@@ -312,7 +315,7 @@ public class BooleanList implements Iterable<Boolean>, Sealable, Cloneable
 
 	/**
 	 * Similary to {@link #toArray()} but creates an array of {@link Boolean} wrappers
-	 * 
+	 *
 	 * @return The list of values currently in this list
 	 */
 	public Boolean [] toObjectArray()
@@ -325,7 +328,7 @@ public class BooleanList implements Iterable<Boolean>, Sealable, Cloneable
 
 	/**
 	 * Copies a subset of this list's data into an array
-	 * 
+	 *
 	 * @param srcPos The index in this list to start copying from
 	 * @param dest The array to copy the data into
 	 * @param destPos The index in the destination array to start copying to
@@ -382,7 +385,7 @@ public class BooleanList implements Iterable<Boolean>, Sealable, Cloneable
 
 	/**
 	 * Ensures that this list's capacity is at list the given value
-	 * 
+	 *
 	 * @param minCapacity The minimum capacity for the list
 	 */
 	public void ensureCapacity(int minCapacity)
@@ -415,11 +418,13 @@ public class BooleanList implements Iterable<Boolean>, Sealable, Cloneable
 			theContent = content;
 		}
 
+		@Override
 		public boolean hasNext()
 		{
 			return theIndex < theContent.length;
 		}
 
+		@Override
 		public Boolean next()
 		{
 			Boolean ret = Boolean.valueOf(theContent[theIndex]);
@@ -428,11 +433,13 @@ public class BooleanList implements Iterable<Boolean>, Sealable, Cloneable
 			return ret;
 		}
 
+		@Override
 		public boolean hasPrevious()
 		{
 			return theIndex > 0;
 		}
 
+		@Override
 		public Boolean previous()
 		{
 			Boolean ret = Boolean.valueOf(theContent[theIndex - 1]);
@@ -441,16 +448,19 @@ public class BooleanList implements Iterable<Boolean>, Sealable, Cloneable
 			return ret;
 		}
 
+		@Override
 		public int nextIndex()
 		{
 			return theIndex;
 		}
 
+		@Override
 		public int previousIndex()
 		{
 			return theIndex - 1;
 		}
 
+		@Override
 		public void remove()
 		{
 			if(lastRemoved)
@@ -468,6 +478,7 @@ public class BooleanList implements Iterable<Boolean>, Sealable, Cloneable
 			lastRemoved = true;
 		}
 
+		@Override
 		public void set(Boolean e)
 		{
 			if(lastRemoved)
@@ -479,6 +490,7 @@ public class BooleanList implements Iterable<Boolean>, Sealable, Cloneable
 			BooleanList.this.set(theIndex, e.booleanValue());
 		}
 
+		@Override
 		public void add(Boolean e)
 		{
 			if(get(theIndex) != theContent[theIndex])
