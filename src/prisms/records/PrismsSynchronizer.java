@@ -9,13 +9,13 @@ import java.io.Writer;
 
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
+import org.qommons.ArrayUtils;
+import org.qommons.json.SAJParser.ParseException;
+import org.qommons.json.SAJParser.ParseState;
 
 import prisms.records.RecordPersister.ChangeData;
 import prisms.records.SynchronizeImpl.ItemGetter;
 import prisms.records.SynchronizeImpl.ItemWriter;
-import prisms.util.ArrayUtils;
-import prisms.util.json.SAJParser.ParseException;
-import prisms.util.json.SAJParser.ParseState;
 
 /** Provides the ability to keep two sets of java objects synchronized across a network connection */
 public class PrismsSynchronizer
@@ -321,7 +321,7 @@ public class PrismsSynchronizer
 				return getImpl().getCurrentValue(record);
 		}
 
-		void writeItem(Object item, prisms.util.json.JsonSerialWriter jsonWriter,
+		void writeItem(Object item, org.qommons.json.JsonSerialWriter jsonWriter,
 			prisms.records.SynchronizeImpl.ItemWriter itemWriter, boolean justID)
 			throws IOException, PrismsRecordException
 		{
@@ -877,7 +877,7 @@ public class PrismsSynchronizer
 
 		final RecordKeeper theKeeper;
 
-		final prisms.util.json.JsonStreamWriter theWriter;
+		final org.qommons.json.JsonStreamWriter theWriter;
 
 		private final LatestCenterChange [] theLatestChanges;
 
@@ -894,7 +894,7 @@ public class PrismsSynchronizer
 		 * @param writer The JSON writer to write the data to
 		 * @param changes The latest center changes of the remote center
 		 */
-		public PS2ItemWriter(SyncTransaction trans, prisms.util.json.JsonStreamWriter writer,
+		public PS2ItemWriter(SyncTransaction trans, org.qommons.json.JsonStreamWriter writer,
 			LatestCenterChange [] changes)
 		{
 			theTrans = trans;
@@ -1260,7 +1260,7 @@ public class PrismsSynchronizer
 	}
 
 	/** Reads items from a synchronization stream */
-	public static class PS2ItemReader extends prisms.util.json.SAJParser.DefaultHandler implements
+	public static class PS2ItemReader extends org.qommons.json.SAJParser.DefaultHandler implements
 		prisms.records.SynchronizeImpl.ItemReader, prisms.records.SynchronizeImpl.ItemGetter
 	{
 		/** Writes content to an output as it is read */
@@ -1542,7 +1542,7 @@ public class PrismsSynchronizer
 		}
 
 		void parse(java.io.Reader reader, int itemCount) throws IOException,
-			prisms.util.json.SAJParser.ParseException
+			org.qommons.json.SAJParser.ParseException
 		{
 			java.io.File tempFile;
 			if(theFile == null)
@@ -1557,7 +1557,7 @@ public class PrismsSynchronizer
 			ParseReader parseReader = new ParseReader(reader, writer);
 			theTrans.getPI().setProgress(0);
 			theTrans.getPI().setProgressScale(itemCount);
-			new prisms.util.json.SAJParser().parse(parseReader, this);
+			new org.qommons.json.SAJParser().parse(parseReader, this);
 			writer.close();
 		}
 
@@ -1626,12 +1626,12 @@ public class PrismsSynchronizer
 			/* Since this item is about to be sync'ed right now, we don't need to sync it when
 			 * syncItems is called */
 			theObjectPositions.remove(key);
-			prisms.util.json.SAJParser.DefaultHandler handler = new prisms.util.json.SAJParser.DefaultHandler();
+			org.qommons.json.SAJParser.DefaultHandler handler = new org.qommons.json.SAJParser.DefaultHandler();
 			try
 			{
 				java.io.Reader reader = theFile.access(pos.intValue());
-				new prisms.util.json.SAJParser().parse(reader, handler);
-			} catch(prisms.util.json.SAJParser.ParseException e)
+				new org.qommons.json.SAJParser().parse(reader, handler);
+			} catch(org.qommons.json.SAJParser.ParseException e)
 			{
 				throw new PrismsRecordException("Malformatted JSON in cached item list", e);
 			} catch(IOException e)
@@ -1660,7 +1660,7 @@ public class PrismsSynchronizer
 			/* For each item in the full list that was not sync'ed already from being needed by a
 			 * change, sync the item with the data set. */
 			setChangeData(null, -1, -1);
-			prisms.util.json.SAJParser.DefaultHandler handler = new prisms.util.json.SAJParser.DefaultHandler();
+			org.qommons.json.SAJParser.DefaultHandler handler = new org.qommons.json.SAJParser.DefaultHandler();
 			for(ObjectID id : theExportedObjects)
 			{
 				Integer pos = theObjectPositions.remove(id);
@@ -1669,8 +1669,8 @@ public class PrismsSynchronizer
 					java.io.Reader reader = theFile.access(pos.intValue());
 					try
 					{
-						new prisms.util.json.SAJParser().parse(reader, handler);
-					} catch(prisms.util.json.SAJParser.ParseException e)
+						new org.qommons.json.SAJParser().parse(reader, handler);
+					} catch(org.qommons.json.SAJParser.ParseException e)
 					{
 						throw new PrismsRecordException("Malformatted JSON in cached item list", e);
 					}
@@ -1698,7 +1698,7 @@ public class PrismsSynchronizer
 						parseEmptyContent();
 						theTrans.getPI().setProgressText(
 							rootProgress + "\nImported " + id.type + " "
-								+ prisms.util.PrismsUtils.encodeUnicode("" + item));
+								+ org.qommons.QommonsUtils.encodeUnicode("" + item));
 					} catch(PrismsRecordException e)
 					{
 						log.error("Failed to import " + id, e);
@@ -1794,7 +1794,7 @@ public class PrismsSynchronizer
 	}
 
 	/** Reads changes from a synchronization stream */
-	public static class ChangeReader extends prisms.util.json.SAJParser.DefaultHandler
+	public static class ChangeReader extends org.qommons.json.SAJParser.DefaultHandler
 	{
 		private final SyncTransaction theTrans;
 
@@ -1823,9 +1823,9 @@ public class PrismsSynchronizer
 			theTrans.getPI().setProgressScale(totalChangeCount);
 		}
 
-		int parse() throws java.io.IOException, prisms.util.json.SAJParser.ParseException
+		int parse() throws java.io.IOException, org.qommons.json.SAJParser.ParseException
 		{
-			new prisms.util.json.SAJParser().parse(theReader, this);
+			new org.qommons.json.SAJParser().parse(theReader, this);
 			return theChangeCount;
 		}
 
@@ -1891,12 +1891,12 @@ public class PrismsSynchronizer
 					if(currentValue != null
 						&& change.type.changeType.getObjectType().isInstance(currentValue))
 						theTrans.getPI().setProgressText(
-							prisms.util.PrismsUtils.encodeUnicode("Importing "
+							org.qommons.QommonsUtils.encodeUnicode("Importing "
 								+ change.toString(currentValue)));
 					else
 						theTrans.getPI()
 							.setProgressText(
-								prisms.util.PrismsUtils.encodeUnicode("Importing "
+								org.qommons.QommonsUtils.encodeUnicode("Importing "
 									+ change.toString()));
 					theTrans.getImpl().doChange(change, currentValue);
 				}
@@ -1918,7 +1918,7 @@ public class PrismsSynchronizer
 		}
 	}
 
-	private class SyncInputHandler extends prisms.util.json.SAJParser.DefaultHandler
+	private class SyncInputHandler extends org.qommons.json.SAJParser.DefaultHandler
 	{
 		final SyncTransaction theTrans;
 
@@ -1969,11 +1969,11 @@ public class PrismsSynchronizer
 				if(DEPENDS.equals(state.top().getPropertyName()))
 				{
 					if(!isCenterIDSet)
-						throw new prisms.util.json.SAJParser.ParseException(
+						throw new org.qommons.json.SAJParser.ParseException(
 							"Can't synchronize dependencies before center ID is sent", state);
 					final int [] dependIdx = new int [] {0};
-					new prisms.util.json.SAJParser().parse(theReader,
-						new prisms.util.json.SAJParser.DefaultHandler()
+					new org.qommons.json.SAJParser().parse(theReader,
+						new org.qommons.json.SAJParser.DefaultHandler()
 						{
 							@Override
 							public void startArray(ParseState state2)
@@ -2038,7 +2038,7 @@ public class PrismsSynchronizer
 							"Retrieving and storing remote values (Stage " + theCurrentStage[0]
 								+ " of " + theStageCount + ")");
 					if(!isCenterIDSet)
-						throw new prisms.util.json.SAJParser.ParseException(
+						throw new org.qommons.json.SAJParser.ParseException(
 							"Can't import items before remote center ID is sent", state);
 					super.valueNull(state);
 					state.spoofValue();
@@ -2061,7 +2061,7 @@ public class PrismsSynchronizer
 							"Importing changes (Stage " + theCurrentStage[0] + " of "
 								+ theStageCount + ")");
 					if(!isCenterIDSet)
-						throw new prisms.util.json.SAJParser.ParseException(
+						throw new org.qommons.json.SAJParser.ParseException(
 							"Can't import changes before center ID is sent", state);
 					super.valueNull(state);
 					state.spoofValue();
@@ -2168,17 +2168,17 @@ public class PrismsSynchronizer
 			} catch(IOException e)
 			{
 				throw new RuntimeWrapper("Could not read synchronization stream", e);
-			} catch(prisms.util.json.SAJParser.ParseException e)
+			} catch(org.qommons.json.SAJParser.ParseException e)
 			{
 				throw new RuntimeWrapper("Could not parse synchronization stream", e);
 			}
 		}
 
 		private void subSync(ParseState state) throws IOException,
-			prisms.util.json.SAJParser.ParseException
+			org.qommons.json.SAJParser.ParseException
 		{
 			if(!isCenterIDSet)
-				throw new prisms.util.json.SAJParser.ParseException(
+				throw new org.qommons.json.SAJParser.ParseException(
 					"Can't import changes before center ID is sent", state);
 			super.valueNull(state);
 			state.spoofValue();
@@ -2187,15 +2187,15 @@ public class PrismsSynchronizer
 		}
 
 		private void subSyncOld(ParseState state) throws IOException,
-			prisms.util.json.SAJParser.ParseException
+			org.qommons.json.SAJParser.ParseException
 		{
 			if(!isCenterIDSet)
-				throw new prisms.util.json.SAJParser.ParseException(
+				throw new org.qommons.json.SAJParser.ParseException(
 					"Can't import changes before center ID is sent", state);
 			super.valueNull(state);
 			state.spoofValue();
 			theTrans.getPI().setCancelable(false);
-			org.json.simple.JSONArray changes = (org.json.simple.JSONArray) prisms.util.json.SAJParser
+			org.json.simple.JSONArray changes = (org.json.simple.JSONArray) org.qommons.json.SAJParser
 				.parse(theReader);
 			for(JSONObject change : (java.util.List<JSONObject>) changes)
 			{
@@ -2342,7 +2342,7 @@ public class PrismsSynchronizer
 		}
 	}
 
-	private class SyncReceiptHandler extends prisms.util.json.SAJParser.DefaultHandler
+	private class SyncReceiptHandler extends org.qommons.json.SAJParser.DefaultHandler
 	{
 		Reader theReader;
 
@@ -2350,12 +2350,12 @@ public class PrismsSynchronizer
 
 		private SyncRecord theRecord;
 
-		private prisms.util.LongList theErrorChanges;
+		private org.qommons.LongList theErrorChanges;
 
 		SyncReceiptHandler(Reader reader)
 		{
 			theReader = reader;
-			theErrorChanges = new prisms.util.LongList();
+			theErrorChanges = new org.qommons.LongList();
 		}
 
 		@Override
@@ -2413,8 +2413,8 @@ public class PrismsSynchronizer
 				final int [] dependIdx = new int [] {0};
 				try
 				{
-					new prisms.util.json.SAJParser().parse(theReader,
-						new prisms.util.json.SAJParser.DefaultHandler()
+					new org.qommons.json.SAJParser().parse(theReader,
+						new org.qommons.json.SAJParser.DefaultHandler()
 						{
 							@Override
 							public void startArray(ParseState state2)
@@ -2536,7 +2536,7 @@ public class PrismsSynchronizer
 				if(theSyncListener != null)
 					theSyncListener.syncChanged(theRecord);
 			}
-			else if(state.top().token == prisms.util.json.SAJParser.ParseToken.ARRAY
+			else if(state.top().token == org.qommons.json.SAJParser.ParseToken.ARRAY
 				&& "errors".equals(state.fromTop(1).getPropertyName()))
 				theErrorChanges.add(value.longValue());
 		}
@@ -2722,7 +2722,7 @@ public class PrismsSynchronizer
 		{
 			long time = System.currentTimeMillis();
 			String fileName = theSyncLoggingLoc + "/SyncAttempt"
-				+ prisms.util.PrismsUtils.TimePrecision.MINUTES.print(time, true);
+				+ org.qommons.QommonsUtils.TimePrecision.MINUTES.print(time, true);
 			int secs = (int) (time % 60000) / 1000;
 			if(secs < 10)
 				fileName += '0';
@@ -2734,7 +2734,7 @@ public class PrismsSynchronizer
 				try
 				{
 					if(tempFile.createNewFile())
-						reader = new prisms.util.LoggingReader(reader, tempFile);
+						reader = new org.qommons.LoggingReader(reader, tempFile);
 					else
 						tempFile = null;
 				} catch(IOException e)
@@ -2744,7 +2744,7 @@ public class PrismsSynchronizer
 			}
 		}
 		boolean closed = false;
-		prisms.util.json.SAJParser parser = new prisms.util.json.SAJParser();
+		org.qommons.json.SAJParser parser = new org.qommons.json.SAJParser();
 		boolean preAI = false;
 		if(getKeeper() instanceof DBRecordKeeper)
 		{
@@ -2760,7 +2760,7 @@ public class PrismsSynchronizer
 				center.setLastImport(syncRecord.getSyncTime());
 			if(storeSyncRecord)
 				verifySyncSuccess(syncRecord);
-		} catch(prisms.util.json.SAJParser.ParseException e)
+		} catch(org.qommons.json.SAJParser.ParseException e)
 		{
 			syncRecord.setSyncError("Could not parse synchronization stream");
 			reader.close();
@@ -2829,16 +2829,16 @@ public class PrismsSynchronizer
 	/** A class representing data to be sent for synchronization */
 	private static class SyncOutput
 	{
-		final prisms.util.IntList theLateIDs;
+		final org.qommons.IntList theLateIDs;
 
 		final LatestCenterChange [] theLocalChanges;
 
 		final long [] theChangeIDs;
 
-		final prisms.util.LongList theErrorChanges;
+		final org.qommons.LongList theErrorChanges;
 
-		SyncOutput(prisms.util.IntList lateIDs, LatestCenterChange [] localChanges,
-			long [] changeIDs, prisms.util.LongList errorChanges)
+		SyncOutput(org.qommons.IntList lateIDs, LatestCenterChange [] localChanges,
+			long [] changeIDs, org.qommons.LongList errorChanges)
 		{
 			theLateIDs = lateIDs;
 			theLocalChanges = localChanges;
@@ -2886,8 +2886,8 @@ public class PrismsSynchronizer
 			localChanges = ret.toArray(new LatestCenterChange [ret.size()]);
 		}
 
-		final prisms.util.IntList lateIDs = new prisms.util.IntList();
-		final prisms.util.LongList errorChanges = new prisms.util.LongList();
+		final org.qommons.IntList lateIDs = new org.qommons.IntList();
+		final org.qommons.LongList errorChanges = new org.qommons.LongList();
 		final java.util.ArrayList<LatestCenterChange> updateChanges = new java.util.ArrayList<LatestCenterChange>();
 		ArrayUtils
 			.adjust(
@@ -2936,7 +2936,7 @@ public class PrismsSynchronizer
 					}
 				});
 
-		prisms.util.LongList changeIDs = new prisms.util.LongList();
+		org.qommons.LongList changeIDs = new org.qommons.LongList();
 		for(LatestCenterChange updateChange : updateChanges)
 		{
 			if(lateIDs.contains(updateChange.getSubjectCenter()) && !request.isWithRecords())
@@ -3054,7 +3054,7 @@ public class PrismsSynchronizer
 				}
 			return syncRecord;
 		}
-		final prisms.util.json.JsonStreamWriter jsw = new prisms.util.json.JsonStreamWriter(writer);
+		final org.qommons.json.JsonStreamWriter jsw = new org.qommons.json.JsonStreamWriter(writer);
 		jsw.startObject();
 		jsw.startProperty("version");
 		jsw.writeString(trans.getImpl().getVersion());
@@ -3088,7 +3088,7 @@ public class PrismsSynchronizer
 		try
 		{
 			PS2ItemWriter itemWriter = new PS2ItemWriter(trans,
-				new prisms.util.json.JsonStreamWriter(writer), request.getValue()
+				new org.qommons.json.JsonStreamWriter(writer), request.getValue()
 					.getLatestChanges());
 			jsw.startObject();
 			if(!sync.theLateIDs.isEmpty())
@@ -3182,7 +3182,7 @@ public class PrismsSynchronizer
 							"Could not retrieve item for synchronization", e);
 					}
 					pi.setProgressText(baseText + "\nWriting " + trans.getType(next) + " "
-						+ prisms.util.PrismsUtils.encodeUnicode("" + next));
+						+ org.qommons.QommonsUtils.encodeUnicode("" + next));
 					itemWriter.writeItem(next);
 				}
 				allItems = null;
@@ -3295,7 +3295,7 @@ public class PrismsSynchronizer
 					else
 					{
 						pi.setProgressText(baseText + "\nExported "
-							+ prisms.util.PrismsUtils.encodeUnicode("" + record));
+							+ org.qommons.QommonsUtils.encodeUnicode("" + record));
 						itemWriter.writeChange(record, sync.theErrorChanges.contains(record.id));
 					}
 				}
@@ -3327,7 +3327,7 @@ public class PrismsSynchronizer
 		throws IOException, PrismsRecordException
 	{
 		SyncRecord [] records = theKeeper.getSyncRecords(center, Boolean.TRUE);
-		prisms.util.json.JsonStreamWriter jsw = new prisms.util.json.JsonStreamWriter(writer);
+		org.qommons.json.JsonStreamWriter jsw = new org.qommons.json.JsonStreamWriter(writer);
 		jsw.startObject();
 		jsw.startProperty(CENTER_ID);
 		jsw.writeNumber(Integer.valueOf(getKeeper().getCenterID()));
@@ -3425,8 +3425,8 @@ public class PrismsSynchronizer
 	{
 		try
 		{
-			new prisms.util.json.SAJParser().parse(reader, new SyncReceiptHandler(reader));
-		} catch(prisms.util.json.SAJParser.ParseException e)
+			new org.qommons.json.SAJParser().parse(reader, new SyncReceiptHandler(reader));
+		} catch(org.qommons.json.SAJParser.ParseException e)
 		{
 			log.error("Could not parse sync receipt", e);
 			throw new IOException("Could not parse sync receipt: " + e.getMessage());

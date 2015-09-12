@@ -6,14 +6,14 @@ import prisms.lang.EvaluationResult;
 import prisms.lang.ParsedItem;
 
 /** A collection of {@link PrismsItemEvaluator}s for evaluating any of a large set of types of expressions */
-public class PrismsEvaluator implements prisms.util.Sealable {
-	private prisms.util.SubClassMap<ParsedItem, PrismsItemEvaluator<?>> theEvaluators;
+public class PrismsEvaluator implements org.qommons.Sealable {
+	private org.qommons.SubClassMap<ParsedItem, PrismsItemEvaluator<?>> theEvaluators;
 
 	private boolean isSealed;
 
 	/** Creates the evaluator */
 	public PrismsEvaluator() {
-		theEvaluators = new prisms.util.SubClassMap<>();
+		theEvaluators = new org.qommons.SubClassMap<>();
 	}
 
 	/**

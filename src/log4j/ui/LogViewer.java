@@ -9,12 +9,12 @@ import java.io.OutputStream;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.qommons.ArrayUtils;
 
 import prisms.arch.PrismsException;
 import prisms.arch.PrismsSession;
 import prisms.logging.LogEntry;
 import prisms.logging.PrismsLogger.LogField;
-import prisms.util.ArrayUtils;
 import prisms.util.Search;
 
 /** Sends log entries to the client for display to the user */
@@ -38,9 +38,9 @@ public class LogViewer implements prisms.arch.DownloadPlugin
 
 	int thePageSize;
 
-	prisms.util.IntList theSnapshot;
+	org.qommons.IntList theSnapshot;
 
-	prisms.util.IntList theSelected;
+	org.qommons.IntList theSelected;
 
 	prisms.ui.UI.DefaultProgressInformer thePI;
 
@@ -117,7 +117,7 @@ public class LogViewer implements prisms.arch.DownloadPlugin
 					reset();
 				}
 			});
-		theSelected = new prisms.util.IntList(true, true);
+		theSelected = new org.qommons.IntList(true, true);
 	}
 
 	/** @return The session that is using this plugin */
@@ -445,7 +445,7 @@ public class LogViewer implements prisms.arch.DownloadPlugin
 			int [] intIDs = new int [ids.length];
 			for(int i = 0; i < ids.length; i++)
 				intIDs[i] = (int) ids[i];
-			theSnapshot = new prisms.util.IntList(intIDs);
+			theSnapshot = new org.qommons.IntList(intIDs);
 			theSelected.and(theSnapshot);
 			theStart = 0;
 			resend();
@@ -696,11 +696,11 @@ public class LogViewer implements prisms.arch.DownloadPlugin
 			jsonEntry.put("levelColor", "#000000");
 		jsonEntry.put("logger", entry.getLoggerName());
 		jsonEntry.put("time",
-			prisms.util.PrismsUtils.TimePrecision.MILLIS.print(entry.getLogTime(), false));
+			org.qommons.QommonsUtils.TimePrecision.MILLIS.print(entry.getLogTime(), false));
 		jsonEntry.put("tracking", entry.getTrackingData());
 		if(entry.getSaveTime() > 0)
 			jsonEntry.put("saveTime",
-				prisms.util.PrismsUtils.TimePrecision.MINUTES.print(entry.getSaveTime(), false));
+				org.qommons.QommonsUtils.TimePrecision.MINUTES.print(entry.getSaveTime(), false));
 		jsonEntry.put("message", entry.getMessage());
 		jsonEntry.put("stackTrace", entry.getStackTrace());
 		if(theSelected.contains(entry.getID()))
@@ -921,7 +921,7 @@ public class LogViewer implements prisms.arch.DownloadPlugin
 				}
 				if(ids)
 					writer.write(Integer.toHexString(entry.getID()) + " ");
-				writer.write(prisms.util.PrismsUtils.TimePrecision.MILLIS.print(entry.getLogTime(),
+				writer.write(org.qommons.QommonsUtils.TimePrecision.MILLIS.print(entry.getLogTime(),
 					true) + " ");
 				writer.write(entry.getLevel().toString() + " ");
 				writer.write(entry.getLoggerName() + " ");
@@ -979,7 +979,7 @@ public class LogViewer implements prisms.arch.DownloadPlugin
 				if(ids)
 					writer.write(Integer.toHexString(entry.getID()) + " ");
 				writer.write("\\b");
-				writer.write(prisms.util.PrismsUtils.TimePrecision.MILLIS.print(entry.getLogTime(),
+				writer.write(org.qommons.QommonsUtils.TimePrecision.MILLIS.print(entry.getLogTime(),
 					true) + " ");
 				if(entry.getLevel().equals(org.apache.log4j.Level.FATAL)
 					|| entry.getLevel().equals(org.apache.log4j.Level.ERROR))
@@ -1068,7 +1068,7 @@ public class LogViewer implements prisms.arch.DownloadPlugin
 				if(ids)
 					writer.write(Integer.toHexString(entry.getID()) + " ");
 				writer.write("<b>");
-				writer.write(prisms.util.PrismsUtils.TimePrecision.MILLIS.print(entry.getLogTime(),
+				writer.write(org.qommons.QommonsUtils.TimePrecision.MILLIS.print(entry.getLogTime(),
 					true) + " ");
 				writer.write("<span style=\"color:");
 				if(entry.getLevel().equals(org.apache.log4j.Level.FATAL)
@@ -1240,7 +1240,7 @@ public class LogViewer implements prisms.arch.DownloadPlugin
 					title += "*";
 				else
 					title += theSession.getProperty(log4j.app.Log4jProperties.search);
-				title += "\" on " + prisms.util.PrismsUtils.print(theLastCheckTime);
+				title += "\" on " + org.qommons.QommonsUtils.print(theLastCheckTime);
 				if("text/plain".equals(format))
 					writer.write(title + "\n\n");
 				else if("text/rtf".equals(format))

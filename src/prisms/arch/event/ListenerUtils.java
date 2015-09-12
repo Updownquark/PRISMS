@@ -3,8 +3,9 @@
  */
 package prisms.arch.event;
 
+import org.qommons.ArrayUtils;
+
 import prisms.arch.PrismsSession;
-import prisms.util.ArrayUtils;
 
 /** A few generally useful utilities for listeners */
 public class ListenerUtils

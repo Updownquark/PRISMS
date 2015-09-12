@@ -11,6 +11,6 @@ public class FormattedJsonSerializer extends prisms.arch.JsonSerializer
 		throws java.io.NotSerializableException
 	{
 		validate(events);
-		return prisms.util.JsonUtils.format(events);
+		return org.qommons.JsonUtils.format(events);
 	}
 }

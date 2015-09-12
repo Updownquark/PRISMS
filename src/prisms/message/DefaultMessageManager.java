@@ -15,6 +15,7 @@ import java.sql.Timestamp;
 import java.util.Collection;
 
 import org.apache.log4j.Logger;
+import org.qommons.*;
 
 import prisms.arch.PrismsException;
 import prisms.arch.ds.Transactor;
@@ -25,15 +26,7 @@ import prisms.message.MessageChangeTypes.MessageChange;
 import prisms.message.MessageChangeTypes.RecipientChange;
 import prisms.message.MessageSearch.SizeSearch;
 import prisms.records.RecordsTransaction;
-import prisms.util.ArrayUtils;
-import prisms.util.DBUtils;
-import prisms.util.DemandCache;
-import prisms.util.IntList;
-import prisms.util.LongList;
-import prisms.util.PrismsUtils;
-import prisms.util.Search;
-import prisms.util.SearchableAPI;
-import prisms.util.Sorter;
+import prisms.util.*;
 import prisms.util.Sorter.Field;
 
 /** The default {@link MessageManager} implementation for PRISMS */
@@ -968,9 +961,9 @@ public class DefaultMessageManager implements MessageManager
 			if(msg.getSubject() == null)
 				msg.setSubject("");
 			else
-				msg.setSubject(PrismsUtils.decodeUnicode(msg.getSubject()));
+				msg.setSubject(QommonsUtils.decodeUnicode(msg.getSubject()));
 			for(MessageAction action : msg.actions())
-				action.setDescrip(PrismsUtils.decodeUnicode(action.getDescrip()));
+				action.setDescrip(QommonsUtils.decodeUnicode(action.getDescrip()));
 		}
 		if(cached.size() == 0 && ret.size() == 1 && withDeletedContent)
 		{ // Single item retrieved from DB with deleted content. Cache for later.
@@ -1089,7 +1082,7 @@ public class DefaultMessageManager implements MessageManager
 						log.error("Connection error", e);
 					}
 			}
-			return PrismsUtils.decodeUnicode(ret.toString());
+			return QommonsUtils.decodeUnicode(ret.toString());
 		}
 	}
 
@@ -1758,7 +1751,7 @@ public class DefaultMessageManager implements MessageManager
 	{
 		String sql = null;
 		ResultSet rs = null;
-		String subject = PrismsUtils.encodeUnicode(message.getSubject());
+		String subject = QommonsUtils.encodeUnicode(message.getSubject());
 		try
 		{
 			if(message.getConversationID() >= 0)
@@ -2082,8 +2075,8 @@ public class DefaultMessageManager implements MessageManager
 		if(dbMessage.getTime() != message.getTime())
 		{
 			modified = true;
-			status[0] += "Message time changed from " + PrismsUtils.print(dbMessage.getTime()) + " to "
-				+ PrismsUtils.print(message.getTime()) + "\n\t";
+			status[0] += "Message time changed from " + QommonsUtils.print(dbMessage.getTime()) + " to "
+				+ QommonsUtils.print(message.getTime()) + "\n\t";
 			sql += "messageTime=" + message.getTime() + ", ";
 			addModification(trans, MessageSubjectType.message, MessageChange.time, 0, dbMessage, null,
 				Long.valueOf(dbMessage.getTime()), null, null);
@@ -2111,8 +2104,8 @@ public class DefaultMessageManager implements MessageManager
 		{
 			modified = true;
 			status[0] += "Subject changed from " + dbMessage.getSubject() + " to " + message.getSubject() + "\n\t";
-			String dbSubject = PrismsUtils.encodeUnicode(dbMessage.getSubject());
-			String subject = PrismsUtils.encodeUnicode(message.getSubject());
+			String dbSubject = QommonsUtils.encodeUnicode(dbMessage.getSubject());
+			String subject = QommonsUtils.encodeUnicode(message.getSubject());
 			if(dbSubject.length() > 100 && subject.length() > 100)
 				updateContent(dbMessage.getID(), "S", dbSubject, subject);
 			else
@@ -2515,9 +2508,9 @@ public class DefaultMessageManager implements MessageManager
 		{
 			modified = true;
 			status[0] += "Recipient " + receipt + " first view changed from ";
-			status[0] += (dbReceipt.getFirstViewed() >= 0 ? PrismsUtils.print(dbReceipt.getFirstViewed()) : "none");
+			status[0] += (dbReceipt.getFirstViewed() >= 0 ? QommonsUtils.print(dbReceipt.getFirstViewed()) : "none");
 			status[0] += " to ";
-			status[0] += (receipt.getFirstViewed() >= 0 ? PrismsUtils.print(receipt.getFirstViewed()) : "none")
+			status[0] += (receipt.getFirstViewed() >= 0 ? QommonsUtils.print(receipt.getFirstViewed()) : "none")
 				+ "\n\t";
 			sql += "firstView=" + DBUtils.formatDate(receipt.getFirstViewed(), isOracle()) + ", ";
 			addModification(trans, MessageSubjectType.messageView, RecipientChange.firstViewed, 0, receipt, null,
@@ -2528,9 +2521,9 @@ public class DefaultMessageManager implements MessageManager
 		{
 			modified = true;
 			status[0] += "Recipient " + receipt + " last view changed from ";
-			status[0] += (dbReceipt.getLastViewed() >= 0 ? PrismsUtils.print(dbReceipt.getLastViewed()) : "none");
+			status[0] += (dbReceipt.getLastViewed() >= 0 ? QommonsUtils.print(dbReceipt.getLastViewed()) : "none");
 			status[0] += " to ";
-			status[0] += (receipt.getLastViewed() >= 0 ? PrismsUtils.print(receipt.getLastViewed()) : "none") + "\n\t";
+			status[0] += (receipt.getLastViewed() >= 0 ? QommonsUtils.print(receipt.getLastViewed()) : "none") + "\n\t";
 			sql += "lastView=" + DBUtils.formatDate(receipt.getLastViewed(), isOracle()) + ", ";
 			addModification(trans, MessageSubjectType.messageView, RecipientChange.lastViewed, 0, receipt, null,
 				Long.valueOf(dbReceipt.getLastViewed()), receipt.getMessage(), null);

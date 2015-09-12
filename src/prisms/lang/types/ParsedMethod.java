@@ -58,7 +58,7 @@ public class ParsedMethod extends Assignable {
 	public ParsedItem [] getDependents() {
 		ParsedItem [] ret = theArguments;
 		if(theContext != null)
-			ret = prisms.util.ArrayUtils.add(theArguments, theContext, 0);
+			ret = org.qommons.ArrayUtils.add(theArguments, theContext, 0);
 		return ret;
 	}
 

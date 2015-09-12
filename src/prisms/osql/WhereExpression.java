@@ -143,7 +143,7 @@ public interface WhereExpression
 			{
 				if(theChildren[c] == null)
 				{
-					theChildren = prisms.util.ArrayUtils.remove(theChildren, c);
+					theChildren = org.qommons.ArrayUtils.remove(theChildren, c);
 					c--;
 				}
 				else if(theChildren[c] instanceof BooleanExpression)
@@ -151,16 +151,16 @@ public interface WhereExpression
 					theChildren[c] = ((BooleanExpression) theChildren[c]).simplify();
 					if(theChildren[c] == null)
 					{
-						theChildren = prisms.util.ArrayUtils.remove(theChildren, c);
+						theChildren = org.qommons.ArrayUtils.remove(theChildren, c);
 						c--;
 					}
 					else if(theChildren[c] instanceof BooleanExpression
 						&& ((BooleanExpression) theChildren[c]).isAnd == isAnd)
 					{
 						BooleanExpression b = (BooleanExpression) theChildren[c];
-						theChildren = prisms.util.ArrayUtils.remove(theChildren, c);
+						theChildren = org.qommons.ArrayUtils.remove(theChildren, c);
 						c--;
-						theChildren = prisms.util.ArrayUtils.addAll(theChildren, b.theChildren);
+						theChildren = org.qommons.ArrayUtils.addAll(theChildren, b.theChildren);
 					}
 				}
 			}

@@ -3,8 +3,9 @@
  */
 package prisms.records;
 
+import org.qommons.ArrayUtils;
+
 import prisms.records.ChangeSearch.ChangeFieldSearch.FieldType;
-import prisms.util.ArrayUtils;
 import prisms.util.Search;
 
 /**
@@ -61,7 +62,7 @@ public class ScaledRecordKeeper extends DBRecordKeeper
 
 	private long theTimeBeforeCheck;
 
-	private prisms.util.LongList theProcessedChanges;
+	private org.qommons.LongList theProcessedChanges;
 
 	// private long theLastPurge;
 
@@ -74,7 +75,7 @@ public class ScaledRecordKeeper extends DBRecordKeeper
 	{
 		super(namespace, connEl, factory, ids);
 		theCheckInterval = 10000;
-		theProcessedChanges = new prisms.util.LongList();
+		theProcessedChanges = new org.qommons.LongList();
 		theDepends = new ScaledRecordKeeper [0];
 		theTimeBeforeCheck = theLastCheck = System.currentTimeMillis();
 	}
@@ -301,10 +302,10 @@ public class ScaledRecordKeeper extends DBRecordKeeper
 				depend.checkChanges(true);
 
 			Long timeBefore = Long.valueOf(theTimeBeforeCheck);
-			prisms.util.LongList ids;
+			org.qommons.LongList ids;
 			try
 			{
-				ids = new prisms.util.LongList(execute(theChangeGetter, timeBefore, timeBefore));
+				ids = new org.qommons.LongList(execute(theChangeGetter, timeBefore, timeBefore));
 			} catch(PrismsRecordException e)
 			{
 				log.error("Could not query for changes from scaled environment", e);

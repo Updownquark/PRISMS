@@ -92,7 +92,7 @@ public abstract class PersistingPropertyManager<T> extends
 		if(thePersister != null && !Boolean.TRUE.equals(evt.getProperty("prismsPersisted")))
 		{
 			prisms.arch.PrismsTransaction trans = getEnv().getTransaction();
-			prisms.util.ProgramTracker.TrackNode track = prisms.util.PrismsUtils.track(trans,
+			org.qommons.ProgramTracker.TrackNode track = prisms.util.PrismsUtils.track(trans,
 				"PRISMS: Persisting data portion (" + evt.name + ") of property " + getProperty());
 			try
 			{
@@ -123,7 +123,7 @@ public abstract class PersistingPropertyManager<T> extends
 			return;
 		theDataLock = true;
 		prisms.arch.PrismsTransaction trans = getEnv().getTransaction();
-		prisms.util.ProgramTracker.TrackNode track = prisms.util.PrismsUtils.track(trans,
+		org.qommons.ProgramTracker.TrackNode track = prisms.util.PrismsUtils.track(trans,
 			"PRISMS: depersisting property " + getProperty());
 		try
 		{
@@ -157,7 +157,7 @@ public abstract class PersistingPropertyManager<T> extends
 		if(thePersister == null)
 			return;
 		prisms.arch.PrismsTransaction trans = getEnv().getTransaction();
-		prisms.util.ProgramTracker.TrackNode track = prisms.util.PrismsUtils.track(trans,
+		org.qommons.ProgramTracker.TrackNode track = prisms.util.PrismsUtils.track(trans,
 			"PRISMS: Persisting new data for property " + getProperty());
 		try
 		{

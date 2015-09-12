@@ -7,11 +7,12 @@ import java.awt.Color;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
+import org.qommons.ArrayUtils;
+
 import prisms.arch.PrismsSession;
 import prisms.arch.event.PrismsEvent;
 import prisms.records.PrismsCenter;
 import prisms.records.RecordUser;
-import prisms.util.ArrayUtils;
 
 /**
  * Displays a set of items, each of which belongs or is associated with a particular user. The

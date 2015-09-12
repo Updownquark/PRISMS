@@ -93,7 +93,7 @@ public class AppGroups extends prisms.ui.list.SelectableList<UserGroup>
 				if(theApp == evt.getProperty("app"))
 				{
 					UserGroup [] groups = (UserGroup []) evt.getProperty("groups");
-					if(!prisms.util.ArrayUtils.contains(groups,
+					if(!org.qommons.ArrayUtils.contains(groups,
 						getSession().getProperty(ManagerProperties.selectedAppGroup)))
 						getSession().setProperty(ManagerProperties.selectedAppGroup, null);
 					setListData(groups);
@@ -223,10 +223,10 @@ public class AppGroups extends prisms.ui.list.SelectableList<UserGroup>
 								for(int u = 0; u < users.length; u++)
 								{
 									if(users[u] == null
-										|| !prisms.util.ArrayUtils.contains(users[u].getGroups(),
+										|| !org.qommons.ArrayUtils.contains(users[u].getGroups(),
 											group))
 									{
-										users = prisms.util.ArrayUtils.remove(users, u);
+										users = org.qommons.ArrayUtils.remove(users, u);
 										u--;
 									}
 								}

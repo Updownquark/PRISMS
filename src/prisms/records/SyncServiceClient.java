@@ -211,9 +211,9 @@ public class SyncServiceClient
 			{
 				javax.net.ssl.KeyManager[] mgrs = new javax.net.ssl.KeyManager [0];
 				if(theSyncKeyManager != null)
-					mgrs = prisms.util.ArrayUtils.add(mgrs, theSyncKeyManager);
+					mgrs = org.qommons.ArrayUtils.add(mgrs, theSyncKeyManager);
 				if(theSystemKeyManager != null)
-					mgrs = prisms.util.ArrayUtils.add(mgrs, theSystemKeyManager);
+					mgrs = org.qommons.ArrayUtils.add(mgrs, theSystemKeyManager);
 				conn.getConnector().setKeyManager(mgrs);
 			} catch(java.security.GeneralSecurityException e)
 			{
@@ -232,7 +232,7 @@ public class SyncServiceClient
 					if(center.getCertificates() != null && center.getCertificates().length > 0)
 					{
 						// TODO compare certificates in a smarter way
-						if(prisms.util.ArrayUtils.equals(chain, center.getCertificates()))
+						if(org.qommons.ArrayUtils.equals(chain, center.getCertificates()))
 							return;
 						else
 							throw new java.security.cert.CertificateException(

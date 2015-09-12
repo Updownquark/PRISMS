@@ -4,6 +4,9 @@
 package prisms.arch.ds;
 
 import org.apache.log4j.Logger;
+import org.qommons.json.JsonSerialReader;
+import org.qommons.json.JsonStreamWriter;
+import org.qommons.json.SAJParser;
 
 import prisms.arch.PrismsApplication;
 import prisms.records.ChangeRecord;
@@ -16,9 +19,6 @@ import prisms.records.RecordKeeper;
 import prisms.records.RecordUtils;
 import prisms.records.SyncRecord;
 import prisms.records.SynchronizeImpl;
-import prisms.util.json.JsonSerialReader;
-import prisms.util.json.JsonStreamWriter;
-import prisms.util.json.SAJParser;
 
 /**
  * Exports PRISMS data to a hidden (dot-prefixed) file in the exported logs directory or imports the data from there.
@@ -121,22 +121,22 @@ public class PrismsDataExportImport
 		{
 			java.io.File exportFile = new java.io.File(theApps[0].getEnvironment().getLogger().getExposedDir()
 				+ ".exportedData.dat");
-			if(exportFile.exists() && !prisms.util.FileSegmentizerOutputStream.delete(exportFile))
+			if(exportFile.exists() && !org.qommons.FileSegmentizerOutputStream.delete(exportFile))
 			{
 				ui.error("Could not delete data exported on "
-					+ prisms.util.PrismsUtils.print(exportFile.lastModified()));
+					+ org.qommons.QommonsUtils.print(exportFile.lastModified()));
 				log.error("Could not delete data exported on "
-					+ prisms.util.PrismsUtils.print(exportFile.lastModified()));
+					+ org.qommons.QommonsUtils.print(exportFile.lastModified()));
 				return false;
 			}
-			prisms.util.FileSegmentizerOutputStream fileStream = null;
-			prisms.util.ExportStream exportStream;
+			org.qommons.FileSegmentizerOutputStream fileStream = null;
+			org.qommons.ExportStream exportStream;
 			java.io.OutputStreamWriter streamWriter;
 			JsonStreamWriter jsw;
 			try
 			{
-				fileStream = new prisms.util.FileSegmentizerOutputStream(exportFile);
-				exportStream = new prisms.util.ExportStream(fileStream);
+				fileStream = new org.qommons.FileSegmentizerOutputStream(exportFile);
+				exportStream = new org.qommons.ExportStream(fileStream);
 				streamWriter = new java.io.OutputStreamWriter(exportStream);
 				// streamWriter = new java.io.OutputStreamWriter(fileStream);
 				jsw = new JsonStreamWriter(streamWriter);
@@ -150,7 +150,7 @@ public class PrismsDataExportImport
 						fileStream.close();
 					} catch(java.io.IOException e2)
 					{}
-				prisms.util.FileSegmentizerOutputStream.delete(exportFile);
+				org.qommons.FileSegmentizerOutputStream.delete(exportFile);
 				return false;
 			}
 			boolean success = false;
@@ -240,7 +240,7 @@ public class PrismsDataExportImport
 						fileStream.close();
 					} catch(java.io.IOException e2)
 					{}
-					prisms.util.FileSegmentizerOutputStream.delete(exportFile);
+					org.qommons.FileSegmentizerOutputStream.delete(exportFile);
 				}
 			}
 			return success;
@@ -298,7 +298,7 @@ public class PrismsDataExportImport
 			prisms.util.Search changeSearch = global ? null : new prisms.records.ChangeSearch.IDRange(
 				Long.valueOf(IDGenerator.getMinID(keeper.getCenterID())), Long.valueOf(IDGenerator.getMaxID(keeper
 					.getCenterID()))).and(new prisms.records.ChangeSearch.LocalOnlySearch(null));
-			prisms.util.LongList changeIDs = new prisms.util.LongList(keeper.search(changeSearch, sorter));
+			org.qommons.LongList changeIDs = new org.qommons.LongList(keeper.search(changeSearch, sorter));
 			long [] batch = new long [changeIDs.size() < 200 ? changeIDs.size() : 200];
 			jsw.startProperty("changes");
 			jsw.startArray();
@@ -326,7 +326,7 @@ public class PrismsDataExportImport
 				pi.setProgressText("Exporting " + namespace + " metadata");
 				jsw.startProperty("latestChanges");
 				jsw.startArray();
-				prisms.util.IntList allCenterIDs = new prisms.util.IntList(keeper.getAllCenterIDs());
+				org.qommons.IntList allCenterIDs = new org.qommons.IntList(keeper.getAllCenterIDs());
 				for(int i = 0; i < allCenterIDs.size(); i++)
 					for(int j = 0; j < allCenterIDs.size(); j++)
 					{
@@ -430,14 +430,14 @@ public class PrismsDataExportImport
 			java.io.File importFile = new java.io.File(exposedDir + ".exportedData.dat");
 			if(!importFile.exists())
 				return -1;
-			prisms.util.FileSegmentizerInputStream fileStream = null;
-			prisms.util.ImportStream importStream;
+			org.qommons.FileSegmentizerInputStream fileStream = null;
+			org.qommons.ImportStream importStream;
 			java.io.InputStreamReader streamReader;
 			JsonSerialReader jsr;
 			try
 			{
-				fileStream = new prisms.util.FileSegmentizerInputStream(importFile);
-				importStream = new prisms.util.ImportStream(fileStream);
+				fileStream = new org.qommons.FileSegmentizerInputStream(importFile);
+				importStream = new org.qommons.ImportStream(fileStream);
 				streamReader = new java.io.InputStreamReader(importStream);
 				jsr = new JsonSerialReader(streamReader);
 			} catch(java.io.IOException e)
@@ -463,7 +463,7 @@ public class PrismsDataExportImport
 				theExportDataTime = jsr.parseLong();
 				if(System.currentTimeMillis() - theExportDataTime > theDataAgeThreshold)
 				{
-					log.error("Exported data is too old (" + prisms.util.PrismsUtils.print(theExportDataTime)
+					log.error("Exported data is too old (" + org.qommons.QommonsUtils.print(theExportDataTime)
 						+ "). Import canceled.");
 					return -1;
 				}
@@ -498,8 +498,8 @@ public class PrismsDataExportImport
 		/** @return The hashing values for the user source that were stored in the backup */
 		public Hashing getHashing()
 		{
-			prisms.util.LongList mults = new prisms.util.LongList();
-			prisms.util.LongList mods = new prisms.util.LongList();
+			org.qommons.LongList mults = new org.qommons.LongList();
+			org.qommons.LongList mods = new org.qommons.LongList();
 			try
 			{
 				if(!"hashing".equals(theJsonReader.getNextProperty()))
@@ -580,9 +580,9 @@ public class PrismsDataExportImport
 				JsonSerialReader.StructState rootState = theJsonReader.startArray();
 				JsonSerialReader.JsonParseItem item;
 				StringBuilder message = new StringBuilder();
-				message.append("Imported PRISMS data from ").append(prisms.util.PrismsUtils.print(theExportDataTime))
+				message.append("Imported PRISMS data from ").append(org.qommons.QommonsUtils.print(theExportDataTime))
 					.append(" (");
-				prisms.util.PrismsUtils.printTimeLength(System.currentTimeMillis() - theExportDataTime, message, false);
+				org.qommons.QommonsUtils.printTimeLength(System.currentTimeMillis() - theExportDataTime, message, false);
 				message.append(" old).");
 				for(item = theJsonReader.getNextItem(true, false); item instanceof JsonSerialReader.ObjectItem; item = theJsonReader
 					.getNextItem(true, false))
@@ -632,7 +632,7 @@ public class PrismsDataExportImport
 				if(theJsonReader.goToProperty("passwords"))
 				{
 					rootState = theJsonReader.startArray();
-					prisms.util.LongList pwdData = new prisms.util.LongList();
+					org.qommons.LongList pwdData = new org.qommons.LongList();
 					for(item = theJsonReader.getNextItem(true, false); item instanceof JsonSerialReader.ObjectItem; item = theJsonReader
 						.getNextItem(true, false))
 					{
@@ -747,7 +747,7 @@ public class PrismsDataExportImport
 					if(centers[i].getID() == 0)
 					{
 						// Don't include the "Here" center in the UI value
-						appCenters = prisms.util.ArrayUtils.remove(appCenters, i);
+						appCenters = org.qommons.ArrayUtils.remove(appCenters, i);
 						break;
 					}
 				app.setGlobalProperty(trans.getImpl().getCentersProperty(), appCenters,
@@ -882,8 +882,8 @@ public class PrismsDataExportImport
 										log.warn("No associated property in sync record");
 										continue;
 									}
-									prisms.util.LongList assocIDs = new prisms.util.LongList();
-									prisms.util.BooleanList assocErrors = new prisms.util.BooleanList();
+									org.qommons.LongList assocIDs = new org.qommons.LongList();
+									org.qommons.BooleanList assocErrors = new org.qommons.BooleanList();
 									jsr.startArray();
 									while(jsr.getNextItem(true, false) instanceof JsonSerialReader.ObjectItem)
 									{

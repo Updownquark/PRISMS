@@ -33,9 +33,9 @@ public class PreferencesScaleImpl implements RecordPersister, ScaleImpl
 	 */
 	public boolean addApp(PrismsApplication app)
 	{
-		if(!prisms.util.ArrayUtils.contains(theApps, app))
+		if(!org.qommons.ArrayUtils.contains(theApps, app))
 		{
-			theApps = prisms.util.ArrayUtils.add(theApps, app);
+			theApps = org.qommons.ArrayUtils.add(theApps, app);
 			return true;
 		}
 		return false;

@@ -6,13 +6,13 @@ package prisms.records;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.qommons.ArrayUtils;
+import org.qommons.QommonsUtils;
 
 import prisms.arch.PrismsSession;
 import prisms.arch.event.PrismsEvent;
 import prisms.records.RecordKeeper.ChangeField;
 import prisms.ui.SortTableStructure.TableCell;
-import prisms.util.ArrayUtils;
-import prisms.util.PrismsUtils;
 import prisms.util.Sorter;
 import prisms.util.preferences.Preference;
 
@@ -47,11 +47,11 @@ public abstract class HistoryViewer implements prisms.arch.AppPlugin
 
 		long theLatestChange;
 
-		private prisms.util.LongList theChanges;
+		private org.qommons.LongList theChanges;
 
 		ChangeGroup(ChangeRecord record)
 		{
-			theChanges = new prisms.util.LongList();
+			theChanges = new org.qommons.LongList();
 			theUser = record.user;
 			theMinTime = record.time - CHANGE_GROUP_TOLERANCE;
 			theMaxTime = record.time + CHANGE_GROUP_TOLERANCE;
@@ -107,7 +107,7 @@ public abstract class HistoryViewer implements prisms.arch.AppPlugin
 
 	Preference<Integer> theCountPref;
 
-	Preference<PrismsUtils.TimePrecision> theTimePref;
+	Preference<QommonsUtils.TimePrecision> theTimePref;
 
 	Preference<TimeZoneType> theTimeZonePref;
 
@@ -123,7 +123,7 @@ public abstract class HistoryViewer implements prisms.arch.AppPlugin
 
 	int theCount;
 
-	PrismsUtils.TimePrecision theTimePrecision;
+	QommonsUtils.TimePrecision theTimePrecision;
 
 	TimeZoneType theTimeZone;
 
@@ -135,7 +135,7 @@ public abstract class HistoryViewer implements prisms.arch.AppPlugin
 
 	private ChangeRecord [] theCurrentView;
 
-	prisms.util.LongList theSelectedIndices;
+	org.qommons.LongList theSelectedIndices;
 
 	private java.util.HashSet<ChangeGroup> theChangeGroups;
 
@@ -158,8 +158,8 @@ public abstract class HistoryViewer implements prisms.arch.AppPlugin
 		theCountPref = new Preference<Integer>(theName, "Displayed Entries",
 			Preference.Type.NONEG_INT, Integer.class, true);
 		theCountPref.setDescription("The number of history entries to display at a time");
-		theTimePref = new Preference<PrismsUtils.TimePrecision>(theName, "Change Time Precision",
-			Preference.Type.ENUM, PrismsUtils.TimePrecision.class, true);
+		theTimePref = new Preference<QommonsUtils.TimePrecision>(theName, "Change Time Precision",
+			Preference.Type.ENUM, QommonsUtils.TimePrecision.class, true);
 		theTimePref.setDescription("The precision with which to display times"
 			+ " in the history viewer");
 		theTimeZonePref = new Preference<TimeZoneType>(theName, "Time Zone", Preference.Type.ENUM,
@@ -182,7 +182,7 @@ public abstract class HistoryViewer implements prisms.arch.AppPlugin
 				}
 				else if(pEvt.getPreference().equals(theTimePref))
 				{
-					theTimePrecision = (PrismsUtils.TimePrecision) pEvt.getNewValue();
+					theTimePrecision = (QommonsUtils.TimePrecision) pEvt.getNewValue();
 					sendDisplay(false, false);
 				}
 				else if(pEvt.getPreference().equals(theTimeZonePref))
@@ -204,7 +204,7 @@ public abstract class HistoryViewer implements prisms.arch.AppPlugin
 			prefs.set(theCountPref, Integer.valueOf(10));
 		theCount = prefs.get(theCountPref).intValue();
 		if(prefs.get(theTimePref) == null)
-			prefs.set(theTimePref, PrismsUtils.TimePrecision.MINUTES);
+			prefs.set(theTimePref, QommonsUtils.TimePrecision.MINUTES);
 		theTimePrecision = prefs.get(theTimePref);
 		if(prefs.get(theTimeZonePref) == null)
 			prefs.set(theTimeZonePref, TimeZoneType.GMT);
@@ -221,7 +221,7 @@ public abstract class HistoryViewer implements prisms.arch.AppPlugin
 		theTable.setColumn(TIME, "Date/Time", true);
 		theSorter = new Sorter<ChangeField>();
 		theSorter.addSort(DBRecordKeeper.ChangeField.CHANGE_TIME, false);
-		theSelectedIndices = new prisms.util.LongList();
+		theSelectedIndices = new org.qommons.LongList();
 		theChangeGroups = new java.util.HashSet<ChangeGroup>();
 		String showHistoryEvent = config.get("showHistoryEvent");
 		if(showHistoryEvent != null)
@@ -499,7 +499,7 @@ public abstract class HistoryViewer implements prisms.arch.AppPlugin
 					pi.setProgressText("Querying changes "
 						+ (theActivitySyncRecord.isImport() ? "imported from " : "exported to ")
 						+ theActivitySyncRecord.getCenter().getName() + " at "
-						+ PrismsUtils.print(theActivitySyncRecord.getSyncTime()));
+						+ QommonsUtils.print(theActivitySyncRecord.getSyncTime()));
 				else
 					pi.setProgressText("Querying entire history");
 
@@ -588,7 +588,7 @@ public abstract class HistoryViewer implements prisms.arch.AppPlugin
 		JSONObject evt = new JSONObject();
 		evt.put("plugin", theName);
 		evt.put("method", "setSnapshotTime");
-		evt.put("time", PrismsUtils.print(theSnapshotTime));
+		evt.put("time", QommonsUtils.print(theSnapshotTime));
 		theSession.postOutgoingEvent(evt);
 		sendItem();
 		sendAutoPurge();
@@ -627,7 +627,7 @@ public abstract class HistoryViewer implements prisms.arch.AppPlugin
 			jsonItem.put(
 				"text",
 				theActivitySyncRecord.getCenter() + " at "
-					+ PrismsUtils.print(theActivitySyncRecord.getSyncTime()));
+					+ QommonsUtils.print(theActivitySyncRecord.getSyncTime()));
 		}
 		evt.put("item", jsonItem);
 		theSession.postOutgoingEvent(evt);
@@ -1032,7 +1032,7 @@ public abstract class HistoryViewer implements prisms.arch.AppPlugin
 			String modError = assertCanUndo(getUser(), mods[m]);
 			if(modError != null)
 			{
-				mods = prisms.util.ArrayUtils.remove(mods, m);
+				mods = org.qommons.ArrayUtils.remove(mods, m);
 				if(error == null)
 					error = modError;
 				else
@@ -1662,9 +1662,9 @@ public abstract class HistoryViewer implements prisms.arch.AppPlugin
 				return;
 			case syncFrequency:
 				long time = ((Number) mod.previousValue).longValue();
-				beforeCell.setLabel(time > 0 ? PrismsUtils.printTimeLength(time) : "none");
+				beforeCell.setLabel(time > 0 ? QommonsUtils.printTimeLength(time) : "none");
 				time = ((Number) afterValue).longValue();
-				afterCell.setLabel(time > 0 ? PrismsUtils.printTimeLength(time) : "none");
+				afterCell.setLabel(time > 0 ? QommonsUtils.printTimeLength(time) : "none");
 				return;
 			case clientUser:
 				setUser(beforeCell, (RecordUser) mod.previousValue);
@@ -1672,9 +1672,9 @@ public abstract class HistoryViewer implements prisms.arch.AppPlugin
 				return;
 			case changeSaveTime:
 				time = ((Number) mod.previousValue).longValue();
-				beforeCell.setLabel(time > 0 ? PrismsUtils.printTimeLength(time) : "none");
+				beforeCell.setLabel(time > 0 ? QommonsUtils.printTimeLength(time) : "none");
 				time = ((Number) afterValue).longValue();
-				afterCell.setLabel(time > 0 ? PrismsUtils.printTimeLength(time) : "none");
+				afterCell.setLabel(time > 0 ? QommonsUtils.printTimeLength(time) : "none");
 				return;
 			}
 			throw new IllegalStateException("Unrecognized center change " + mod.type.changeType);

@@ -3,6 +3,8 @@
  */
 package prisms.util;
 
+import org.qommons.QommonsUtils;
+
 /**
  * A pool of objects that should only be used by one thread at a time
  * 
@@ -507,7 +509,7 @@ public class ResourcePool<T>
 						{
 							lastStatus[0] = now;
 							System.out.println(testTries[0] + " tries and " + faults[0]
-								+ " faults in " + PrismsUtils.printTimeLength(now - start));
+								+ " faults in " + QommonsUtils.printTimeLength(now - start));
 						}
 						testTries[0]++;
 						Thread.yield();
@@ -531,7 +533,7 @@ public class ResourcePool<T>
 			threads[i] = new Thread(task);
 		for(int i = 0; i < threads.length; i++)
 			threads[i].start();
-		System.out.println("Started resource pool test at " + PrismsUtils.print(start) + " with "
+		System.out.println("Started resource pool test at " + QommonsUtils.print(start) + " with "
 			+ threadCount + " threads and " + pool.getMaxSize() + " resources");
 		try
 		{

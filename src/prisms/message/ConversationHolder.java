@@ -11,7 +11,7 @@ public class ConversationHolder implements Iterable<MessageView>
 
 	private java.util.TreeSet<MessageView> theMessages;
 
-	private prisms.util.LongList theMatched;
+	private org.qommons.LongList theMatched;
 
 	/** @param conversation The conversation view that this holder is for */
 	public ConversationHolder(ConversationView conversation)
@@ -25,7 +25,7 @@ public class ConversationHolder implements Iterable<MessageView>
 				return diff < 0 ? -1 : diff > 0 ? 1 : 0;
 			}
 		});
-		theMatched = new prisms.util.LongList();
+		theMatched = new org.qommons.LongList();
 	}
 
 	/** @return The conversation view that this holder is for */

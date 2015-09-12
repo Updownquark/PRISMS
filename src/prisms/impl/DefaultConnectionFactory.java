@@ -55,14 +55,14 @@ public class DefaultConnectionFactory implements prisms.arch.ConnectionFactory
 
 		synchronized void addReconnectListener(ReconnectListener listener)
 		{
-			theListeners = prisms.util.ArrayUtils.add(theListeners, listener);
+			theListeners = org.qommons.ArrayUtils.add(theListeners, listener);
 		}
 
 		synchronized boolean removeReconnectListener(ReconnectListener listener)
 		{
-			int idx = prisms.util.ArrayUtils.indexOf(theListeners, listener);
+			int idx = org.qommons.ArrayUtils.indexOf(theListeners, listener);
 			if(idx >= 0)
-				theListeners = prisms.util.ArrayUtils.remove(theListeners, listener);
+				theListeners = org.qommons.ArrayUtils.remove(theListeners, listener);
 			return idx >= 0;
 		}
 
@@ -428,7 +428,7 @@ public class DefaultConnectionFactory implements prisms.arch.ConnectionFactory
 		{
 			if(isReleased)
 				throw new IllegalStateException("This transactor has been released");
-			theListeners = prisms.util.ArrayUtils.add(theListeners, listener);
+			theListeners = org.qommons.ArrayUtils.add(theListeners, listener);
 			theDefaultTransactor.addReconnectListener(listener);
 		}
 
@@ -436,7 +436,7 @@ public class DefaultConnectionFactory implements prisms.arch.ConnectionFactory
 		{
 			if(isReleased)
 				throw new IllegalStateException("This transactor has been released");
-			theListeners = prisms.util.ArrayUtils.remove(theListeners, listener);
+			theListeners = org.qommons.ArrayUtils.remove(theListeners, listener);
 			return theDefaultTransactor.removeReconnectListener(listener);
 		}
 
@@ -594,7 +594,7 @@ public class DefaultConnectionFactory implements prisms.arch.ConnectionFactory
 			}
 			else
 			{
-				coreConnectionID = prisms.util.PrismsUtils.getRandomString(16);
+				coreConnectionID = org.qommons.QommonsUtils.getRandomString(16);
 				theNamedConnEls.put(coreConnectionID, connEl);
 			}
 

@@ -67,7 +67,7 @@ public class BlowfishEncryption implements Encryption
 				allOnes = false;
 			}
 		if(allOnes)
-			keys = prisms.util.ArrayUtils.remove(keys, 0);
+			keys = org.qommons.ArrayUtils.remove(keys, 0);
 		return keys;
 	}
 

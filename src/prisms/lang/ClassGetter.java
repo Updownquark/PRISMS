@@ -150,7 +150,7 @@ public class ClassGetter {
 			else if(fileNamePattern.matcher(f.getName()).matches()) {
 				String cn = f.getName();
 				cn = cn.substring(0, cn.lastIndexOf('.'));
-				cn = prisms.util.PrismsUtils.replaceAll(cn, "$", ".");
+				cn = org.qommons.QommonsUtils.replaceAll(cn, "$", ".");
 				addClassName(pkg == null ? cn : pkg + "." + cn);
 			}
 		}
@@ -169,9 +169,9 @@ public class ClassGetter {
 				fileName = name;
 			if(fileNamePattern.matcher(fileName).matches()) {
 				String className = fileName.substring(0, fileName.lastIndexOf('.'));
-				className = prisms.util.PrismsUtils.replaceAll(className, "$", ".");
+				className = org.qommons.QommonsUtils.replaceAll(className, "$", ".");
 				if(idx >= 0)
-					className = prisms.util.PrismsUtils.replaceAll(name.substring(0, idx), "/", ".") + "." + className;
+					className = org.qommons.QommonsUtils.replaceAll(name.substring(0, idx), "/", ".") + "." + className;
 				addClassName(className);
 			}
 		}

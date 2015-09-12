@@ -37,7 +37,7 @@ public class DeclarationEvaluator implements AssignableEvaluator<ParsedDeclarati
 			for(int p = 0; p < ptTypes.length; p++)
 				ptTypes[p] = evaluator.evaluate(item.getTypeParams()[p], env, true, true).getType();
 			if(ptTypes.length > 0 && ret.getBaseType().getTypeParameters().length == 0) {
-				String args = prisms.util.ArrayUtils.toString(ptTypes);
+				String args = org.qommons.ArrayUtils.toString(ptTypes);
 				args = args.substring(1, args.length() - 1);
 				int index = item.getType().getMatch().index + item.getType().getMatch().text.length();
 				throw new prisms.lang.EvaluationException("The type " + ret
@@ -49,7 +49,7 @@ public class DeclarationEvaluator implements AssignableEvaluator<ParsedDeclarati
 					type += t + ", ";
 				type = type.substring(0, type.length() - 2);
 				type += ">";
-				String args = prisms.util.ArrayUtils.toString(ptTypes);
+				String args = org.qommons.ArrayUtils.toString(ptTypes);
 				args = args.substring(1, args.length() - 1);
 				int index = item.getType().getMatch().index + item.getType().getMatch().text.length();
 				throw new EvaluationException("Incorrect number of arguments for type " + type

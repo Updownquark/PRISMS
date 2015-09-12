@@ -147,7 +147,7 @@ public class UserGroups extends SelectableList<UserGroup>
 			UserGroup [] groups = new UserGroup [0];
 			for(UserGroup g : theUser.getGroups())
 				if(g.getApp().equals(theApp))
-					groups = prisms.util.ArrayUtils.add(groups, g);
+					groups = org.qommons.ArrayUtils.add(groups, g);
 			setSelectedObjects(groups);
 		}
 		else

@@ -52,6 +52,6 @@ public class CommonValueManager<T> extends PersistingPropertyManager<T>
 	@Override
 	public boolean isValueCorrect(prisms.arch.PrismsSession session, Object val)
 	{
-		return prisms.util.ArrayUtils.equals(theValue, val);
+		return org.qommons.ArrayUtils.equals(theValue, val);
 	}
 }

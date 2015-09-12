@@ -43,7 +43,7 @@ public class Join extends Table
 	/** @return All tables that are joined in this structure */
 	public Table [] getTables()
 	{
-		return prisms.util.ArrayUtils.add(theLinkTables, theLinkKeys[0].getTable(), 0);
+		return org.qommons.ArrayUtils.add(theLinkTables, theLinkKeys[0].getTable(), 0);
 	}
 
 	/** @return The foreign keys used to join this structure's tables */
@@ -220,9 +220,9 @@ public class Join extends Table
 	public static Join join(Join join, ForeignKey [] keys, Table [] tables, JoinType [] types)
 		throws PrismsSqlException
 	{
-		keys = prisms.util.ArrayUtils.addAll(join.theLinkKeys, keys);
-		tables = prisms.util.ArrayUtils.addAll(join.theLinkTables, tables);
-		types = prisms.util.ArrayUtils.addAll(join.theJoinTypes, types);
+		keys = org.qommons.ArrayUtils.addAll(join.theLinkKeys, keys);
+		tables = org.qommons.ArrayUtils.addAll(join.theLinkTables, tables);
+		types = org.qommons.ArrayUtils.addAll(join.theJoinTypes, types);
 		return join(keys, tables, types);
 	}
 }

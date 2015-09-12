@@ -5,8 +5,7 @@ package prisms.ui;
 
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
-
-import prisms.util.PrismsUtils;
+import org.qommons.QommonsUtils;
 
 /**
  * Serializes an X.509 certificate chain into JSON to be interpreted on the client by a Certificate
@@ -49,7 +48,7 @@ public class CertificateSerializer
 	{
 		JSONObject ret = new JSONObject();
 		String subject = getCertSubjectName(cert, false);
-		ret.put("subject", subject != null ? PrismsUtils.encodeUnicode(subject)
+		ret.put("subject", subject != null ? QommonsUtils.encodeUnicode(subject)
 			: "Could not parse certificate subject");
 		String issuer = getCertSubjectName(cert, true);
 		if(issuer == null)
@@ -57,7 +56,7 @@ public class CertificateSerializer
 		else if(issuer.equals(subject))
 			ret.put("issuer", "Self-signed");
 		else
-			ret.put("issuer", PrismsUtils.encodeUnicode(issuer));
+			ret.put("issuer", QommonsUtils.encodeUnicode(issuer));
 		ret.put("validFrom", print(cert.getNotBefore().getTime()));
 		ret.put("validTo", print(cert.getNotAfter().getTime()));
 		String status = getCertStatus(cert, url);
@@ -82,7 +81,7 @@ public class CertificateSerializer
 		}
 		details.add(detail("Serial number", abbrev(sb.toString()), sb.toString()));
 		sb.setLength(0);
-		details.add(detail("Signature algorithm", PrismsUtils.encodeUnicode(cert.getSigAlgName()),
+		details.add(detail("Signature algorithm", QommonsUtils.encodeUnicode(cert.getSigAlgName()),
 			null));
 		details.add(detail("Subject", abbrev(getCertSubjectFull(cert, false, false)),
 			getCertSubjectFull(cert, false, true)));
@@ -108,7 +107,7 @@ public class CertificateSerializer
 
 	static String print(long time)
 	{
-		return PrismsUtils.TimePrecision.DAYS.print(time, false);
+		return QommonsUtils.TimePrecision.DAYS.print(time, false);
 	}
 
 	/**
@@ -153,7 +152,7 @@ public class CertificateSerializer
 		java.util.regex.Matcher match = PRINCIPAL_PATTERN.matcher(subjectName);
 		if(match.find() && match.start() == 0)
 			subjectName = match.group(1);
-		return PrismsUtils.encodeUnicode(subjectName);
+		return QommonsUtils.encodeUnicode(subjectName);
 	}
 
 	/**
@@ -199,7 +198,7 @@ public class CertificateSerializer
 			return null;
 		java.util.regex.Matcher match = PRINCIPAL_PATTERN.matcher(subjectName);
 		if(!match.find())
-			return PrismsUtils.encodeUnicode(subjectName);
+			return QommonsUtils.encodeUnicode(subjectName);
 		StringBuilder ret = new StringBuilder();
 		if(withKeys)
 			ret.append(match.group());
@@ -218,7 +217,7 @@ public class CertificateSerializer
 				ret.append(match.group(1));
 			}
 		}
-		return PrismsUtils.encodeUnicode(ret.toString());
+		return QommonsUtils.encodeUnicode(ret.toString());
 	}
 
 	/**
@@ -278,7 +277,7 @@ public class CertificateSerializer
 				else
 					ret.append(match.group(1));
 			}
-		return PrismsUtils.encodeUnicode(ret.toString());
+		return QommonsUtils.encodeUnicode(ret.toString());
 	}
 
 	/**
@@ -349,7 +348,7 @@ public class CertificateSerializer
 	{
 		if(value.length() < MAX_DETAIL_CHARS)
 			return value;
-		return value.substring(0, MAX_DETAIL_CHARS - 2) + PrismsUtils.encodeUnicode("\u2026");
+		return value.substring(0, MAX_DETAIL_CHARS - 2) + QommonsUtils.encodeUnicode("\u2026");
 	}
 
 	static JSONObject detail(String name, String value, String descrip)

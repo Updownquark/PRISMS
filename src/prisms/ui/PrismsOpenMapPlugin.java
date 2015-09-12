@@ -438,7 +438,7 @@ public class PrismsOpenMapPlugin implements ImagePlugin
 	/** Causes the client to redraw its image */
 	public void draw()
 	{
-		theSession.postOutgoingEvent(prisms.util.PrismsUtils.rEventProps("plugin", theName,
+		theSession.postOutgoingEvent(org.qommons.QommonsUtils.rEventProps("plugin", theName,
 			"method", "resetImage"));
 	}
 

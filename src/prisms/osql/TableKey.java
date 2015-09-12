@@ -41,7 +41,7 @@ public class TableKey implements Iterable<Column<?>>
 
 	void addColumn(Column<?> column)
 	{
-		theColumns = prisms.util.ArrayUtils.add(theColumns, column);
+		theColumns = org.qommons.ArrayUtils.add(theColumns, column);
 	}
 
 	/**

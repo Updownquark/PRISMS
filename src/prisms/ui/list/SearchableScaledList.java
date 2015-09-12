@@ -293,16 +293,16 @@ public abstract class SearchableScaledList<T> extends SearchableListPlugin<T>
 		{
 			String [] ids = (String []) ((org.json.simple.JSONArray) evt.get("ids"))
 				.toArray(new String [0]);
-			if(prisms.util.ArrayUtils.contains(ids, thePreviousNode.getID()))
+			if(org.qommons.ArrayUtils.contains(ids, thePreviousNode.getID()))
 				previous();
-			else if(prisms.util.ArrayUtils.contains(ids, theNextNode.getID()))
+			else if(org.qommons.ArrayUtils.contains(ids, theNextNode.getID()))
 				next();
-			else if(prisms.util.ArrayUtils.contains(ids, theBeginNode.getID()))
+			else if(org.qommons.ArrayUtils.contains(ids, theBeginNode.getID()))
 			{
 				theStart = 0;
 				sendDisplay();
 			}
-			else if(prisms.util.ArrayUtils.contains(ids, theEndNode.getID()))
+			else if(org.qommons.ArrayUtils.contains(ids, theEndNode.getID()))
 			{
 				int newStart;
 				int total = getMatchedItemCount();
@@ -320,7 +320,7 @@ public abstract class SearchableScaledList<T> extends SearchableListPlugin<T>
 				theStart = newStart;
 				sendDisplay();
 			}
-			else if(prisms.util.ArrayUtils.contains(ids, theDAN.getID()))
+			else if(org.qommons.ArrayUtils.contains(ids, theDAN.getID()))
 				displayAll();
 		}
 		super.processEvent(evt);
@@ -384,7 +384,7 @@ public abstract class SearchableScaledList<T> extends SearchableListPlugin<T>
 
 	int getMatchedItemCount()
 	{
-		prisms.util.IntList disp = getSearchResults();
+		org.qommons.IntList disp = getSearchResults();
 		int total;
 		if(disp != null)
 			total = disp.size();
@@ -401,7 +401,7 @@ public abstract class SearchableScaledList<T> extends SearchableListPlugin<T>
 		for(int i = 0; i < getItemCount(); i++)
 			if(getItem(i).equals(node))
 			{
-				prisms.util.IntList displayed = getSearchResults();
+				org.qommons.IntList displayed = getSearchResults();
 				if(displayed != null)
 					return displayed.indexOf(i) >= theStart
 						&& displayed.indexOf(i) < theStart + theDisplayCount;
@@ -480,7 +480,7 @@ public abstract class SearchableScaledList<T> extends SearchableListPlugin<T>
 		JSONObject evt = new JSONObject();
 		evt.put("plugin", getName());
 		evt.put("method", "setItems");
-		prisms.util.IntList displayed = getSearchResults();
+		org.qommons.IntList displayed = getSearchResults();
 		org.json.simple.JSONArray items = new org.json.simple.JSONArray();
 		evt.put("items", items);
 		if(displayed != null)

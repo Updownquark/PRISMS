@@ -3,13 +3,14 @@
  */
 package manager.ui.app.inspect;
 
+import org.qommons.ArrayUtils;
+import org.qommons.ProgramTracker;
+import org.qommons.ProgramTracker.TrackNode;
+
 import prisms.arch.PrismsSession;
 import prisms.arch.event.PrismsEvent;
 import prisms.records.HistoryViewer.TimeZoneType;
 import prisms.ui.tree.CategoryNode;
-import prisms.util.ArrayUtils;
-import prisms.util.ProgramTracker;
-import prisms.util.ProgramTracker.TrackNode;
 import prisms.util.preferences.Preference;
 
 /** A tree that displays performance data selected by the user */
@@ -27,7 +28,7 @@ public class PerformanceDisplayTree extends prisms.ui.tree.DataTreeMgrPlugin
 
 	long theSnapshotTime;
 
-	prisms.util.TrackerSet.TrackConfig theSelection;
+	org.qommons.TrackerSet.TrackConfig theSelection;
 
 	ProgramTracker theCurrentValue;
 
@@ -157,7 +158,7 @@ public class PerformanceDisplayTree extends prisms.ui.tree.DataTreeMgrPlugin
 	{
 		PrismsEvent evt = new PrismsEvent("getPerformanceOptions");
 		getSession().fireEvent(evt);
-		final prisms.util.TrackerSet.TrackConfig[] configs = (prisms.util.TrackerSet.TrackConfig[]) evt
+		final org.qommons.TrackerSet.TrackConfig[] configs = (org.qommons.TrackerSet.TrackConfig[]) evt
 			.getProperty("options");
 		if(configs == null || configs.length == 0)
 		{
@@ -166,7 +167,7 @@ public class PerformanceDisplayTree extends prisms.ui.tree.DataTreeMgrPlugin
 		}
 		final String [] options = new String [configs.length];
 		for(int o = 0; o < options.length; o++)
-			options[o] = prisms.util.PrismsUtils.printTimeLength(configs[o].getKeepTime());
+			options[o] = org.qommons.QommonsUtils.printTimeLength(configs[o].getKeepTime());
 		final String preSelectOption = getSession().getPreferences().get(theTimeIntSelectPref);
 		int selIdx = ArrayUtils.indexOf(options, preSelectOption);
 		if(selIdx < 0)
@@ -221,9 +222,9 @@ public class PerformanceDisplayTree extends prisms.ui.tree.DataTreeMgrPlugin
 			final long displayThresh = Math.round(theDisplayThresh * actualLength);
 			StringBuilder text = new StringBuilder();
 			text.append(tracker.getName()).append("--Actual Interval: ");
-			prisms.util.PrismsUtils.printTimeLength(actualLength, text, true);
+			org.qommons.QommonsUtils.printTimeLength(actualLength, text, true);
 			text.append(" Snapshot from ").append(
-				prisms.util.PrismsUtils.TimePrecision.SECONDS.print(theSnapshotTime,
+				org.qommons.QommonsUtils.TimePrecision.SECONDS.print(theSnapshotTime,
 					theTimeZone == TimeZoneType.LOCAL));
 			root.setText(text.toString());
 			root.setChildren(ArrayUtils.adjust((TrackTreeNode []) root.getChildren(),
@@ -298,7 +299,7 @@ public class PerformanceDisplayTree extends prisms.ui.tree.DataTreeMgrPlugin
 				theTimeZone == TimeZoneType.LOCAL);
 			text.append(": ");
 			long localTime = node.getLocalLength(null);
-			prisms.util.PrismsUtils.printTimeLength(localTime, text, true);
+			org.qommons.QommonsUtils.printTimeLength(localTime, text, true);
 			if(localTime > 0)
 				text.append(" (")
 					.append(ProgramTracker.PERCENT_FORMAT.format(localTime * 100.0 / theTotalTime))
@@ -307,7 +308,7 @@ public class PerformanceDisplayTree extends prisms.ui.tree.DataTreeMgrPlugin
 
 			text.setLength(0);
 			long realLength = node.getRealLength();
-			prisms.util.PrismsUtils.printTimeLength(realLength, text, true);
+			org.qommons.QommonsUtils.printTimeLength(realLength, text, true);
 			text.append(" total");
 			if(realLength > 0)
 				text.append(" (")

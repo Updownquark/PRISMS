@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.concurrent.locks.Lock;
 
 import org.apache.log4j.Logger;
+import org.qommons.ArrayUtils;
+import org.qommons.LongList;
 
 import prisms.arch.*;
 import prisms.arch.PrismsApplication.ApplicationLock;
@@ -20,9 +22,7 @@ import prisms.arch.ds.Transactor.TransactionOperation;
 import prisms.impl.PrismsChangeTypes.GroupChange;
 import prisms.impl.PrismsChangeTypes.UserChange;
 import prisms.records.RecordsTransaction;
-import prisms.util.ArrayUtils;
 import prisms.util.DBUtils;
-import prisms.util.LongList;
 
 /** A {@link prisms.arch.ds.ManageableUserSource} that obtains its information from a database */
 public class DBUserSource implements ScalableUserSource
@@ -1106,10 +1106,10 @@ public class DBUserSource implements ScalableUserSource
 						&& (now - password[0].thePasswordTime) < constraints
 							.getMinPasswordChangeInterval())
 						throw new PrismsException("Password cannot be changed more than every "
-							+ prisms.util.PrismsUtils.printTimeLength(constraints
+							+ org.qommons.QommonsUtils.printTimeLength(constraints
 								.getMinPasswordChangeInterval())
 							+ "\nPassword can be changed at "
-							+ prisms.util.PrismsUtils.print(password[0].thePasswordTime
+							+ org.qommons.QommonsUtils.print(password[0].thePasswordTime
 								+ constraints.getMinPasswordChangeInterval()));
 				}
 
@@ -1253,7 +1253,7 @@ public class DBUserSource implements ScalableUserSource
 				if(constraints.getMaxPasswordDuration() > 0
 					&& time - System.currentTimeMillis() > constraints.getMaxPasswordDuration())
 					throw new PrismsException("Password expiration cannot be set for more than "
-						+ prisms.util.PrismsUtils.printTimeLength(constraints
+						+ org.qommons.QommonsUtils.printTimeLength(constraints
 							.getMaxPasswordDuration()) + " from current date");
 				PasswordData [] password = getPasswordData(user, true, stmt);
 				if(password.length == 0)
@@ -1265,7 +1265,7 @@ public class DBUserSource implements ScalableUserSource
 				else
 					toSet = "NULL";
 				userLog.info("User " + user + "'s password expiration set to "
-					+ prisms.util.PrismsUtils.print(time));
+					+ org.qommons.QommonsUtils.print(time));
 				sql = "UPDATE " + theTransactor.getTablePrefix()
 					+ "prisms_user_password SET pwdExpire=" + toSet + " WHERE id=" + password[0].id;
 				try

@@ -102,7 +102,7 @@ public class ManagerUtils
 				userSource.setUserAccess(to, app, true, new prisms.records.RecordsTransaction(
 					userSource.getSystemUser()));
 		for(prisms.arch.ds.UserGroup group : from.getGroups())
-			if(!prisms.util.ArrayUtils.contains(to.getGroups(), group))
+			if(!org.qommons.ArrayUtils.contains(to.getGroups(), group))
 				to.addTo(group);
 	}
 

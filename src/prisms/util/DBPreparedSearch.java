@@ -7,6 +7,8 @@ import java.sql.SQLException;
 import java.util.Collection;
 
 import org.apache.log4j.Logger;
+import org.qommons.IntList;
+import org.qommons.LongList;
 
 import prisms.arch.ds.Transactor;
 

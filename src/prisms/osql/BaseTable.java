@@ -109,8 +109,8 @@ public class BaseTable extends Table
 		try
 		{
 			DatabaseMetaData md = theConn.getSqlConnection().getMetaData();
-			java.util.LinkedHashMap<prisms.util.DualKey<String, String>, FKTemplate> fks;
-			fks = new java.util.LinkedHashMap<prisms.util.DualKey<String, String>, FKTemplate>();
+			java.util.LinkedHashMap<org.qommons.DualKey<String, String>, FKTemplate> fks;
+			fks = new java.util.LinkedHashMap<org.qommons.DualKey<String, String>, FKTemplate>();
 			rs = md.getImportedKeys(null, theSchema, theName);
 			while(rs.next())
 			{
@@ -118,7 +118,7 @@ public class BaseTable extends Table
 				String schema = rs.getString("PKTABLE_SCHEM");
 				String tableName = rs.getString("PKTABLE_NAME");
 				BaseTable fkTable = theConn.getTable(schema, tableName);
-				prisms.util.DualKey<String, String> key = new prisms.util.DualKey<String, String>(
+				org.qommons.DualKey<String, String> key = new org.qommons.DualKey<String, String>(
 					fkName, schema + "." + tableName);
 				FKTemplate fk = fks.get(key);
 				if(fk == null)
@@ -178,7 +178,7 @@ public class BaseTable extends Table
 			rs = null;
 			theFKs = new ForeignKey [0];
 			for(FKTemplate fk : fks.values())
-				theFKs = prisms.util.ArrayUtils.add(theFKs, new ForeignKey(fk.theFKName, this,
+				theFKs = org.qommons.ArrayUtils.add(theFKs, new ForeignKey(fk.theFKName, this,
 					fk.theFKColumns, fk.theReference, fk.theUpdateRule, fk.theDeleteRule));
 		} catch(java.sql.SQLException e)
 		{

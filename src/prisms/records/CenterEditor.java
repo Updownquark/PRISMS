@@ -7,13 +7,13 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
+import org.qommons.json.SAJParser.ParseException;
+import org.qommons.json.SAJParser.ParseState;
 
 import prisms.arch.PrismsSession;
 import prisms.arch.event.PrismsProperty;
 import prisms.ui.UI;
 import prisms.util.Sorter;
-import prisms.util.json.SAJParser.ParseException;
-import prisms.util.json.SAJParser.ParseState;
 
 /** Allows the user to edit a PRISMS center */
 public abstract class CenterEditor implements prisms.arch.AppPlugin
@@ -484,7 +484,7 @@ public abstract class CenterEditor implements prisms.arch.AppPlugin
 		{
 			long freq = ((Number) ((JSONObject) evt.get("freq")).get("seconds")).longValue() * 1000;
 			status = "Server synchronization frequency of data center \"" + theCenter.getName()
-				+ "\" changed to " + prisms.util.PrismsUtils.printTimeLength(freq);
+				+ "\" changed to " + org.qommons.QommonsUtils.printTimeLength(freq);
 			theCenter.setServerSyncFrequency(freq);
 		}
 		else if("setClientUser".equals(evt.get("method")))
@@ -651,8 +651,8 @@ public abstract class CenterEditor implements prisms.arch.AppPlugin
 		evt.put("purgeEnabled", Boolean.valueOf(canPurge()));
 		theSession.postOutgoingEvent(evt);
 
-		RecordUser [] users = prisms.util.ArrayUtils.adjust(getUsers(), getCenters(),
-			new prisms.util.ArrayUtils.DifferenceListener<RecordUser, PrismsCenter>()
+		RecordUser [] users = org.qommons.ArrayUtils.adjust(getUsers(), getCenters(),
+			new org.qommons.ArrayUtils.DifferenceListener<RecordUser, PrismsCenter>()
 			{
 				public boolean identity(RecordUser o1, PrismsCenter o2)
 				{
@@ -1125,8 +1125,8 @@ public abstract class CenterEditor implements prisms.arch.AppPlugin
 		try
 		{
 			java.io.Writer writer = new java.io.OutputStreamWriter(
-				new prisms.util.ExportStream(out));
-			prisms.util.json.JsonStreamWriter jsw = new prisms.util.json.JsonStreamWriter(writer);
+				new org.qommons.ExportStream(out));
+			org.qommons.json.JsonStreamWriter jsw = new org.qommons.json.JsonStreamWriter(writer);
 			jsw.startObject();
 			jsw.startProperty("message");
 			jsw.writeString(message);
@@ -1200,7 +1200,7 @@ public abstract class CenterEditor implements prisms.arch.AppPlugin
 		final java.io.Reader reader;
 		try
 		{
-			java.io.Reader tempReader = new java.io.InputStreamReader(new prisms.util.ImportStream(
+			java.io.Reader tempReader = new java.io.InputStreamReader(new org.qommons.ImportStream(
 				new java.io.ByteArrayInputStream(receiptBytes)));
 			java.io.StringWriter writer = new java.io.StringWriter();
 			int read = tempReader.read();
@@ -1211,8 +1211,8 @@ public abstract class CenterEditor implements prisms.arch.AppPlugin
 			}
 			String json = writer.toString();
 			reader = new java.io.StringReader(json);
-			new prisms.util.json.SAJParser().parse(reader,
-				new prisms.util.json.SAJParser.DefaultHandler()
+			new org.qommons.json.SAJParser().parse(reader,
+				new org.qommons.json.SAJParser.DefaultHandler()
 				{
 					@Override
 					public void separator(ParseState state)
@@ -1573,8 +1573,8 @@ public abstract class CenterEditor implements prisms.arch.AppPlugin
 	{
 		SyncRecord record = holder.theRecord;
 		row.cell(0).setLabel(record.getSyncType().toString());
-		row.cell(1).setLabel(prisms.util.PrismsUtils.print(record.getSyncTime()));
-		JSONObject linkID = prisms.util.PrismsUtils.rEventProps("id",
+		row.cell(1).setLabel(org.qommons.QommonsUtils.print(record.getSyncTime()));
+		JSONObject linkID = org.qommons.QommonsUtils.rEventProps("id",
 			Integer.valueOf(record.getID()));
 		if(record.getSyncError() == null)
 		{
@@ -1627,7 +1627,7 @@ public abstract class CenterEditor implements prisms.arch.AppPlugin
 					error = "The latest successful synchronization record cannot be purged";
 					continue;
 				}
-				toPurge = prisms.util.ArrayUtils.add(toPurge, records.get(i));
+				toPurge = org.qommons.ArrayUtils.add(toPurge, records.get(i));
 			}
 		}
 		if(error != null)

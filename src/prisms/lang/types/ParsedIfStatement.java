@@ -20,19 +20,19 @@ public class ParsedIfStatement extends ParsedItem {
 			if("condition".equals(m.config.get("storeAs"))) {
 				if(!conditions.isEmpty()) {
 					if(content == null)
-						theContents = prisms.util.ArrayUtils.add(theContents, new ParsedStatementBlock(parser, this, m));
+						theContents = org.qommons.ArrayUtils.add(theContents, new ParsedStatementBlock(parser, this, m));
 					content = null;
 				}
 				conditions.add(parser.parseStructures(this, m)[0]);
 			} else if("terminal".equals(m.config.get("storeAs"))) {
 				if(content == null)
-					theContents = prisms.util.ArrayUtils.add(theContents, new ParsedStatementBlock(parser, this, m));
+					theContents = org.qommons.ArrayUtils.add(theContents, new ParsedStatementBlock(parser, this, m));
 				content = null;
 			} else if("content".equals(m.config.get("storeAs"))) {
 				content = parser.parseStructures(this, m)[0];
 				if(!(content instanceof ParsedStatementBlock))
 					content = new ParsedStatementBlock(parser, this, content.getMatch(), content);
-				theContents = prisms.util.ArrayUtils.add(theContents, (ParsedStatementBlock) content);
+				theContents = org.qommons.ArrayUtils.add(theContents, (ParsedStatementBlock) content);
 			}
 		}
 		theConditions = conditions.toArray(new ParsedItem[conditions.size()]);

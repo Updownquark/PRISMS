@@ -193,7 +193,7 @@ public class DataListMgrPlugin extends DataListManager implements prisms.arch.Ap
 		params.put("title", getTitle());
 		params.put("icon", getIcon());
 		params.put("description", getDescription());
-		params.put("actions", prisms.util.JsonUtils.serialize(getActions()));
+		params.put("actions", prisms.ui.UIUtil.serialize(getActions()));
 		return params;
 	}
 
@@ -317,7 +317,7 @@ public class DataListMgrPlugin extends DataListManager implements prisms.arch.Ap
 		// Deselect nodes first
 		for(int i = 0; i < getItemCount(); i++)
 		{
-			boolean selected = prisms.util.ArrayUtils.contains(nodes, getItem(i));
+			boolean selected = org.qommons.ArrayUtils.contains(nodes, getItem(i));
 			if(getItem(i).isSelected() && !selected)
 			{
 				if(fromUser)
@@ -329,7 +329,7 @@ public class DataListMgrPlugin extends DataListManager implements prisms.arch.Ap
 		// Now select nodes
 		for(int i = 0; i < getItemCount(); i++)
 		{
-			boolean selected = prisms.util.ArrayUtils.contains(nodes, getItem(i));
+			boolean selected = org.qommons.ArrayUtils.contains(nodes, getItem(i));
 			if(!getItem(i).isSelected() && selected)
 			{
 				if(fromUser)
@@ -401,7 +401,7 @@ public class DataListMgrPlugin extends DataListManager implements prisms.arch.Ap
 					for(j = 0; j < getItemCount(); j++)
 						if(ids.get(i).equals(getItem(j).getID()))
 						{
-							items = prisms.util.ArrayUtils.add(items, getItem(j));
+							items = org.qommons.ArrayUtils.add(items, getItem(j));
 							break;
 						}
 					if(j == getItemCount())
@@ -420,8 +420,8 @@ public class DataListMgrPlugin extends DataListManager implements prisms.arch.Ap
 			DataListNode [] selection = new DataListNode [0];
 			for(int i = 0; i < getItemCount(); i++)
 			{
-				if(prisms.util.ArrayUtils.contains(ids, getItem(i).getID()))
-					selection = prisms.util.ArrayUtils.add(selection, getItem(i));
+				if(org.qommons.ArrayUtils.contains(ids, getItem(i).getID()))
+					selection = org.qommons.ArrayUtils.add(selection, getItem(i));
 			}
 			setSelection(selection, true);
 		}

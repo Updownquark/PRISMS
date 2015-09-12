@@ -138,7 +138,7 @@ public class LoggerTree extends prisms.ui.tree.DataTreeMgrPlugin
 			if(toUse == null)
 			{
 				toUse = new LoggerNode(this, subtree, subtree.hasPublicActions(), logger);
-				subtree.setChildren(prisms.util.ArrayUtils.add(subtree.getChildren(), toUse));
+				subtree.setChildren(org.qommons.ArrayUtils.add(subtree.getChildren(), toUse));
 			}
 			return;
 		}
@@ -154,7 +154,7 @@ public class LoggerTree extends prisms.ui.tree.DataTreeMgrPlugin
 			}
 			intermediateLog = org.apache.log4j.Logger.getLogger(name.toString());
 			toUse = new LoggerNode(this, subtree, subtree.hasPublicActions(), intermediateLog);
-			subtree.setChildren(prisms.util.ArrayUtils.add(subtree.getChildren(), toUse));
+			subtree.setChildren(org.qommons.ArrayUtils.add(subtree.getChildren(), toUse));
 		}
 		addLogger(toUse, logger, path, pathIndex + 1);
 	}

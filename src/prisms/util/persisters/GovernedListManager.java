@@ -4,11 +4,11 @@
 package prisms.util.persisters;
 
 import org.apache.log4j.Logger;
+import org.qommons.ArrayUtils;
 
 import prisms.arch.PrismsApplication;
 import prisms.arch.PrismsSession;
 import prisms.arch.event.PrismsPCE;
-import prisms.util.ArrayUtils;
 
 /**
  * Governs a set of items, distributing to the appropriate sessions of different applications

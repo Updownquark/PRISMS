@@ -79,7 +79,7 @@ public class Preferences implements prisms.util.persisters.OwnedObject
 	 */
 	public void addListener(Listener L)
 	{
-		theListeners = prisms.util.ArrayUtils.add(theListeners, L);
+		theListeners = org.qommons.ArrayUtils.add(theListeners, L);
 	}
 
 	/**
@@ -89,7 +89,7 @@ public class Preferences implements prisms.util.persisters.OwnedObject
 	 */
 	public void removeListener(Listener L)
 	{
-		theListeners = prisms.util.ArrayUtils.remove(theListeners, L);
+		theListeners = org.qommons.ArrayUtils.remove(theListeners, L);
 	}
 
 	/**
@@ -248,7 +248,7 @@ public class Preferences implements prisms.util.persisters.OwnedObject
 		try
 		{
 			for(Preference<?> pref : thePrefs.keySet())
-				if(!prisms.util.ArrayUtils.contains(ret, pref.getDomain()))
+				if(!org.qommons.ArrayUtils.contains(ret, pref.getDomain()))
 					ret.add(pref.getDomain());
 		} finally
 		{
@@ -266,7 +266,7 @@ public class Preferences implements prisms.util.persisters.OwnedObject
 		try
 		{
 			for(Preference<?> pref : theActivePrefs)
-				if(!prisms.util.ArrayUtils.contains(ret, pref.getDomain()))
+				if(!org.qommons.ArrayUtils.contains(ret, pref.getDomain()))
 					ret.add(pref.getDomain());
 		} finally
 		{

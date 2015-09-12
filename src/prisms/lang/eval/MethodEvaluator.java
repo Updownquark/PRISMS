@@ -222,7 +222,7 @@ public class MethodEvaluator implements AssignableEvaluator<ParsedMethod> {
 			else
 				methods = ctxType.getType().getBaseType().getMethods();
 			if(!env.usePublicOnly())
-				methods = prisms.util.ArrayUtils.mergeInclusive(java.lang.reflect.Method.class, methods, ctxType.getType().getBaseType()
+				methods = org.qommons.ArrayUtils.mergeInclusive(java.lang.reflect.Method.class, methods, ctxType.getType().getBaseType()
 					.getDeclaredMethods());
 			java.lang.reflect.Method goodTarget = null;
 			java.lang.reflect.Method badTarget = null;

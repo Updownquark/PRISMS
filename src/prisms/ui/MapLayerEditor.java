@@ -6,9 +6,9 @@ package prisms.ui;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.qommons.ArrayUtils;
 
 import prisms.arch.PrismsSession;
-import prisms.util.ArrayUtils;
 
 import com.bbn.openmap.Layer;
 import com.bbn.openmap.plugin.PlugIn;

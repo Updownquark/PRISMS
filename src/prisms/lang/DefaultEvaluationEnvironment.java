@@ -5,10 +5,11 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.qommons.ProgramTracker;
+import org.qommons.json.JsonSerialReader.StructState;
+
 import prisms.lang.eval.PrismsEvaluator;
 import prisms.lang.types.ParsedFunctionDeclaration;
-import prisms.util.ProgramTracker;
-import prisms.util.json.JsonSerialReader.StructState;
 
 /** Default implementation of {@link EvaluationEnvironment} */
 public class DefaultEvaluationEnvironment implements EvaluationEnvironment {
@@ -42,7 +43,7 @@ public class DefaultEvaluationEnvironment implements EvaluationEnvironment {
 
 	private volatile boolean isCanceled;
 
-	private prisms.util.ProgramTracker theTracker;
+	private org.qommons.ProgramTracker theTracker;
 
 	/** Creates the environment */
 	public DefaultEvaluationEnvironment() {
@@ -269,7 +270,7 @@ public class DefaultEvaluationEnvironment implements EvaluationEnvironment {
 			ret = theFunctions.toArray(new ParsedFunctionDeclaration[theFunctions.size()]);
 		}
 		if(theParent != null)
-			ret = prisms.util.ArrayUtils.addAll(ret, theParent.getDeclaredFunctions());
+			ret = org.qommons.ArrayUtils.addAll(ret, theParent.getDeclaredFunctions());
 		return ret;
 	}
 
@@ -278,7 +279,7 @@ public class DefaultEvaluationEnvironment implements EvaluationEnvironment {
 		synchronized(theFunctions) {
 			int fIdx = theFunctions.indexOf(function);
 			if(fIdx < 0) {
-				if(theParent != null && prisms.util.ArrayUtils.indexOf(theParent.getDeclaredFunctions(), function) >= 0) {
+				if(theParent != null && org.qommons.ArrayUtils.indexOf(theParent.getDeclaredFunctions(), function) >= 0) {
 					if(isTransaction)
 						theParent.dropFunction(function, struct, index);
 					else
@@ -545,8 +546,8 @@ public class DefaultEvaluationEnvironment implements EvaluationEnvironment {
 	@Override
 	public VariableImpl [] save(OutputStream out) throws IOException {
 		java.io.OutputStreamWriter charWriter = new java.io.OutputStreamWriter(out);
-		prisms.util.json.JsonStreamWriter jsonWriter = new prisms.util.json.JsonStreamWriter(charWriter);
-		prisms.util.HexStreamWriter hexWriter = new prisms.util.HexStreamWriter();
+		org.qommons.json.JsonStreamWriter jsonWriter = new org.qommons.json.JsonStreamWriter(charWriter);
+		org.qommons.HexStreamWriter hexWriter = new org.qommons.HexStreamWriter();
 
 		jsonWriter.startObject();
 		jsonWriter.startProperty("variables");
@@ -617,7 +618,7 @@ public class DefaultEvaluationEnvironment implements EvaluationEnvironment {
 		return fails.toArray(new VariableImpl[fails.size()]);
 	}
 
-	private void writeVar(VariableImpl var, prisms.util.json.JsonStreamWriter jsonWriter, prisms.util.HexStreamWriter hexWriter,
+	private void writeVar(VariableImpl var, org.qommons.json.JsonStreamWriter jsonWriter, org.qommons.HexStreamWriter hexWriter,
 		java.io.Writer charWriter, boolean isShort) throws IOException {
 		jsonWriter.startObject();
 		jsonWriter.startProperty("name");
@@ -641,14 +642,14 @@ public class DefaultEvaluationEnvironment implements EvaluationEnvironment {
 	@Override
 	public void load(InputStream in, PrismsParser parser, PrismsEvaluator eval) throws IOException {
 		java.io.InputStreamReader charReader = new java.io.InputStreamReader(in);
-		prisms.util.json.JsonSerialReader jsonReader = new prisms.util.json.JsonSerialReader(charReader);
+		org.qommons.json.JsonSerialReader jsonReader = new org.qommons.json.JsonSerialReader(charReader);
 
-		try (prisms.util.HexStreamReader hexReader = new prisms.util.HexStreamReader()) {
+		try (org.qommons.HexStreamReader hexReader = new org.qommons.HexStreamReader()) {
 			StructState rootState = jsonReader.startObject();
 			if(!"variables".equals(jsonReader.getNextProperty()))
 				throw new IOException("Unrecognizable JSON stream--no variables");
 			StructState arrayState = jsonReader.startArray();
-			while(jsonReader.getNextItem(true, false) instanceof prisms.util.json.JsonSerialReader.ObjectItem) {
+			while(jsonReader.getNextItem(true, false) instanceof org.qommons.json.JsonSerialReader.ObjectItem) {
 				StructState varState = jsonReader.save();
 				try {
 					VariableImpl var = parseNextVariable(jsonReader, hexReader, parser, eval);
@@ -709,7 +710,7 @@ public class DefaultEvaluationEnvironment implements EvaluationEnvironment {
 			if(!"importMethods".equals(jsonReader.getNextProperty()))
 				throw new IOException("Unrecognizable JSON stream--no importMethods");
 			arrayState = jsonReader.startArray();
-			while(jsonReader.getNextItem(true, false) instanceof prisms.util.json.JsonSerialReader.ObjectItem) {
+			while(jsonReader.getNextItem(true, false) instanceof org.qommons.json.JsonSerialReader.ObjectItem) {
 				StructState objState = jsonReader.save();
 				if(!"methodName".equals(jsonReader.getNextProperty()))
 					throw new IOException("Unrecognizable JSON stream--no methodName on importMethod");
@@ -729,7 +730,7 @@ public class DefaultEvaluationEnvironment implements EvaluationEnvironment {
 			if(!"history".equals(jsonReader.getNextProperty()))
 				throw new IOException("Unrecognizable JSON stream--no history");
 			arrayState = jsonReader.startArray();
-			while(jsonReader.getNextItem(true, false) instanceof prisms.util.json.JsonSerialReader.ObjectItem) {
+			while(jsonReader.getNextItem(true, false) instanceof org.qommons.json.JsonSerialReader.ObjectItem) {
 				StructState histState = jsonReader.save();
 				try {
 					VariableImpl var = parseNextVariable(jsonReader, hexReader, parser, eval);
@@ -744,13 +745,13 @@ public class DefaultEvaluationEnvironment implements EvaluationEnvironment {
 			jsonReader.endObject(rootState);
 		} catch(ClassCastException e) {
 			throw new IOException("Could not parse environment", e);
-		} catch(prisms.util.json.SAJParser.ParseException e) {
+		} catch(org.qommons.json.SAJParser.ParseException e) {
 			throw new IOException("Could not parse environment", e);
 		}
 	}
 
-	private VariableImpl parseNextVariable(prisms.util.json.JsonSerialReader jsonReader, prisms.util.HexStreamReader hexReader,
-		PrismsParser parser, PrismsEvaluator eval) throws IOException, prisms.util.json.SAJParser.ParseException {
+	private VariableImpl parseNextVariable(org.qommons.json.JsonSerialReader jsonReader, org.qommons.HexStreamReader hexReader,
+		PrismsParser parser, PrismsEvaluator eval) throws IOException, org.qommons.json.SAJParser.ParseException {
 		if(!"name".equals(jsonReader.getNextProperty()))
 			throw new IOException("Unrecognizable JSON stream--variable has no name");
 		String name = jsonReader.parseString();

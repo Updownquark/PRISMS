@@ -82,14 +82,14 @@ public class LoggerMonitor implements prisms.arch.event.SessionMonitor
 		{
 			changed = true;
 			all = new NamedSearch(ALL_SEARCH, null);
-			searches = prisms.util.ArrayUtils.add(searches, all, 0);
+			searches = org.qommons.ArrayUtils.add(searches, all, 0);
 		}
 		else if(all.getSearch() != null)
 		{
 			changed = true;
-			searches = prisms.util.ArrayUtils.remove(searches, all);
+			searches = org.qommons.ArrayUtils.remove(searches, all);
 			all = new NamedSearch(ALL_SEARCH, null);
-			searches = prisms.util.ArrayUtils.add(searches, all, 0);
+			searches = org.qommons.ArrayUtils.add(searches, all, 0);
 		}
 		if(def == null)
 		{
@@ -98,13 +98,13 @@ public class LoggerMonitor implements prisms.arch.event.SessionMonitor
 				def = all;
 			else
 				def = realDef;
-			searches = prisms.util.ArrayUtils.add(searches, def, 1);
+			searches = org.qommons.ArrayUtils.add(searches, def, 1);
 		}
 		else if(realDef != null && !realDef.getSearch().equals(def.getSearch()))
 		{
 			changed = true;
-			searches = prisms.util.ArrayUtils.remove(searches, def);
-			searches = prisms.util.ArrayUtils.add(searches, realDef, 1);
+			searches = org.qommons.ArrayUtils.remove(searches, def);
+			searches = org.qommons.ArrayUtils.add(searches, realDef, 1);
 		}
 		if(changed)
 			session.setProperty(Log4jProperties.searches, searches);

@@ -9,11 +9,11 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
+import org.qommons.ArrayUtils;
+import org.qommons.DualKey;
+import org.qommons.QommonsUtils;
 
 import prisms.arch.PrismsConfig;
-import prisms.util.ArrayUtils;
-import prisms.util.DualKey;
-import prisms.util.PrismsUtils;
 
 /** Parses syntactical structures from text without regard to semantics using an XML-encoded grammar file */
 public class PrismsParser {
@@ -877,7 +877,7 @@ public class PrismsParser {
 	private ParseMatch parseLiteral(StringBuilder sb, int index, PrismsConfig item) {
 		String value = item.getValue();
 		if(value != null)
-			value = prisms.util.PrismsUtils.decodeUnicode(value);
+			value = org.qommons.QommonsUtils.decodeUnicode(value);
 		if(index == sb.length()) {
 			if(value != null && value.length() > 0)
 				return new ParseMatch(item, "", index, null, false, item.getValue() + " expected");
@@ -890,7 +890,7 @@ public class PrismsParser {
 					return new ParseMatch(item, "", index, null, false, item.getValue() + " expected");
 			return new ParseMatch(item, sb.substring(index, index + value.length()), index, null, true, null);
 		} else {
-			String pattern = PrismsUtils.decodeUnicode(item.get("pattern"));
+			String pattern = QommonsUtils.decodeUnicode(item.get("pattern"));
 			java.util.regex.Matcher match = Pattern.compile(pattern, Pattern.DOTALL).matcher(sb.substring(index));
 			if(!match.find() || match.start() > 0)
 				return new ParseMatch(item, "", index, null, false, "Sequence matching " + item.get("pattern") + " expected");
@@ -901,7 +901,7 @@ public class PrismsParser {
 	private ParseMatch parseCharset(StringBuilder sb, int index, PrismsConfig item) {
 		if(index == sb.length())
 			return new ParseMatch(item, "", index, null, false, "Sequence matching " + item.get("pattern") + " expected");
-		String pattern = PrismsUtils.decodeUnicode(item.get("pattern"));
+		String pattern = QommonsUtils.decodeUnicode(item.get("pattern"));
 		Pattern pat = Pattern.compile(pattern, Pattern.DOTALL);
 		java.util.regex.Matcher match = pat.matcher(sb.substring(index));
 		if(!match.find() || match.start() > 0)
@@ -909,13 +909,13 @@ public class PrismsParser {
 		int end = index + match.end();
 		for(PrismsConfig exclude : item.subConfigs("exclude")) {
 			String escape = exclude.get("escape");
-			String value = PrismsUtils.decodeUnicode(exclude.getValue());
+			String value = QommonsUtils.decodeUnicode(exclude.getValue());
 			if(escape == null) {
 				int idx = sb.indexOf(value, index);
 				if(idx >= 0 && idx < end)
 					end = idx;
 			} else {
-				escape = PrismsUtils.decodeUnicode(escape);
+				escape = QommonsUtils.decodeUnicode(escape);
 				for(int i = index; i < end; i++) {
 					if(startsWith(sb, i, escape))
 						i += escape.length() - 1;
@@ -935,7 +935,7 @@ public class PrismsParser {
 			String maxMatch = null;
 			boolean incomplete = false;
 			for(PrismsConfig m : item.subConfigs("match")) {
-				String mValue = PrismsUtils.decodeUnicode(m.getValue());
+				String mValue = QommonsUtils.decodeUnicode(m.getValue());
 				if(text.equals(mValue))
 					found = true;
 				if(found)

@@ -3,6 +3,8 @@
  */
 package prisms.util;
 
+import org.qommons.LongList;
+
 import prisms.arch.PrismsException;
 
 /** A utility to reset passwords in a PRISMS database */

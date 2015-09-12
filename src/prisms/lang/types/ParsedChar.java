@@ -13,7 +13,7 @@ public class ParsedChar extends ParsedLiteral {
 
 	@Override
 	public Object parseValue(String text) throws ParseException {
-		text = prisms.util.PrismsUtils.decodeUnicode(text);
+		text = org.qommons.QommonsUtils.decodeUnicode(text);
 		if(text.length() != 1)
 			throw new ParseException("Invalid character constant", getRoot().getFullCommand(), getStored("value").index);
 		return text.charAt(0);
@@ -27,7 +27,7 @@ public class ParsedChar extends ParsedLiteral {
 	@Override
 	public String toString() {
 		StringBuilder ret = new StringBuilder('\'').append(getValue().charValue()).append('\'');
-		prisms.util.PrismsUtils.encodeUnicode(ret);
+		org.qommons.QommonsUtils.encodeUnicode(ret);
 		return ret.toString();
 	}
 }

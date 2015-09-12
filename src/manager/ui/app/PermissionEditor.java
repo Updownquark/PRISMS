@@ -158,9 +158,9 @@ public class PermissionEditor implements prisms.arch.AppPlugin
 		users = users.clone();
 		for(int u = 0; u < users.length; u++)
 		{
-			if(!prisms.util.ArrayUtils.contains(users[u].getGroups(), theGroup))
+			if(!org.qommons.ArrayUtils.contains(users[u].getGroups(), theGroup))
 			{
-				users = prisms.util.ArrayUtils.remove(users, u);
+				users = org.qommons.ArrayUtils.remove(users, u);
 				u--;
 			}
 		}

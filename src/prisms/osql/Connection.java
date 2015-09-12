@@ -7,8 +7,7 @@ import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 
 import org.apache.log4j.Logger;
-
-import prisms.util.DualKey;
+import org.qommons.DualKey;
 
 /**
  * Represents an objectified database connection, by which inserts, selects, updates and deletes may
@@ -189,7 +188,7 @@ public class Connection
 			}
 		if(tableIdx < 0)
 			return null;
-		ret = new BaseTable(this, theSchemas[prisms.util.ArrayUtils.indexOf(theSchemaTables,
+		ret = new BaseTable(this, theSchemas[org.qommons.ArrayUtils.indexOf(theSchemaTables,
 			tableNames)], tableNames[tableIdx]);
 		theTables.put(key, ret);
 		return ret;

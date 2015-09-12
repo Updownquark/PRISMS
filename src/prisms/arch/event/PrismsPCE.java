@@ -3,9 +3,10 @@
  */
 package prisms.arch.event;
 
+import org.qommons.ArrayUtils;
+
 import prisms.arch.PrismsApplication;
 import prisms.arch.PrismsSession;
-import prisms.util.ArrayUtils;
 
 /**
  * A substitute for {@link java.beans.PropertyChangeEvent} that represents a change to a typed

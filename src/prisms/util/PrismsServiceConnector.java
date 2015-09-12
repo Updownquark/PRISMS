@@ -11,6 +11,8 @@ import javax.net.ssl.SSLSession;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.qommons.QommonsUtils;
+import org.qommons.net.HttpConnector;
 
 import prisms.arch.Encryption;
 import prisms.arch.ds.Hashing;
@@ -19,7 +21,7 @@ import prisms.arch.ds.Hashing;
  * Connects to a PRISMS service. This class handles all the handshaking and protocols specific to
  * PRISMS so that any PRISMS web service can be accessed using this class (assuming the client knows
  * the required information including a password if necessary) simply by passing JSON objects.
- * 
+ *
  * The methods in this connector that connect to a server and throw {@link java.io.IOException}s may
  * actually throw several different subtypes of I/O exception:
  * <ul>
@@ -60,7 +62,7 @@ public class PrismsServiceConnector
 
 		/**
 		 * Creates a PrismsServiceException
-		 * 
+		 *
 		 * @param msg The client message
 		 * @param errorCode The error code from the server
 		 * @param prismsMsg The error message from the server
@@ -109,7 +111,7 @@ public class PrismsServiceConnector
 	{
 		/**
 		 * Creates a new password
-		 * 
+		 *
 		 * @param message The message to use to create the new password (user interface display)
 		 * @param constraints The constraints that the password must meet
 		 * @return The new password to use
@@ -120,7 +122,7 @@ public class PrismsServiceConnector
 		 * Called when the password is changed externally (not as a result of the connector's
 		 * session). This allows the calling software the opportunity to query or generate the
 		 * password that was set.
-		 * 
+		 *
 		 * @param setTime The time at which the password was set
 		 * @return The new password to use for encryption
 		 */
@@ -155,7 +157,7 @@ public class PrismsServiceConnector
 	{
 		/**
 		 * Called when client validation is requested by the server
-		 * 
+		 *
 		 * @param validationInfo The validation information sent by the server
 		 * @return Validation information to be used by the server to validate the client
 		 */
@@ -167,14 +169,14 @@ public class PrismsServiceConnector
 	{
 		/**
 		 * Called when the method finishes successfully
-		 * 
+		 *
 		 * @param returnVal The return value of the method
 		 */
 		void doReturn(JSONObject returnVal);
 
 		/**
 		 * Called when an error occurs invoking the remote method
-		 * 
+		 *
 		 * @param e The exception that occurred
 		 */
 		void doError(IOException e);
@@ -185,14 +187,14 @@ public class PrismsServiceConnector
 	{
 		/**
 		 * Called when the service call finishes successfully
-		 * 
+		 *
 		 * @param returnVals The return values of the service call
 		 */
 		void doReturn(JSONArray returnVals);
 
 		/**
 		 * Called when an error occurs invoking the service
-		 * 
+		 *
 		 * @param e The exception that occurred
 		 */
 		void doError(IOException e);
@@ -209,7 +211,7 @@ public class PrismsServiceConnector
 
 		/**
 		 * Creates the version info structure
-		 * 
+		 *
 		 * @param v The version numbers
 		 * @param m The modification date
 		 */
@@ -267,7 +269,7 @@ public class PrismsServiceConnector
 
 	/**
 	 * Creates a connector
-	 * 
+	 *
 	 * @param serviceURL The base URL of the service
 	 * @param appName The name of the application to access
 	 * @param serviceName The name of the service configuration to access
@@ -279,6 +281,7 @@ public class PrismsServiceConnector
 		theConnector = new HttpConnector(serviceURL);
 		theConnector.setHostnameVerifier(new javax.net.ssl.HostnameVerifier()
 		{
+			@Override
 			public boolean verify(String arg0, SSLSession arg1)
 			{
 				return true;
@@ -302,7 +305,7 @@ public class PrismsServiceConnector
 	/**
 	 * Sets the password to use for encryption if it is requested by the server. This takes
 	 * precedence over the user source if it is set.
-	 * 
+	 *
 	 * @param password The encryption password to use
 	 */
 	public void setPassword(String password)
@@ -330,7 +333,7 @@ public class PrismsServiceConnector
 
 	/**
 	 * Sets the user source for encryption information if it is requested by the server
-	 * 
+	 *
 	 * @param source The user source to get encryption information from
 	 */
 	public void setUserSource(prisms.arch.ds.UserSource source)
@@ -368,7 +371,7 @@ public class PrismsServiceConnector
 	 * outside the PRISMS architecture. This field is only used if asynchronous service calls are
 	 * used.
 	 * </p>
-	 * 
+	 *
 	 * @param env The PRISMS environment to use for transactions
 	 */
 	public void setEnv(prisms.arch.PrismsEnv env)
@@ -407,7 +410,7 @@ public class PrismsServiceConnector
 	 * made with {@link org.apache.log4j.Level#INFO} priority. If this connector is used by multiple
 	 * threads or if asynchronous communication is used, requests/responses will be logged in the
 	 * order they are received, which may make matching the requests and responses difficult.
-	 * 
+	 *
 	 * @param logRR Whether this connector should log its transactions to Log4j
 	 */
 	public void setLogRequestsResponses(boolean logRR)
@@ -417,7 +420,7 @@ public class PrismsServiceConnector
 
 	/**
 	 * Sets the HTTP method used to send data to the server
-	 * 
+	 *
 	 * @param post true if the POST method is to be used; false if GET is to be used
 	 */
 	public void setPost(boolean post)
@@ -432,7 +435,7 @@ public class PrismsServiceConnector
 	 * used, calling this method is not necessary. But it may be used to initialize the server for
 	 * quicker initial communication or as a ping to see if the service is still running and this
 	 * connector is still connected.
-	 * 
+	 *
 	 * @throws AuthenticationFailedException If this connector is unable to log in to the PRISMS
 	 *         server
 	 * @throws PrismsServiceException If a PRISMS error occurs
@@ -461,7 +464,7 @@ public class PrismsServiceConnector
 
 	/**
 	 * Queries the service for version information on the application that this connector accesses
-	 * 
+	 *
 	 * @return The version information for the given application
 	 * @throws AuthenticationFailedException If this connector is unable to log in to the PRISMS
 	 *         server
@@ -469,11 +472,11 @@ public class PrismsServiceConnector
 	 * @throws IOException If this service connector is unable to retrieve the information
 	 */
 	public VersionInfo getVersion() throws AuthenticationFailedException, PrismsServiceException,
-		IOException
+	IOException
 	{
 		JSONArray retArray;
 		prisms.arch.PrismsTransaction trans = theEnv != null ? theEnv.getTransaction() : null;
-		prisms.util.ProgramTracker.TrackNode track = null;
+		org.qommons.ProgramTracker.TrackNode track = null;
 		track = PrismsUtils.track(trans, "PRISMS connect");
 		try
 		{
@@ -500,7 +503,7 @@ public class PrismsServiceConnector
 
 	/**
 	 * Calls the service expecting a return value
-	 * 
+	 *
 	 * @param plugin The plugin to call
 	 * @param method The method to call
 	 * @param params The parameters to send to the method
@@ -514,11 +517,11 @@ public class PrismsServiceConnector
 	{
 		JSONObject rEventProps;
 		prisms.arch.PrismsTransaction trans = theEnv != null ? theEnv.getTransaction() : null;
-		prisms.util.ProgramTracker.TrackNode track = null;
+		org.qommons.ProgramTracker.TrackNode track = null;
 		track = PrismsUtils.track(trans, "PRISMS connect");
 		try
 		{
-			rEventProps = PrismsUtils.rEventProps(params);
+			rEventProps = QommonsUtils.rEventProps(params);
 		} finally
 		{
 			PrismsUtils.end(trans, track);
@@ -530,7 +533,7 @@ public class PrismsServiceConnector
 
 	/**
 	 * Calls the service expecting a return value
-	 * 
+	 *
 	 * @param plugin The plugin to call
 	 * @param method The method to call
 	 * @param params The parameters to send to the method
@@ -546,7 +549,7 @@ public class PrismsServiceConnector
 		params.put("method", method);
 		JSONArray serverReturn;
 		prisms.arch.PrismsTransaction trans = theEnv != null ? theEnv.getTransaction() : null;
-		prisms.util.ProgramTracker.TrackNode track = null;
+		org.qommons.ProgramTracker.TrackNode track = null;
 		track = PrismsUtils.track(trans, "PRISMS connect");
 		try
 		{
@@ -564,7 +567,7 @@ public class PrismsServiceConnector
 
 	/**
 	 * Calls the service where any number of return values may be expected
-	 * 
+	 *
 	 * @param plugin The plugin to call
 	 * @param method The method to call
 	 * @param params The parameters to send to the method
@@ -576,13 +579,13 @@ public class PrismsServiceConnector
 	 */
 	public JSONArray getResults(String plugin, String method, Object... params) throws IOException
 	{
-		JSONObject rEventProps = PrismsUtils.rEventProps(params);
+		JSONObject rEventProps = QommonsUtils.rEventProps(params);
 		if(rEventProps == null)
 			rEventProps = new JSONObject();
 		rEventProps.put("plugin", plugin);
 		rEventProps.put("method", method);
 		prisms.arch.PrismsTransaction trans = theEnv != null ? theEnv.getTransaction() : null;
-		prisms.util.ProgramTracker.TrackNode track = null;
+		org.qommons.ProgramTracker.TrackNode track = null;
 		track = PrismsUtils.track(trans, "PRISMS connect");
 		try
 		{
@@ -595,7 +598,7 @@ public class PrismsServiceConnector
 
 	/**
 	 * Calls the service expecting no return value
-	 * 
+	 *
 	 * @param plugin The plugin to call
 	 * @param method The method to call
 	 * @param sync Whether the call is to synchronous (will not return until the procedure is
@@ -612,7 +615,7 @@ public class PrismsServiceConnector
 	{
 		final JSONObject rEventProps;
 		{
-			JSONObject propTemp = PrismsUtils.rEventProps(params);
+			JSONObject propTemp = QommonsUtils.rEventProps(params);
 			if(propTemp == null)
 				propTemp = new JSONObject();
 			rEventProps = propTemp;
@@ -632,6 +635,7 @@ public class PrismsServiceConnector
 		final prisms.arch.PrismsSession[] session = new prisms.arch.PrismsSession [1];
 		Runnable run = new Runnable()
 		{
+			@Override
 			public void run()
 			{
 				prisms.arch.PrismsTransaction trans = null;
@@ -639,7 +643,7 @@ public class PrismsServiceConnector
 					trans = getEnv().transact(session[0], stage[0]);
 				else if(app[0] != null)
 					trans = getEnv().transact(app[0]);
-				prisms.util.ProgramTracker.TrackNode track = null;
+				org.qommons.ProgramTracker.TrackNode track = null;
 				track = PrismsUtils.track(trans, "PRISMS connect");
 				try
 				{
@@ -650,7 +654,7 @@ public class PrismsServiceConnector
 						thrown[0] = e;
 					else
 					{
-						e.setStackTrace(PrismsUtils.patchStackTraces(e.getStackTrace(),
+						e.setStackTrace(QommonsUtils.patchStackTraces(e.getStackTrace(),
 							outerStack[0].getStackTrace(), getClass().getName(), "run"));
 						log.error("Remote procedure call threw exception", e);
 					}
@@ -665,7 +669,7 @@ public class PrismsServiceConnector
 		if(sync)
 		{
 			prisms.arch.PrismsTransaction trans = theEnv != null ? theEnv.getTransaction() : null;
-			prisms.util.ProgramTracker.TrackNode track = null;
+			org.qommons.ProgramTracker.TrackNode track = null;
 			track = PrismsUtils.track(trans, "PRISMS connect");
 			try
 			{
@@ -692,11 +696,13 @@ public class PrismsServiceConnector
 			outerStack[0] = new Exception();
 			theWorker.run(run, new prisms.arch.Worker.ErrorListener()
 			{
+				@Override
 				public void error(Error error)
 				{
 					log.error("Remote procedure call threw exception", error);
 				}
 
+				@Override
 				public void runtime(RuntimeException ex)
 				{
 					log.error("Remote procedure call threw exception", ex);
@@ -707,7 +713,7 @@ public class PrismsServiceConnector
 
 	/**
 	 * Calls the service asynchronously, expecting a return value
-	 * 
+	 *
 	 * @param plugin The plugin to call
 	 * @param method The method to call
 	 * @param aRet The interface to receive the return value of the remote call or the error that
@@ -719,7 +725,7 @@ public class PrismsServiceConnector
 	{
 		final JSONObject rEventProps;
 		{
-			JSONObject propTemp = PrismsUtils.rEventProps(params);
+			JSONObject propTemp = QommonsUtils.rEventProps(params);
 			if(propTemp == null)
 				propTemp = new JSONObject();
 			rEventProps = propTemp;
@@ -732,6 +738,7 @@ public class PrismsServiceConnector
 		final prisms.arch.PrismsSession[] session = new prisms.arch.PrismsSession [1];
 		Runnable run = new Runnable()
 		{
+			@Override
 			public void run()
 			{
 				prisms.arch.PrismsTransaction trans = null;
@@ -741,7 +748,7 @@ public class PrismsServiceConnector
 					trans = getEnv().transact(app[0]);
 				try
 				{
-					prisms.util.ProgramTracker.TrackNode track = null;
+					org.qommons.ProgramTracker.TrackNode track = null;
 					track = PrismsUtils.track(trans, "PRISMS connect");
 					JSONArray serverReturn;
 					try
@@ -749,7 +756,7 @@ public class PrismsServiceConnector
 						serverReturn = callServer(ServerMethod.processEvent, rEventProps);
 					} catch(IOException e)
 					{
-						e.setStackTrace(PrismsUtils.patchStackTraces(e.getStackTrace(),
+						e.setStackTrace(QommonsUtils.patchStackTraces(e.getStackTrace(),
 							outerStack[0].getStackTrace(), getClass().getName(), "run"));
 						aRet.doError(e);
 						return;
@@ -761,7 +768,7 @@ public class PrismsServiceConnector
 					{
 						IOException e = new IOException(
 							"Error interfacing with server: No result returned: " + serverReturn);
-						e.setStackTrace(PrismsUtils.patchStackTraces(e.getStackTrace(),
+						e.setStackTrace(QommonsUtils.patchStackTraces(e.getStackTrace(),
 							outerStack[0].getStackTrace(), getClass().getName(), "run"));
 						aRet.doError(e);
 						return;
@@ -788,11 +795,13 @@ public class PrismsServiceConnector
 		outerStack[1] = new Exception();
 		theWorker.run(run, new prisms.arch.Worker.ErrorListener()
 		{
+			@Override
 			public void error(Error error)
 			{
 				log.error("Remote service call threw exception", error);
 			}
 
+			@Override
 			public void runtime(RuntimeException ex)
 			{
 				log.error("Remote service call threw exception", ex);
@@ -802,7 +811,7 @@ public class PrismsServiceConnector
 
 	/**
 	 * Calls the service asynchronously, expecting a return value
-	 * 
+	 *
 	 * @param plugin The plugin to call
 	 * @param method The method to call
 	 * @param aRet The interface to receive the return values of the service call or the error that
@@ -814,7 +823,7 @@ public class PrismsServiceConnector
 	{
 		final JSONObject rEventProps;
 		{
-			JSONObject propTemp = PrismsUtils.rEventProps(params);
+			JSONObject propTemp = QommonsUtils.rEventProps(params);
 			if(propTemp == null)
 				propTemp = new JSONObject();
 			rEventProps = propTemp;
@@ -827,6 +836,7 @@ public class PrismsServiceConnector
 		final prisms.arch.PrismsSession[] session = new prisms.arch.PrismsSession [1];
 		Runnable run = new Runnable()
 		{
+			@Override
 			public void run()
 			{
 				prisms.arch.PrismsTransaction trans = null;
@@ -836,7 +846,7 @@ public class PrismsServiceConnector
 					trans = getEnv().transact(app[0]);
 				try
 				{
-					prisms.util.ProgramTracker.TrackNode track = null;
+					org.qommons.ProgramTracker.TrackNode track = null;
 					track = PrismsUtils.track(trans, "PRISMS connect");
 					JSONArray serverReturn;
 					try
@@ -844,7 +854,7 @@ public class PrismsServiceConnector
 						serverReturn = callServer(ServerMethod.processEvent, rEventProps);
 					} catch(IOException e)
 					{
-						e.setStackTrace(PrismsUtils.patchStackTraces(e.getStackTrace(),
+						e.setStackTrace(QommonsUtils.patchStackTraces(e.getStackTrace(),
 							outerStack[0].getStackTrace(), getClass().getName(), "run"));
 						aRet.doError(e);
 						return;
@@ -873,11 +883,13 @@ public class PrismsServiceConnector
 		outerStack[0] = new Exception();
 		theWorker.run(run, new prisms.arch.Worker.ErrorListener()
 		{
+			@Override
 			public void error(Error error)
 			{
 				log.error("Remote service call threw exception", error);
 			}
 
+			@Override
 			public void runtime(RuntimeException ex)
 			{
 				log.error("Remote service call threw exception", ex);
@@ -1010,7 +1022,7 @@ public class PrismsServiceConnector
 			}
 			if(logRequestsResponses)
 				log.info(retStr);
-			retStr = PrismsUtils.decodeUnicode(retStr);
+			retStr = QommonsUtils.decodeUnicode(retStr);
 			JSONArray retJson;
 			try
 			{
@@ -1125,7 +1137,7 @@ public class PrismsServiceConnector
 		if(params != null)
 		{
 			dataStr = params.toString();
-			dataStr = PrismsUtils.encodeUnicode(dataStr);
+			dataStr = QommonsUtils.encodeUnicode(dataStr);
 			if(theEncryption != null)
 			{
 				if(dataStr.length() <= 20)
@@ -1153,7 +1165,7 @@ public class PrismsServiceConnector
 
 	/**
 	 * Gets an image from the service
-	 * 
+	 *
 	 * @param plugin The plugin to access
 	 * @param method The method to call
 	 * @param params The parameters to call the method with
@@ -1174,7 +1186,7 @@ public class PrismsServiceConnector
 
 	/**
 	 * Gets binary data from the service
-	 * 
+	 *
 	 * @param plugin The name of the download plugin to request data from
 	 * @param method The method to send to the plugin
 	 * @param params The data parameters to send to the plugin
@@ -1193,7 +1205,7 @@ public class PrismsServiceConnector
 
 	/**
 	 * Uploads data to the service TODO This does not currently work
-	 * 
+	 *
 	 * @param fileName The name of the file to send to the servlet
 	 * @param mimeType The content type to send to the servlet
 	 * @param plugin The name of the upload plugin to send the data to
@@ -1207,7 +1219,7 @@ public class PrismsServiceConnector
 	{
 		if(params == null)
 			params = new Object [0];
-		JSONObject jsonParams = PrismsUtils.rEventProps(params);
+		JSONObject jsonParams = QommonsUtils.rEventProps(params);
 		jsonParams.put("plugin", plugin);
 		jsonParams.put("method", method);
 		String dataStr;
@@ -1254,7 +1266,7 @@ public class PrismsServiceConnector
 
 	private synchronized JSONArray startEncryption(Hashing hashing, JSONObject encryptionParams,
 		String postAction, ServerMethod postServerMethod, JSONObject postRequest, long authID)
-		throws IOException
+			throws IOException
 	{
 		Lock lock = theCredentialLock.writeLock();
 		lock.lock();
@@ -1286,7 +1298,7 @@ public class PrismsServiceConnector
 						}
 					if(key == null)
 						throw new AuthenticationFailedException("Password set at "
-							+ PrismsUtils.print(authID) + " not found");
+							+ QommonsUtils.print(authID) + " not found");
 				}
 			}
 			else if(authID >= 0)
@@ -1368,7 +1380,7 @@ public class PrismsServiceConnector
 	{
 		if(pwd.length() < constraints.getMinCharacterLength())
 			return "Password must be at least " + constraints.getMinCharacterLength()
-				+ " character" + (constraints.getMinCharacterLength() > 1 ? "s" : "") + " long";
+			+ " character" + (constraints.getMinCharacterLength() > 1 ? "s" : "") + " long";
 		int lc = 0;
 		int uc = 0;
 		int dig = 0;
@@ -1387,16 +1399,16 @@ public class PrismsServiceConnector
 		}
 		if(lc < constraints.getMinLowerCase())
 			return "Password must contain at least " + constraints.getMinLowerCase()
-				+ " lower-case letter" + (constraints.getMinLowerCase() > 1 ? "s" : "");
+			+ " lower-case letter" + (constraints.getMinLowerCase() > 1 ? "s" : "");
 		if(uc < constraints.getMinUpperCase())
 			return "Password must contain at least " + constraints.getMinUpperCase()
-				+ " upper-case letter" + (constraints.getMinUpperCase() > 1 ? "s" : "");
+			+ " upper-case letter" + (constraints.getMinUpperCase() > 1 ? "s" : "");
 		if(dig < constraints.getMinDigits())
 			return "Password must contain at least " + constraints.getMinDigits()
-				+ " numeric digit" + (constraints.getMinDigits() > 1 ? "s" : "");
+			+ " numeric digit" + (constraints.getMinDigits() > 1 ? "s" : "");
 		if(special < constraints.getMinLowerCase())
 			return "Password must contain at least " + constraints.getMinSpecialChars()
-				+ " special character" + (constraints.getMinSpecialChars() > 1 ? "s" : "");
+			+ " special character" + (constraints.getMinSpecialChars() > 1 ? "s" : "");
 		return null;
 	}
 

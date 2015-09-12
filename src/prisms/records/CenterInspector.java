@@ -85,13 +85,13 @@ public class CenterInspector implements prisms.arch.event.DataInspector
 			}
 			ret.append("Last Successful Export:");
 			if(center.getLastExport() >= 0)
-				ret.append(prisms.util.PrismsUtils.print(center.getLastExport()));
+				ret.append(org.qommons.QommonsUtils.print(center.getLastExport()));
 			else
 				ret.append("never");
 			ret.append("\n            ");
 			ret.append("Last Successful Import:");
 			if(center.getLastExport() >= 0)
-				ret.append(prisms.util.PrismsUtils.print(center.getLastImport()));
+				ret.append(org.qommons.QommonsUtils.print(center.getLastImport()));
 			else
 				ret.append("never");
 			ret.append("            \n").append("ID: ")

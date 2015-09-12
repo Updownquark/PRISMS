@@ -107,13 +107,13 @@ public class Preference<T> implements Comparable<Preference<?>>
 			@Override
 			public Object deserialize(String serialized)
 			{
-				return prisms.util.ColorUtils.fromHTML(serialized);
+				return org.qommons.ColorUtils.fromHTML(serialized);
 			}
 
 			@Override
 			public String serialize(Object o)
 			{
-				return prisms.util.ColorUtils.toHTML((java.awt.Color) o);
+				return org.qommons.ColorUtils.toHTML((java.awt.Color) o);
 			}
 		},
 		/** A proportion-type preference, representing a value between 0 and 1 */

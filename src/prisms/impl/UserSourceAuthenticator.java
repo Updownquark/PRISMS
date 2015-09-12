@@ -5,6 +5,7 @@ package prisms.impl;
 
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
+import org.qommons.ArrayUtils;
 
 import prisms.arch.BlowfishEncryption;
 import prisms.arch.Encryption;
@@ -14,7 +15,6 @@ import prisms.arch.PrismsConfig;
 import prisms.arch.PrismsException;
 import prisms.arch.PrismsServer.PrismsRequest;
 import prisms.arch.ds.User;
-import prisms.util.ArrayUtils;
 
 /** Authenticates using the usernames/passwords stored in the UserSource */
 public class UserSourceAuthenticator implements PrismsAuthenticator
@@ -102,12 +102,12 @@ public class UserSourceAuthenticator implements PrismsAuthenticator
 
 	private class DummySessionAuth implements SessionAuthenticator
 	{
-		private prisms.util.DemandCache<String, DummySessionData> theEncryptions;
+		private org.qommons.DemandCache<String, DummySessionData> theEncryptions;
 
 		DummySessionAuth()
 		{
-			theEncryptions = new prisms.util.DemandCache<String, DummySessionData>(
-				new prisms.util.DemandCache.Qualitizer<String, DummySessionData>()
+			theEncryptions = new org.qommons.DemandCache<String, DummySessionData>(
+				new org.qommons.DemandCache.Qualitizer<String, DummySessionData>()
 				{
 					@Override
 					public float quality(String key, DummySessionData value)
@@ -695,7 +695,7 @@ public class UserSourceAuthenticator implements PrismsAuthenticator
 
 	private User theDummyUser;
 
-	private prisms.util.DemandCache<String, DummyUser> theDummyUsers;
+	private org.qommons.DemandCache<String, DummyUser> theDummyUsers;
 
 	private DummySessionAuth theDummyAuth;
 
@@ -756,7 +756,7 @@ public class UserSourceAuthenticator implements PrismsAuthenticator
 			else if(id > 0)
 				id = -id;
 			theDummyUser = new User(null, "Dummy", id);
-			theDummyUsers = new prisms.util.DemandCache<String, DummyUser>(null, 50, 10L * 60 * 1000);
+			theDummyUsers = new org.qommons.DemandCache<String, DummyUser>(null, 50, 10L * 60 * 1000);
 			theDummyAuth = new DummySessionAuth();
 		}
 	}

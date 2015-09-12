@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import org.apache.log4j.Logger;
+import org.qommons.DualKey;
 
 import prisms.arch.*;
 import prisms.arch.ds.Transactor;
@@ -15,7 +16,6 @@ import prisms.arch.event.PrismsPCE;
 import prisms.arch.event.PrismsProperty;
 import prisms.records.PrismsRecordException;
 import prisms.util.DBUtils;
-import prisms.util.DualKey;
 
 /** Persists preferences needed by PRISMS to a database */
 public class PreferencesPersister implements

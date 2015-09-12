@@ -13,7 +13,7 @@ public abstract class SynchronizerPersister implements prisms.arch.Persister<Pri
 	public void configure(prisms.arch.PrismsConfig config, prisms.arch.PrismsApplication app,
 		prisms.arch.event.PrismsProperty<PrismsSynchronizer> property)
 	{
-		theApps = prisms.util.ArrayUtils.add(theApps, app);
+		theApps = org.qommons.ArrayUtils.add(theApps, app);
 		if(theSynchronizer == null)
 		{
 			theSynchronizer = createSynchronizer(config, app);

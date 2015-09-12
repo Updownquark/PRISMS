@@ -9,6 +9,7 @@ import java.lang.reflect.Array;
 
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
+import org.qommons.ArrayUtils;
 
 import prisms.arch.PrismsApplication;
 import prisms.arch.PrismsSession;
@@ -18,7 +19,6 @@ import prisms.arch.event.DataInspector.InspectSession;
 import prisms.ui.list.NodeAction;
 import prisms.ui.tree.DataTreeNode;
 import prisms.ui.tree.service.ServiceTreeNode;
-import prisms.util.ArrayUtils;
 
 /** This server tree allows access to all session data in this enterprise instance */
 public class AppSessionServerTree extends prisms.ui.tree.service.ServiceTree
@@ -152,10 +152,10 @@ public class AppSessionServerTree extends prisms.ui.tree.service.ServiceTree
 		return new ASSTreeClient(id, u);
 	}
 
-	private org.json.simple.JSONArray getPerformanceOptions(prisms.util.TrackerSet trackers)
+	private org.json.simple.JSONArray getPerformanceOptions(org.qommons.TrackerSet trackers)
 	{
 		org.json.simple.JSONArray ret = new org.json.simple.JSONArray();
-		for(prisms.util.TrackerSet.TrackConfig config : trackers.getConfigs())
+		for(org.qommons.TrackerSet.TrackConfig config : trackers.getConfigs())
 		{
 			JSONObject jsonConfig = new JSONObject();
 			jsonConfig.put("keepTime", Long.valueOf(config.getKeepTime()));
@@ -165,9 +165,9 @@ public class AppSessionServerTree extends prisms.ui.tree.service.ServiceTree
 		return ret;
 	}
 
-	private JSONObject getPerformanceData(prisms.util.TrackerSet trackers, long interval)
+	private JSONObject getPerformanceData(org.qommons.TrackerSet trackers, long interval)
 	{
-		prisms.util.ProgramTracker tracker = trackers.getTrackData(interval);
+		org.qommons.ProgramTracker tracker = trackers.getTrackData(interval);
 		return tracker == null ? null : tracker.toJson();
 	}
 
@@ -205,7 +205,7 @@ public class AppSessionServerTree extends prisms.ui.tree.service.ServiceTree
 		{
 			StringBuilder ret = new StringBuilder();
 			ret.append("Installed:").append(
-				prisms.util.PrismsUtils.print(getSession().getApp().getEnvironment().getIDs()
+				org.qommons.QommonsUtils.print(getSession().getApp().getEnvironment().getIDs()
 					.getInstallDate()));
 			ret.append("            \nInstallation ID:").append(
 				getSession().getApp().getEnvironment().getIDs().getCenterID());
@@ -578,7 +578,7 @@ public class AppSessionServerTree extends prisms.ui.tree.service.ServiceTree
 			StringBuilder ret = new StringBuilder();
 			if(theInstance != null)
 				ret.append("Initialized ").append(
-					prisms.util.PrismsUtils.print(theInstance.initTime));
+					org.qommons.QommonsUtils.print(theInstance.initTime));
 			Runtime runtime = Runtime.getRuntime();
 			ret.append("            \nCPUs:").append(runtime.availableProcessors());
 			float cpu = getCPU();
@@ -732,7 +732,7 @@ public class AppSessionServerTree extends prisms.ui.tree.service.ServiceTree
 						StringBuilder ret = new StringBuilder();
 						ret.append("CPU Time on ").append(getText(client)).append("\n\n");
 						ret.append("(averages over ");
-						prisms.util.PrismsUtils.printTimeLength(
+						org.qommons.QommonsUtils.printTimeLength(
 							(theClockEnd - theClockOriginal) / 1000, ret, false);
 						ret.append(")\n");
 						for(int i = 0; i < theCallCount; i++)
@@ -1314,10 +1314,10 @@ public class AppSessionServerTree extends prisms.ui.tree.service.ServiceTree
 				authName = authName.substring(0, idx);
 			ret.append(authName);
 			ret.append("                  \nInitiated:");
-			ret.append(prisms.util.PrismsUtils.TimePrecision.SECONDS.print(
+			ret.append(org.qommons.QommonsUtils.TimePrecision.SECONDS.print(
 				theSession.getCreationTime(), true));
 			ret.append("                  \nLast Access:");
-			ret.append(prisms.util.PrismsUtils.TimePrecision.SECONDS.print(
+			ret.append(org.qommons.QommonsUtils.TimePrecision.SECONDS.print(
 				theSession.getLastAccess(), true));
 			ret.append("                  \nRemote Host:");
 			ret.append(md.getRemoteHost());

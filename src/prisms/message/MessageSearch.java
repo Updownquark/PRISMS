@@ -1297,7 +1297,7 @@ public abstract class MessageSearch extends Search
 		public boolean equals(Object obj)
 		{
 			return obj instanceof DeletedSearch
-				&& prisms.util.ArrayUtils.equals(deleted, ((DeletedSearch) obj).deleted);
+				&& org.qommons.ArrayUtils.equals(deleted, ((DeletedSearch) obj).deleted);
 		}
 	}
 

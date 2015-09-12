@@ -6,8 +6,7 @@ package prisms.arch.wms;
 import java.util.List;
 
 import org.dom4j.Element;
-
-import prisms.util.ArrayUtils;
+import org.qommons.ArrayUtils;
 
 /** A WMS_Capabilities document is returned in response to a GetCapabilities request made on a WMS. */
 public class WmsCapabilities

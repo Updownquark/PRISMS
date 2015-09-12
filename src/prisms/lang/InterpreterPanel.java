@@ -8,10 +8,11 @@ import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
 
+import org.qommons.ArrayUtils;
+
 import prisms.lang.eval.DefaultEvaluation;
 import prisms.lang.eval.PrismsEvaluator;
 import prisms.lang.types.*;
-import prisms.util.ArrayUtils;
 
 /** A panel that takes user-entered text, interprets it, and prints the results */
 public class InterpreterPanel extends javax.swing.JPanel {
@@ -29,7 +30,7 @@ public class InterpreterPanel extends javax.swing.JPanel {
 		 * @param o The object to write
 		 */
 		public void write(Object o) {
-			answer(prisms.util.ArrayUtils.toString(o), false);
+			answer(org.qommons.ArrayUtils.toString(o), false);
 		}
 
 		/**
@@ -976,7 +977,7 @@ public class InterpreterPanel extends javax.swing.JPanel {
 		Integer [] strengths = new Integer[items.size()];
 		for(int i = 0; i < strengths.length; i++)
 			strengths[i] = Integer.valueOf(getMatchStrength(items.get(i).name, toMatch));
-		prisms.util.ArrayUtils.sort(strengths, new prisms.util.ArrayUtils.SortListener<Integer>() {
+		org.qommons.ArrayUtils.sort(strengths, new org.qommons.ArrayUtils.SortListener<Integer>() {
 			@Override
 			public int compare(Integer o1, Integer o2) {
 				return o1.compareTo(o2);
@@ -1070,7 +1071,7 @@ public class InterpreterPanel extends javax.swing.JPanel {
 					theEvaluator.evaluate(s, theEnv.transact(), false, false);
 					EvaluationResult type = theEvaluator.evaluate(s, theEnv, false, true);
 					if(type != null && !Void.TYPE.equals(type.getType().getBaseType())) {
-						answer(prisms.util.ArrayUtils.toString(type.getValue()), false);
+						answer(org.qommons.ArrayUtils.toString(type.getValue()), false);
 						if(!(s instanceof prisms.lang.types.ParsedPreviousAnswer))
 							theEnv.addHistory(type.getType(), type.getValue());
 					}

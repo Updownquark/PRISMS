@@ -225,9 +225,9 @@ public class SortTableStructure
 				if(isBold)
 					style.put("bold", Boolean.TRUE);
 				if(theBGColor != null)
-					style.put("bgColor", prisms.util.ColorUtils.toHTML(theBGColor));
+					style.put("bgColor", org.qommons.ColorUtils.toHTML(theBGColor));
 				if(theFontColor != null)
-					style.put("fontColor", prisms.util.ColorUtils.toHTML(theFontColor));
+					style.put("fontColor", org.qommons.ColorUtils.toHTML(theFontColor));
 			}
 			return ret;
 		}

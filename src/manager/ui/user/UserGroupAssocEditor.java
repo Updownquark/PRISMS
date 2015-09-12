@@ -129,7 +129,7 @@ public class UserGroupAssocEditor implements prisms.arch.AppPlugin
 	{
 		if(theUser == null)
 			return false;
-		return prisms.util.ArrayUtils.contains(theUser.getGroups(), theGroup);
+		return org.qommons.ArrayUtils.contains(theUser.getGroups(), theGroup);
 	}
 
 	boolean isEnabled()
@@ -175,7 +175,7 @@ public class UserGroupAssocEditor implements prisms.arch.AppPlugin
 	{
 		if(theUser == null || theGroup == null)
 			return;
-		if(isMember == prisms.util.ArrayUtils.contains(theUser.getGroups(), theGroup))
+		if(isMember == org.qommons.ArrayUtils.contains(theUser.getGroups(), theGroup))
 			return;
 		if(theUser.isReadOnly())
 			throw new IllegalStateException("User " + theUser + " is read-only");

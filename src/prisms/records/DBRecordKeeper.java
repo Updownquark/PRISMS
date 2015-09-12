@@ -12,6 +12,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.apache.log4j.Logger;
+import org.qommons.ArrayUtils;
+import org.qommons.IntList;
+import org.qommons.LongList;
+import org.qommons.QommonsUtils;
 
 import prisms.arch.PrismsException;
 import prisms.arch.ds.Transactor;
@@ -1011,10 +1015,10 @@ public class DBRecordKeeper implements RecordKeeper
 					if(dbCenter.getServerSyncFrequency() != center.getServerSyncFrequency())
 					{
 						changeMsg += "Changed server synchronization frequency from "
-							+ (dbCenter.getServerSyncFrequency() >= 0 ? PrismsUtils
+							+ (dbCenter.getServerSyncFrequency() >= 0 ? QommonsUtils
 								.printTimeLength(dbCenter.getServerSyncFrequency()) : "none")
 							+ " to "
-							+ (center.getServerSyncFrequency() >= 0 ? PrismsUtils
+							+ (center.getServerSyncFrequency() >= 0 ? QommonsUtils
 								.printTimeLength(center.getServerSyncFrequency()) : "none") + "\n";
 						modified = true;
 						addModification(trans, PrismsChange.center,
@@ -1039,10 +1043,10 @@ public class DBRecordKeeper implements RecordKeeper
 					if(dbCenter.getChangeSaveTime() != center.getChangeSaveTime())
 					{
 						changeMsg += "Changed modification save time from "
-							+ (dbCenter.getChangeSaveTime() >= 0 ? PrismsUtils
+							+ (dbCenter.getChangeSaveTime() >= 0 ? QommonsUtils
 								.printTimeLength(dbCenter.getChangeSaveTime()) : "none")
 							+ " to "
-							+ (center.getChangeSaveTime() >= 0 ? PrismsUtils.printTimeLength(center
+							+ (center.getChangeSaveTime() >= 0 ? QommonsUtils.printTimeLength(center
 								.getChangeSaveTime()) : "none") + "\n";
 						modified = true;
 						addModification(trans, PrismsChange.center,
@@ -1053,10 +1057,10 @@ public class DBRecordKeeper implements RecordKeeper
 					if(dbCenter.getLastImport() != center.getLastImport())
 					{
 						changeMsg += "Change last import time from "
-							+ (dbCenter.getLastImport() > 0 ? PrismsUtils.print(dbCenter
+							+ (dbCenter.getLastImport() > 0 ? QommonsUtils.print(dbCenter
 								.getLastImport()) : "none")
 							+ " to "
-							+ (center.getLastImport() > 0 ? PrismsUtils.print(center
+							+ (center.getLastImport() > 0 ? QommonsUtils.print(center
 								.getLastImport()) : "none");
 						modified = true;
 						dbCenter.setLastImport(center.getLastImport());
@@ -1064,10 +1068,10 @@ public class DBRecordKeeper implements RecordKeeper
 					if(dbCenter.getLastExport() != center.getLastExport())
 					{
 						changeMsg += "Change last export time from "
-							+ (dbCenter.getLastExport() > 0 ? PrismsUtils.print(dbCenter
+							+ (dbCenter.getLastExport() > 0 ? QommonsUtils.print(dbCenter
 								.getLastExport()) : "none")
 							+ " to "
-							+ (center.getLastExport() > 0 ? PrismsUtils.print(dbCenter
+							+ (center.getLastExport() > 0 ? QommonsUtils.print(dbCenter
 								.getLastExport()) : "none");
 						modified = true;
 						dbCenter.setLastExport(center.getLastExport());
@@ -1268,8 +1272,8 @@ public class DBRecordKeeper implements RecordKeeper
 					if(dbRecord.getSyncTime() != record.getSyncTime())
 					{
 						changeMsg += "Changed time from "
-							+ PrismsUtils.print(dbRecord.getSyncTime()) + " to "
-							+ PrismsUtils.print(record.getSyncTime()) + "\n";
+							+ QommonsUtils.print(dbRecord.getSyncTime()) + " to "
+							+ QommonsUtils.print(record.getSyncTime()) + "\n";
 						modified = true;
 						dbRecord.setSyncTime(record.getSyncTime());
 					}
@@ -2398,7 +2402,7 @@ public class DBRecordKeeper implements RecordKeeper
 						int read;
 						while((read = reader.read()) >= 0)
 							fv.append((char) read);
-						template.previousValue = PrismsUtils.decodeUnicode(fv.toString());
+						template.previousValue = QommonsUtils.decodeUnicode(fv.toString());
 					} catch(java.io.IOException e)
 					{
 						throw new PrismsRecordException("Could not read long field value", e);
@@ -2906,14 +2910,14 @@ public class DBRecordKeeper implements RecordKeeper
 						String serialized = (String) error.getSerializedPreValue();
 						if(serialized.length() <= 100)
 						{
-							pStmt.setString(12, PrismsUtils.encodeUnicode(serialized));
+							pStmt.setString(12, QommonsUtils.encodeUnicode(serialized));
 							pStmt.setNull(13, java.sql.Types.CLOB);
 						}
 						else
 						{
 							pStmt.setNull(12, java.sql.Types.VARCHAR);
 							pStmt.setCharacterStream(13,
-								new java.io.StringReader(PrismsUtils.encodeUnicode(serialized)),
+								new java.io.StringReader(QommonsUtils.encodeUnicode(serialized)),
 								serialized.length());
 						}
 					}
@@ -2965,14 +2969,14 @@ public class DBRecordKeeper implements RecordKeeper
 						String serialized = serializePreValue(record);
 						if(serialized.length() <= 100)
 						{
-							pStmt.setString(12, PrismsUtils.encodeUnicode(serialized));
+							pStmt.setString(12, QommonsUtils.encodeUnicode(serialized));
 							pStmt.setNull(13, java.sql.Types.CLOB);
 						}
 						else
 						{
 							pStmt.setNull(12, java.sql.Types.VARCHAR);
 							pStmt.setCharacterStream(13,
-								new java.io.StringReader(PrismsUtils.encodeUnicode(serialized)),
+								new java.io.StringReader(QommonsUtils.encodeUnicode(serialized)),
 								serialized.length());
 						}
 					}
@@ -3524,9 +3528,9 @@ public class DBRecordKeeper implements RecordKeeper
 		if(dbPurger.getAge() != purger.getAge())
 		{
 			changeMsg += "Changed age from "
-				+ (dbPurger.getAge() >= 0 ? PrismsUtils.printTimeLength(dbPurger.getAge()) : "none")
+				+ (dbPurger.getAge() >= 0 ? QommonsUtils.printTimeLength(dbPurger.getAge()) : "none")
 				+ " to "
-				+ (purger.getAge() >= 0 ? PrismsUtils.printTimeLength(purger.getAge()) : "none")
+				+ (purger.getAge() >= 0 ? QommonsUtils.printTimeLength(purger.getAge()) : "none")
 				+ "\n";
 			modified = true;
 			addModification(trans, PrismsChange.autoPurge, PrismsChange.AutoPurgeChange.age, 0,

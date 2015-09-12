@@ -4,10 +4,10 @@
 package prisms.ui;
 
 import org.json.simple.JSONObject;
+import org.qommons.QommonsUtils;
 
 import prisms.arch.AppPlugin;
 import prisms.arch.PrismsSession;
-import prisms.util.PrismsUtils;
 
 /**
  * A very simple plugin that listens for "sendStatusUpdate" and "sendStatusError" events and posts
@@ -68,7 +68,7 @@ public class StatusPlugin implements AppPlugin
 		JSONObject evt = new JSONObject();
 		evt.put("plugin", theName);
 		evt.put("method", "showStatus");
-		evt.put("message", PrismsUtils.encodeUnicode(message));
+		evt.put("message", QommonsUtils.encodeUnicode(message));
 		theSession.postOutgoingEvent(evt);
 	}
 
@@ -82,7 +82,7 @@ public class StatusPlugin implements AppPlugin
 		JSONObject evt = new JSONObject();
 		evt.put("plugin", theName);
 		evt.put("method", "showError");
-		evt.put("message", PrismsUtils.encodeUnicode(message));
+		evt.put("message", QommonsUtils.encodeUnicode(message));
 		theSession.postOutgoingEvent(evt);
 	}
 

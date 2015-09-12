@@ -13,7 +13,7 @@ import java.lang.reflect.Array;
 public class ListenerManager<L>
 {
 	/** The key for listeners to all properties or all events */
-	private static final String ALL_KEY = "All" + prisms.util.PrismsUtils.getRandomString(8);
+	private static final String ALL_KEY = "All" + org.qommons.QommonsUtils.getRandomString(8);
 
 	private Class<L> theType;
 

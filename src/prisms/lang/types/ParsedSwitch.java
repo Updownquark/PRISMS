@@ -25,16 +25,16 @@ public class ParsedSwitch extends ParsedItem
 			if("case".equals(m.config.get("storeAs")) || "default".equals(m.config.get("storeAs")))
 			{
 				if(theCases.length > 0)
-					theCaseBlocks = prisms.util.ArrayUtils.add(theCaseBlocks, caseStmts.toArray(new ParsedItem [caseStmts.size()]));
+					theCaseBlocks = org.qommons.ArrayUtils.add(theCaseBlocks, caseStmts.toArray(new ParsedItem [caseStmts.size()]));
 				caseStmts.clear();
 				if("case".equals(m.config.get("storeAs")))
-					theCases = prisms.util.ArrayUtils.add(theCases, parser.parseStructures(this, m)[0]);
+					theCases = org.qommons.ArrayUtils.add(theCases, parser.parseStructures(this, m)[0]);
 				else if(hasDefault)
 					throw new prisms.lang.ParseException("Only one default statement allowed in a switch", getRoot().getFullCommand(),
 						m.index);
 				else
 				{
-					theCases = prisms.util.ArrayUtils.add(theCases, null);
+					theCases = org.qommons.ArrayUtils.add(theCases, null);
 					hasDefault = true;
 				}
 			}
@@ -42,7 +42,7 @@ public class ParsedSwitch extends ParsedItem
 				caseStmts.add(parser.parseStructures(this, m)[0]);
 		}
 		if(theCases.length > theCaseBlocks.length)
-			theCaseBlocks = prisms.util.ArrayUtils.add(theCaseBlocks, caseStmts.toArray(new ParsedItem [caseStmts.size()]));
+			theCaseBlocks = org.qommons.ArrayUtils.add(theCaseBlocks, caseStmts.toArray(new ParsedItem [caseStmts.size()]));
 	}
 
 	/** @return The variable that this switch switches on */

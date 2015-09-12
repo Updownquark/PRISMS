@@ -5,7 +5,7 @@ package prisms.message;
 
 import java.util.Iterator;
 
-import prisms.util.ArrayUtils;
+import org.qommons.ArrayUtils;
 
 /** All metadata attached to a PRISMS message */
 public class Message implements Cloneable

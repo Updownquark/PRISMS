@@ -227,7 +227,7 @@ public class MutableConfig extends PrismsConfig
 	/** @param subs The sub configurations for this configuration */
 	public void setSubConfigs(MutableConfig [] subs)
 	{
-		prisms.util.ArrayUtils.adjust(theSubConfigs, subs, new prisms.util.ArrayUtils.DifferenceListener<MutableConfig, MutableConfig>()
+		org.qommons.ArrayUtils.adjust(theSubConfigs, subs, new org.qommons.ArrayUtils.DifferenceListener<MutableConfig, MutableConfig>()
 			{
 			@Override
 			public boolean identity(MutableConfig o1, MutableConfig o2)
@@ -267,7 +267,7 @@ public class MutableConfig extends PrismsConfig
 	 */
 	public MutableConfig addSubConfig(MutableConfig sub)
 	{
-		theSubConfigs = prisms.util.ArrayUtils.add(theSubConfigs, sub);
+		theSubConfigs = org.qommons.ArrayUtils.add(theSubConfigs, sub);
 		sub.theParent = this;
 		sub.addListener(theSubConfigListener);
 		return sub;
@@ -276,7 +276,7 @@ public class MutableConfig extends PrismsConfig
 	/** @param sub The sub configuration to remove from this configuration */
 	public void removeSubConfig(MutableConfig sub)
 	{
-		theSubConfigs = prisms.util.ArrayUtils.remove(theSubConfigs, sub);
+		theSubConfigs = org.qommons.ArrayUtils.remove(theSubConfigs, sub);
 		if(sub.theParent == this)
 			sub.theParent = null;
 		sub.removeListener(theSubConfigListener);
@@ -286,13 +286,13 @@ public class MutableConfig extends PrismsConfig
 	public void addListener(ConfigListener listener)
 	{
 		if(listener != null)
-			theListeners = prisms.util.ArrayUtils.add(theListeners, listener);
+			theListeners = org.qommons.ArrayUtils.add(theListeners, listener);
 	}
 
 	/** @param listener The listener to stop notification for */
 	public void removeListener(ConfigListener listener)
 	{
-		theListeners = prisms.util.ArrayUtils.remove(theListeners, listener);
+		theListeners = org.qommons.ArrayUtils.remove(theListeners, listener);
 	}
 
 	void configAdded(MutableConfig config)

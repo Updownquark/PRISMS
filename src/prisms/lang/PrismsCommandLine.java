@@ -158,7 +158,7 @@ public class PrismsCommandLine {
 					else {
 						EvaluationResult evRes = (EvaluationResult) res;
 						if(evRes != null && !evRes.getType().canAssignTo(Void.TYPE))
-							System.out.println("\t" + prisms.util.ArrayUtils.toString(evRes.getValue()));
+							System.out.println("\t" + org.qommons.ArrayUtils.toString(evRes.getValue()));
 					}
 				}
 			} while(true);

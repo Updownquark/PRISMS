@@ -17,10 +17,10 @@ public class PerformanceDisplay implements prisms.arch.AppPlugin
 		theSession = session;
 		theName = config.get("name");
 		session.addPropertyChangeListener(manager.app.ManagerProperties.performanceData,
-			new prisms.arch.event.PrismsPCL<prisms.util.ProgramTracker>()
+			new prisms.arch.event.PrismsPCL<org.qommons.ProgramTracker>()
 			{
 				public void propertyChange(
-					prisms.arch.event.PrismsPCE<prisms.util.ProgramTracker> evt)
+					prisms.arch.event.PrismsPCE<org.qommons.ProgramTracker> evt)
 				{
 					initClient();
 				}

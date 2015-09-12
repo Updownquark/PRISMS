@@ -19,7 +19,7 @@ public class PrismsDetailException extends RuntimeException
 	public PrismsDetailException(String msg, Object... params)
 	{
 		super(msg);
-		theParams = prisms.util.PrismsUtils.rEventProps(params);
+		theParams = org.qommons.QommonsUtils.rEventProps(params);
 	}
 
 	/**
@@ -31,7 +31,7 @@ public class PrismsDetailException extends RuntimeException
 	public PrismsDetailException(String msg, Throwable cause, Object... params)
 	{
 		super(msg, cause);
-		theParams = prisms.util.PrismsUtils.rEventProps(params);
+		theParams = org.qommons.QommonsUtils.rEventProps(params);
 	}
 
 	/**

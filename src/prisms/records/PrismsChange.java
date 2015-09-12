@@ -3,7 +3,7 @@
  */
 package prisms.records;
 
-import prisms.util.PrismsUtils;
+import org.qommons.QommonsUtils;
 
 /**
  * The changes that can happen internal to the PRISMS synchronization architecture. Changes of these
@@ -209,8 +209,8 @@ public enum PrismsChange implements SubjectType
 			case changeSaveTime:
 				long bef = ((Number) before).longValue();
 				long aft = ((Number) before).longValue();
-				return ret + " from " + (bef < 0 ? "none" : PrismsUtils.printTimeLength(bef))
-					+ " to " + (aft < 0 ? "none" : PrismsUtils.printTimeLength(aft));
+				return ret + " from " + (bef < 0 ? "none" : QommonsUtils.printTimeLength(bef))
+					+ " to " + (aft < 0 ? "none" : QommonsUtils.printTimeLength(aft));
 			}
 			throw new IllegalStateException("Unrecognized change type " + name());
 		}
@@ -314,8 +314,8 @@ public enum PrismsChange implements SubjectType
 				long bAge = ((Number) before).longValue();
 				long aAge = ((Number) after).longValue();
 				return toString(add, major, minor) + " from "
-					+ (bAge < 0 ? "none" : PrismsUtils.print(bAge)) + " to "
-					+ (aAge < 0 ? "none" : PrismsUtils.print(aAge));
+					+ (bAge < 0 ? "none" : QommonsUtils.print(bAge)) + " to "
+					+ (aAge < 0 ? "none" : QommonsUtils.print(aAge));
 			case excludeType:
 				if(add > 0)
 					return "Type '" + before + "' excluded from auto-purge";

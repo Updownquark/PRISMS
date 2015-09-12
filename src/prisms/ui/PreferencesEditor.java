@@ -54,7 +54,7 @@ public class PreferencesEditor implements prisms.arch.AppPlugin
 						postEvt.put("value", enumPref);
 						break;
 					case COLOR:
-						postEvt.put("value", prisms.util.ColorUtils.toHTML((Color) value));
+						postEvt.put("value", org.qommons.ColorUtils.toHTML((Color) value));
 						break;
 					default:
 						postEvt.put("value", value);
@@ -106,7 +106,7 @@ public class PreferencesEditor implements prisms.arch.AppPlugin
 					}
 				break;
 			case COLOR:
-				value = prisms.util.ColorUtils.fromHTML((String) value);
+				value = org.qommons.ColorUtils.fromHTML((String) value);
 				break;
 			case INT:
 			case NONEG_INT:
@@ -167,7 +167,7 @@ public class PreferencesEditor implements prisms.arch.AppPlugin
 					prefObject.put("value", enumPref);
 					break;
 				case COLOR:
-					prefObject.put("value", prisms.util.ColorUtils.toHTML((Color) value));
+					prefObject.put("value", org.qommons.ColorUtils.toHTML((Color) value));
 					break;
 				default:
 					prefObject.put("value", value);

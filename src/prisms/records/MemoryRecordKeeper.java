@@ -7,6 +7,11 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
 
+import org.qommons.ArrayUtils;
+import org.qommons.DualKey;
+import org.qommons.LongList;
+import org.qommons.QommonsUtils;
+
 import prisms.util.*;
 import prisms.util.MemPreparedSearch.MatchState;
 
@@ -794,7 +799,7 @@ public class MemoryRecordKeeper implements RecordKeeper
 	 */
 	public MemoryRecordKeeper(String namespace, IDGetter getter)
 	{
-		this(namespace, getter, PrismsUtils.getRandomInt());
+		this(namespace, getter, QommonsUtils.getRandomInt());
 	}
 
 	/**

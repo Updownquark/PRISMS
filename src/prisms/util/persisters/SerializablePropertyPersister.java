@@ -157,8 +157,8 @@ public class SerializablePropertyPersister<T> implements UserSpecificPersister<T
 		@SuppressWarnings("rawtypes") prisms.arch.event.PrismsPCE evt)
 	{
 		Entry<String, String> [] entries = getProps(session).entrySet().toArray(new Entry [0]);
-		T [] newVals = prisms.util.ArrayUtils.adjust((T []) value, entries,
-			new prisms.util.ArrayUtils.DifferenceListener<T, Entry<String, String>>()
+		T [] newVals = org.qommons.ArrayUtils.adjust((T []) value, entries,
+			new org.qommons.ArrayUtils.DifferenceListener<T, Entry<String, String>>()
 			{
 				public boolean identity(T o1, Entry<String, String> o2)
 				{

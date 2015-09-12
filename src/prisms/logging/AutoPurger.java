@@ -3,13 +3,13 @@
  */
 package prisms.logging;
 
-import prisms.util.ArrayUtils;
+import org.qommons.ArrayUtils;
 
 /**
  * A configuration with which {@link PrismsLogger} purges log entries automatically to keep the
  * database size manageable
  */
-public class AutoPurger implements prisms.util.Sealable, Cloneable
+public class AutoPurger implements org.qommons.Sealable, Cloneable
 {
 	private volatile boolean isSealed;
 

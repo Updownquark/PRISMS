@@ -18,7 +18,7 @@ public class TypeEvaluator implements PrismsItemEvaluator<ParsedType> {
 				for(int p = 0; p < paramTypes.length; p++)
 					paramTypes[p] = evaluator.evaluate(item.getParameterTypes()[p], env, true, withValues).getType();
 				if(paramTypes.length > 0 && ret.getTypeParameters().length == 0) {
-					String args = prisms.util.ArrayUtils.toString(paramTypes);
+					String args = org.qommons.ArrayUtils.toString(paramTypes);
 					args = args.substring(1, args.length() - 1);
 					int index = item.getStored("base").index + item.getStored("base").text.length();
 					throw new prisms.lang.EvaluationException("The type " + ret.getName()
@@ -30,7 +30,7 @@ public class TypeEvaluator implements PrismsItemEvaluator<ParsedType> {
 						type += t + ", ";
 					type = type.substring(0, type.length() - 2);
 					type += ">";
-					String args = prisms.util.ArrayUtils.toString(paramTypes);
+					String args = org.qommons.ArrayUtils.toString(paramTypes);
 					args = args.substring(1, args.length() - 1);
 					int index = item.getStored("base").index + item.getStored("base").text.length();
 					throw new prisms.lang.EvaluationException("Incorrect number of arguments for type " + type

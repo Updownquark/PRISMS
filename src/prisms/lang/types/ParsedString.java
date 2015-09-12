@@ -24,18 +24,18 @@ public class ParsedString extends ParsedLiteral {
 
 	static String unescape(String str) {
 		StringBuilder ret = new StringBuilder(str);
-		prisms.util.PrismsUtils.replaceAll(ret, "\\\"", "\"");
-		prisms.util.PrismsUtils.replaceAll(ret, "\\n", "\n");
-		prisms.util.PrismsUtils.replaceAll(ret, "\\t", "\t");
-		return prisms.util.PrismsUtils.decodeUnicode(ret.toString());
+		org.qommons.QommonsUtils.replaceAll(ret, "\\\"", "\"");
+		org.qommons.QommonsUtils.replaceAll(ret, "\\n", "\n");
+		org.qommons.QommonsUtils.replaceAll(ret, "\\t", "\t");
+		return org.qommons.QommonsUtils.decodeUnicode(ret.toString());
 	}
 
 	static String escape(String str) {
 		StringBuilder ret = new StringBuilder(str);
-		prisms.util.PrismsUtils.replaceAll(ret, "\"", "\\\"");
-		prisms.util.PrismsUtils.replaceAll(ret, "\n", "\\n");
-		prisms.util.PrismsUtils.replaceAll(ret, "\t", "\\t");
-		prisms.util.PrismsUtils.encodeUnicode(ret);
+		org.qommons.QommonsUtils.replaceAll(ret, "\"", "\\\"");
+		org.qommons.QommonsUtils.replaceAll(ret, "\n", "\\n");
+		org.qommons.QommonsUtils.replaceAll(ret, "\t", "\\t");
+		org.qommons.QommonsUtils.encodeUnicode(ret);
 		return ret.toString();
 	}
 

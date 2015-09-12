@@ -6,7 +6,7 @@ package prisms.records;
 /** Stores objects by a type and ID */
 public class ObjectBag
 {
-	private static final class BagKey extends prisms.util.DualKey<String, Long>
+	private static final class BagKey extends org.qommons.DualKey<String, Long>
 	{
 		public BagKey(String key1, long key2)
 		{

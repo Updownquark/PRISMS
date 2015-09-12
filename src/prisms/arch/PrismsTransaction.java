@@ -4,8 +4,7 @@
 package prisms.arch;
 
 import org.apache.log4j.Logger;
-
-import prisms.util.ProgramTracker;
+import org.qommons.ProgramTracker;
 
 /** Represents a transaction (a single request) in the PRISMS architecture */
 public class PrismsTransaction
@@ -179,7 +178,7 @@ public class PrismsTransaction
 	 */
 	public void addFinishListenener(FinishListener L)
 	{
-		theListeners = prisms.util.ArrayUtils.add(theListeners, L);
+		theListeners = org.qommons.ArrayUtils.add(theListeners, L);
 	}
 
 	/** @return Whether this transaction is currently running */
@@ -229,7 +228,7 @@ public class PrismsTransaction
 			}
 		isFinished = false;
 		isStarted = true;
-		theID = prisms.util.PrismsUtils.getRandomString(16);
+		theID = org.qommons.QommonsUtils.getRandomString(16);
 		theApp = app;
 		theThread = Thread.currentThread();
 		theStage = stage;
@@ -265,7 +264,7 @@ public class PrismsTransaction
 		{
 			for(FinishListener L : theListeners)
 			{
-				prisms.util.ProgramTracker.TrackNode track = theTracker
+				org.qommons.ProgramTracker.TrackNode track = theTracker
 					.start("Transaction Finish Listener " + L);
 				try
 				{

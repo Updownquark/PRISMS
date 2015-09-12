@@ -6,6 +6,7 @@ package manager.ui.user;
 import manager.app.ManagerProperties;
 
 import org.apache.log4j.Logger;
+import org.qommons.ArrayUtils;
 
 import prisms.arch.PrismsException;
 import prisms.arch.PrismsSession;
@@ -13,7 +14,6 @@ import prisms.arch.ds.ManageableUserSource;
 import prisms.arch.ds.User;
 import prisms.arch.event.PrismsProperties;
 import prisms.ui.list.NodeAction;
-import prisms.util.ArrayUtils;
 
 /** Displays the list of all users to the user and allows user creation/deletion/selection */
 public class AllUsersList extends prisms.ui.list.SelectableList<User>
@@ -53,7 +53,7 @@ public class AllUsersList extends prisms.ui.list.SelectableList<User>
 							if(!confirm)
 								return;
 							User [] users = getSession().getProperty(PrismsProperties.users);
-							users = prisms.util.ArrayUtils.remove(users, user);
+							users = org.qommons.ArrayUtils.remove(users, user);
 							getSession().setProperty(PrismsProperties.users, users);
 						}
 					});
@@ -102,7 +102,7 @@ public class AllUsersList extends prisms.ui.list.SelectableList<User>
 				for(prisms.arch.ds.UserGroup group : user.getGroups())
 					newUser.addTo(group);
 				getSession().setProperty(PrismsProperties.users,
-					prisms.util.ArrayUtils.add(users, newUser));
+					org.qommons.ArrayUtils.add(users, newUser));
 				doSelect(newUser);
 			}
 		};
@@ -124,7 +124,7 @@ public class AllUsersList extends prisms.ui.list.SelectableList<User>
 				public void propertyChange(prisms.arch.event.PrismsPCE<User []> evt)
 				{
 					setListData(evt.getNewValue());
-					if(!prisms.util.ArrayUtils.contains(evt.getNewValue(), getSession()
+					if(!org.qommons.ArrayUtils.contains(evt.getNewValue(), getSession()
 						.getProperty(ManagerProperties.selectedUser)))
 						getSession().setProperty(ManagerProperties.selectedUser, null);
 				}
@@ -217,7 +217,7 @@ public class AllUsersList extends prisms.ui.list.SelectableList<User>
 					throw new IllegalStateException("Could not create user", e);
 				}
 				getSession().setProperty(PrismsProperties.users,
-					prisms.util.ArrayUtils.add(users, newUser));
+					org.qommons.ArrayUtils.add(users, newUser));
 				doSelect(newUser);
 			}
 
@@ -290,7 +290,7 @@ public class AllUsersList extends prisms.ui.list.SelectableList<User>
 		{
 			if(getSession().getPermissions().has("createUser"))
 			{
-				ret = prisms.util.ArrayUtils
+				ret = org.qommons.ArrayUtils
 					.add(ret, new NodeAction("Restore Deleted User", false));
 				// ret = prisms.util.ArrayUtils.add(ret, new NodeAction("Purge Deleted User",
 				// false));
@@ -329,7 +329,7 @@ public class AllUsersList extends prisms.ui.list.SelectableList<User>
 			{
 				if(!getSession().getApp().getEnvironment().getIDs().belongs(u.getID()))
 					continue;
-				if(prisms.util.ArrayUtils.contains(
+				if(org.qommons.ArrayUtils.contains(
 					getSession().getProperty(PrismsProperties.users), u))
 					continue;
 				deletedUsers.add(u);
@@ -347,7 +347,7 @@ public class AllUsersList extends prisms.ui.list.SelectableList<User>
 			for(int i = 0; i < options.length; i++)
 			{
 				String name = deletedUsers.get(i).getName();
-				for(int j = 2; prisms.util.ArrayUtils.contains(options, name); j++)
+				for(int j = 2; org.qommons.ArrayUtils.contains(options, name); j++)
 					name = deletedUsers.get(i).getName() + " (" + j + ")";
 				options[i] = name;
 			}
@@ -358,7 +358,7 @@ public class AllUsersList extends prisms.ui.list.SelectableList<User>
 					{
 						if(option == null)
 							return;
-						int idx = prisms.util.ArrayUtils.indexOf(options, option);
+						int idx = org.qommons.ArrayUtils.indexOf(options, option);
 						User user = deletedUsers.get(idx);
 						if(restore)
 						{

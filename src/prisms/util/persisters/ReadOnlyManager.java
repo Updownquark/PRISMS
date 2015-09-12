@@ -108,7 +108,7 @@ public class ReadOnlyManager<T> extends prisms.arch.event.GlobalPropertyManager<
 		if(evt.getSession() != null)
 			isCorrect = isValueCorrect(evt.getSession(), evt.getNewValue());
 		else
-			isCorrect = prisms.util.ArrayUtils.equals(evt.getNewValue(), evt.getApp()
+			isCorrect = org.qommons.ArrayUtils.equals(evt.getNewValue(), evt.getApp()
 				.getGlobalProperty(getProperty()));
 		if(!isCorrect)
 			throw new IllegalArgumentException("Cannot change the value of the read-only property "

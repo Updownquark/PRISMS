@@ -108,7 +108,7 @@ public class SyncClientPersister implements prisms.arch.Persister<SyncServiceCli
 				continue;
 			long lastSync = centers[rc].getLastImport();
 			if(time - lastSync >= syncFreq)
-				toSync = prisms.util.ArrayUtils.add(toSync, centers[rc]);
+				toSync = org.qommons.ArrayUtils.add(toSync, centers[rc]);
 		}
 		if(toSync.length == 0)
 			return;

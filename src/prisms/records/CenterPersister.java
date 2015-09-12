@@ -52,7 +52,7 @@ public abstract class CenterPersister extends prisms.util.persisters.ListPersist
 			if(ret[i].getID() == 0)
 			{
 				// Don't include the "Here" center in the UI value
-				ret = prisms.util.ArrayUtils.remove(ret, i);
+				ret = org.qommons.ArrayUtils.remove(ret, i);
 				break;
 			}
 		return ret;

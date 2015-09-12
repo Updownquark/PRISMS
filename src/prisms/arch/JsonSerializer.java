@@ -12,7 +12,7 @@ import org.json.simple.JSONObject;
 /**
  * A very simple serializer that writes and reads JSON, performing a simple check on sent objects.
  * The serializer accounts for encoded unicode characters (See
- * {@link prisms.util.PrismsUtils#decodeUnicode(String)}) and safely-encoded characters (same as
+ * {@link org.qommons.QommonsUtils#decodeUnicode(String)}) and safely-encoded characters (same as
  * unicode-encoded, but using "__XENC" as a prefix instead of "\\u".
  */
 public class JsonSerializer implements RemoteEventSerializer

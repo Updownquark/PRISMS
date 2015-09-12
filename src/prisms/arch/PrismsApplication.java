@@ -7,9 +7,9 @@ import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
+import org.qommons.ProgramTracker.TrackNode;
 
 import prisms.arch.event.*;
-import prisms.util.ProgramTracker.TrackNode;
 
 /**
  * PrismsApplication represents a type of application from which sessions may be instantiated that
@@ -192,7 +192,7 @@ public class PrismsApplication
 
 	private PropertySetActionQueue thePSAQueue;
 
-	private final prisms.util.TrackerSet theTrackSet;
+	private final org.qommons.TrackerSet theTrackSet;
 
 	private int theFollowedReloadPropsCommand;
 
@@ -242,7 +242,7 @@ public class PrismsApplication
 		thePropertyLocks = new ConcurrentHashMap<PrismsProperty<?>, PrismsPropertyLock>();
 		thePropertyStack = new ConcurrentHashMap<PrismsProperty<?>, PrismsApplication>();
 		thePSAQueue = new PropertySetActionQueue();
-		theTrackSet = new prisms.util.TrackerSet("App: " + name, null);
+		theTrackSet = new org.qommons.TrackerSet("App: " + name, null);
 	}
 
 	/** @return The environment that this application is used in */
@@ -400,7 +400,7 @@ public class PrismsApplication
 	}
 
 	/** @return The track set that keeps track of performance for this application */
-	public prisms.util.TrackerSet getTrackSet()
+	public org.qommons.TrackerSet getTrackSet()
 	{
 		return theTrackSet;
 	}
@@ -452,7 +452,7 @@ public class PrismsApplication
 		PropertyManager<T> [] ret = new PropertyManager [0];
 		for(PropertyManager<?> pm : theManagers)
 			if(pm.getProperty().equals(property))
-				ret = prisms.util.ArrayUtils.add(ret, (PropertyManager<T>) pm);
+				ret = org.qommons.ArrayUtils.add(ret, (PropertyManager<T>) pm);
 		return ret;
 	}
 
@@ -496,7 +496,7 @@ public class PrismsApplication
 		if(listeners == null)
 			listeners = new PrismsEventListener [] {listener};
 		else
-			listeners = prisms.util.ArrayUtils.add(listeners, listener);
+			listeners = org.qommons.ArrayUtils.add(listeners, listener);
 		theGlobalListeners.put(eventName, listeners);
 		for(PrismsSession session : theSessions)
 		{
@@ -521,7 +521,7 @@ public class PrismsApplication
 		else if(listeners.length == 1)
 			listeners = null;
 		else
-			listeners = prisms.util.ArrayUtils.remove(listeners, listener);
+			listeners = org.qommons.ArrayUtils.remove(listeners, listener);
 		theGlobalListeners.put(eventName, listeners);
 		for(PrismsSession session : theSessions)
 		{
@@ -667,7 +667,7 @@ public class PrismsApplication
 						if(session == fromSession)
 							continue;
 						T sessionValue = session.getProperty(prop);
-						if(manager == null && !prisms.util.ArrayUtils.equals(sessionValue, value))
+						if(manager == null && !org.qommons.ArrayUtils.equals(sessionValue, value))
 							session.setProperty(prop, sessionValue, eventProps);
 						else if(manager != null
 							&& !manager.isValueCorrect(session, session.getProperty(prop)))
@@ -904,7 +904,7 @@ public class PrismsApplication
 							task.run(s);
 						} catch(RuntimeException e)
 						{
-							e.setStackTrace(prisms.util.PrismsUtils.patchStackTraces(
+							e.setStackTrace(org.qommons.QommonsUtils.patchStackTraces(
 								e.getStackTrace(), trace, getClass().getName(), "run"));
 							throw e;
 						} finally
@@ -1202,12 +1202,12 @@ public class PrismsApplication
 				ScheduledTask task = it.next();
 				if(task.shouldRun(currentTime))
 				{
-					tasks = prisms.util.ArrayUtils.add(tasks, task);
+					tasks = org.qommons.ArrayUtils.add(tasks, task);
 					it.remove();
 					ret = true;
 				}
 			}
-			tasks = prisms.util.ArrayUtils.mergeInclusive(ScheduledTask.class, tasks,
+			tasks = org.qommons.ArrayUtils.mergeInclusive(ScheduledTask.class, tasks,
 				theRecurringTasks.toArray(new ScheduledTask [0]));
 		}
 		if(tasks.length > 0)
@@ -1441,7 +1441,7 @@ public class PrismsApplication
 				"Only the manager app may have unrestricted access to the set of sessions");
 		synchronized(theWatchers)
 		{
-			theWatchers = prisms.util.ArrayUtils.add(theWatchers, watcher);
+			theWatchers = org.qommons.ArrayUtils.add(theWatchers, watcher);
 			return theSessions.toArray(new PrismsSession [theSessions.size()]);
 		}
 	}
@@ -1451,7 +1451,7 @@ public class PrismsApplication
 	{
 		synchronized(theWatchers)
 		{
-			theWatchers = prisms.util.ArrayUtils.remove(theWatchers, watcher);
+			theWatchers = org.qommons.ArrayUtils.remove(theWatchers, watcher);
 		}
 	}
 

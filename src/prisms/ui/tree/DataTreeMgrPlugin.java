@@ -224,11 +224,11 @@ public class DataTreeMgrPlugin extends DataTreeManager implements prisms.arch.Ap
 			break;
 		}
 		final DataTreeNode [][] newSelected = new DataTreeNode [1] [0];
-		prisms.util.ArrayUtils.adjust(theSelection.toArray(new DataTreeNode [theSelection.size()]),
-			nodes, new prisms.util.ArrayUtils.DifferenceListener<DataTreeNode, DataTreeNode>()
+		org.qommons.ArrayUtils.adjust(theSelection.toArray(new DataTreeNode [theSelection.size()]),
+			nodes, new org.qommons.ArrayUtils.DifferenceListener<DataTreeNode, DataTreeNode>()
 			{
 				/**
-				 * @see prisms.util.ArrayUtils.DifferenceListener#identity(java.lang.Object,
+				 * @see org.qommons.ArrayUtils.DifferenceListener#identity(java.lang.Object,
 				 *      java.lang.Object)
 				 */
 				public boolean identity(DataTreeNode o1, DataTreeNode o2)
@@ -243,12 +243,12 @@ public class DataTreeMgrPlugin extends DataTreeManager implements prisms.arch.Ap
 				}
 
 				/**
-				 * @see prisms.util.ArrayUtils.DifferenceListener#added(java.lang.Object, int, int)
+				 * @see org.qommons.ArrayUtils.DifferenceListener#added(java.lang.Object, int, int)
 				 */
 				public DataTreeNode added(DataTreeNode o, int index, int retIdx)
 				{
 					theSelection.add(o);
-					newSelected[0] = prisms.util.ArrayUtils.add(newSelected[0], o);
+					newSelected[0] = org.qommons.ArrayUtils.add(newSelected[0], o);
 					return o;
 				}
 
@@ -444,7 +444,7 @@ public class DataTreeMgrPlugin extends DataTreeManager implements prisms.arch.Ap
 					log.error("Could not find path for action " + action, e);
 					continue;
 				}
-				nodes = prisms.util.ArrayUtils.add(nodes, target);
+				nodes = org.qommons.ArrayUtils.add(nodes, target);
 			}
 			if(nodes.length > 0)
 				performAction(nodes, action);

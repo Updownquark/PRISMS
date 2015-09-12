@@ -376,7 +376,7 @@ public class ServiceTree extends prisms.ui.tree.DataTreeManager implements prism
 				{
 					throw new IllegalStateException("Could not find path for action " + action, e);
 				}
-				nodes = prisms.util.ArrayUtils.add(nodes, target);
+				nodes = org.qommons.ArrayUtils.add(nodes, target);
 			}
 			if(nodes.length > 0)
 				performAction(client, nodes, action, lastCheck);
@@ -638,7 +638,7 @@ public class ServiceTree extends prisms.ui.tree.DataTreeManager implements prism
 		{
 			Object val = json.get(i);
 			if(val instanceof String)
-				json.set(i, prisms.util.PrismsUtils.encodeUnicode((String) val));
+				json.set(i, org.qommons.QommonsUtils.encodeUnicode((String) val));
 			else if(val instanceof JSONObject)
 				fixUnicode((JSONObject) val);
 			else if(val instanceof JSONArray)
@@ -652,7 +652,7 @@ public class ServiceTree extends prisms.ui.tree.DataTreeManager implements prism
 			.entrySet())
 		{
 			if(entry.getValue() instanceof String)
-				entry.setValue(prisms.util.PrismsUtils.encodeUnicode((String) entry.getValue()));
+				entry.setValue(org.qommons.QommonsUtils.encodeUnicode((String) entry.getValue()));
 			else if(entry.getValue() instanceof JSONObject)
 				fixUnicode((JSONObject) entry.getValue());
 			else if(entry.getValue() instanceof JSONArray)

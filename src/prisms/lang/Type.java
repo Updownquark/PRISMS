@@ -354,7 +354,7 @@ public class Type {
 				return methodTypes.get(tv.getName());
 
 			if(theBaseType != null) {
-				int decIndex = prisms.util.ArrayUtils.indexOf(declaringClass.getTypeParameters(), tv);
+				int decIndex = org.qommons.ArrayUtils.indexOf(declaringClass.getTypeParameters(), tv);
 				if(decIndex >= 0) {
 					java.lang.reflect.Type [] path = getTypePath(declaringClass, theBaseType);
 					if(path == null)
@@ -403,7 +403,7 @@ public class Type {
 			ret = getTypePath(superType, subType.getSuperclass());
 			if(ret != null) {
 				ret[ret.length - 1] = subType.getGenericSuperclass();
-				ret = prisms.util.ArrayUtils.add(ret, subType);
+				ret = org.qommons.ArrayUtils.add(ret, subType);
 				return ret;
 			}
 		}
@@ -411,7 +411,7 @@ public class Type {
 			ret = getTypePath(superType, subType.getInterfaces()[i]);
 			if(ret != null) {
 				ret[ret.length - 1] = subType.getGenericInterfaces()[i];
-				ret = prisms.util.ArrayUtils.add(ret, subType);
+				ret = org.qommons.ArrayUtils.add(ret, subType);
 				return ret;
 			}
 		}
@@ -661,7 +661,7 @@ public class Type {
 			return false;
 		if(theName == null ? t.theName != null : !theName.equals(t.theName))
 			return false;
-		if(!prisms.util.ArrayUtils.equals(theParamTypes, t.theParamTypes))
+		if(!org.qommons.ArrayUtils.equals(theParamTypes, t.theParamTypes))
 			return false;
 		return true;
 	}
@@ -678,7 +678,7 @@ public class Type {
 		if(theName != null)
 			ret = ret * 13 + theName.hashCode();
 		if(theParamTypes != null)
-			ret = ret * 17 + prisms.util.ArrayUtils.hashCode(theParamTypes);
+			ret = ret * 17 + org.qommons.ArrayUtils.hashCode(theParamTypes);
 		return ret;
 	}
 

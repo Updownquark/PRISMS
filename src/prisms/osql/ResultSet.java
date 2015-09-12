@@ -46,7 +46,7 @@ public class ResultSet implements Iterable<ValueSet>
 	 */
 	public boolean has(Column<?> column)
 	{
-		return prisms.util.ArrayUtils.contains(theColumns, column);
+		return org.qommons.ArrayUtils.contains(theColumns, column);
 	}
 
 	/**

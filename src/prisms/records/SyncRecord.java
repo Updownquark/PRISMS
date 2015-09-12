@@ -229,6 +229,6 @@ public class SyncRecord
 	public String toString()
 	{
 		return theSyncType + (isImport ? " import from " : " export to ") + theCenter + " at "
-			+ prisms.util.PrismsUtils.print(theSyncTime);
+			+ org.qommons.QommonsUtils.print(theSyncTime);
 	}
 }

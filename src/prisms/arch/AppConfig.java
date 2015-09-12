@@ -4,6 +4,8 @@
 package prisms.arch;
 
 import org.apache.log4j.Logger;
+import org.qommons.QommonsUtils;
+import org.qommons.TrackerSet;
 
 import prisms.arch.event.PrismsEventListener;
 import prisms.arch.event.PropertyManager;
@@ -34,15 +36,15 @@ public class AppConfig
 		{
 			if(app.isConfigured())
 				return;
-			prisms.util.TrackerSet.TrackConfig[] trackConfigs = null;
+			org.qommons.TrackerSet.TrackConfig[] trackConfigs = null;
 			PrismsConfig tracks = config.subConfig("tracking");
 			if(tracks != null)
-				trackConfigs = prisms.util.TrackerSet.parseTrackConfigs(tracks);
+				trackConfigs = parseTrackConfigs(tracks);
 			if(trackConfigs == null)
 				trackConfigs = app.getEnvironment().getTrackConfigs();
 			if(trackConfigs != null)
 				configureTracking(app, trackConfigs);
-			java.util.Collection<PropertyManager<?>> newMgrs = new java.util.ArrayList<PropertyManager<?>>();
+			java.util.Collection<PropertyManager<?>> newMgrs = new java.util.ArrayList<>();
 			for(PrismsConfig propConfig : config.subConfigs("properties/property"))
 				try
 				{
@@ -143,7 +145,7 @@ public class AppConfig
 	 * @param trackConfigs The track configs to configure the application's tracking with
 	 */
 	public void configureTracking(PrismsApplication app,
-		prisms.util.TrackerSet.TrackConfig[] trackConfigs)
+		org.qommons.TrackerSet.TrackConfig[] trackConfigs)
 	{
 		app.getTrackSet().addTrackConfigs(trackConfigs);
 	}
@@ -317,5 +319,28 @@ public class AppConfig
 			return;
 		}
 		client.addPluginType(name, type, pluginConfig);
+	}
+	
+
+	/**
+	 * Parses track configs from a PRISMS configuration XML file
+	 * 
+	 * @param config The configuration to parse the times from
+	 * @return The parsed tracking configs
+	 */
+	public static TrackerSet.TrackConfig[] parseTrackConfigs(prisms.arch.PrismsConfig config)
+	{
+		java.util.ArrayList<TrackerSet.TrackConfig> ret = new java.util.ArrayList<>();
+		for(prisms.arch.PrismsConfig track : config.subConfigs("track"))
+		{
+			long time = QommonsUtils.parseEnglishTime(track.getValue());
+			if(time < 0)
+			{
+				log.warn("Unrecognized track time: " + track.getValue());
+				continue;
+			}
+			ret.add(new TrackerSet.TrackConfig(time, "true".equals(track.get("stats"))));
+		}
+		return ret.toArray(new TrackerSet.TrackConfig [ret.size()]);
 	}
 }

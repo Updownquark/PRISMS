@@ -50,6 +50,6 @@ public class ManagerProperties
 		.create("userSelectedPermission", prisms.arch.Permission.class);
 
 	/** The performance data selected by the user to view */
-	public static final PrismsProperty<prisms.util.ProgramTracker> performanceData = PrismsProperty
-		.create("manager/performanceData", prisms.util.ProgramTracker.class);
+	public static final PrismsProperty<org.qommons.ProgramTracker> performanceData = PrismsProperty
+		.create("manager/performanceData", org.qommons.ProgramTracker.class);
 }

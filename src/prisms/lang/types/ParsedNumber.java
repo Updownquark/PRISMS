@@ -40,7 +40,7 @@ public class ParsedNumber extends ParsedLiteral {
 		boolean neg = getStored("neg") != null;
 		if(getStored("hex") != null) {
 			String value = text;
-			value = prisms.util.PrismsUtils.replaceAll(value, "_", "");
+			value = org.qommons.QommonsUtils.replaceAll(value, "_", "");
 			if(longType) {
 				if(value.length() > 16)
 					throw new ParseException("The literal 0x" + getStored("value").text + " of type long is out of range", getRoot()
@@ -129,7 +129,7 @@ public class ParsedNumber extends ParsedLiteral {
 			boolean expNeg = getStored("expNeg") != null;
 			if(fractPart == null && expPart == null && !floatType) {
 				String value = intPart.text;
-				value = prisms.util.PrismsUtils.replaceAll(value, "_", "");
+				value = org.qommons.QommonsUtils.replaceAll(value, "_", "");
 				if(longType) {
 					if(value.length() > MAX_LONG.length() || (value.length() == MAX_LONG.length() && value.compareTo(MAX_LONG) > 0))
 						throw new ParseException("The literal " + value + " of type long is out of range", getRoot().getFullCommand(),
@@ -152,14 +152,14 @@ public class ParsedNumber extends ParsedLiteral {
 				String value;
 				if(intPart != null) {
 					value = intPart.text;
-					value = prisms.util.PrismsUtils.replaceAll(value, "_", "");
+					value = org.qommons.QommonsUtils.replaceAll(value, "_", "");
 					for(int c = 0; c < value.length(); c++)
 						d = d * 10 + value.charAt(c) - '0';
 				}
 				if(fractPart != null) {
 					double frac = 0;
 					value = fractPart.text;
-					value = prisms.util.PrismsUtils.replaceAll(value, "_", "");
+					value = org.qommons.QommonsUtils.replaceAll(value, "_", "");
 					for(int c = value.length() - 1; c >= 0; c--)
 						frac = frac / 10 + value.charAt(c) - '0';
 					frac /= 10;
@@ -168,7 +168,7 @@ public class ParsedNumber extends ParsedLiteral {
 				if(expPart != null) {
 					int exp = 0;
 					value = expPart.text;
-					value = prisms.util.PrismsUtils.replaceAll(value, "_", "");
+					value = org.qommons.QommonsUtils.replaceAll(value, "_", "");
 					for(int c = 0; c < value.length(); c++)
 						exp = exp * 10 + value.charAt(c) - '0';
 					for(int i = 0; i < exp; i++)

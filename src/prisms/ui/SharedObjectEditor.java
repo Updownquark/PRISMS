@@ -145,9 +145,9 @@ public class SharedObjectEditor
 		JSONArray jsonUsers = (JSONArray) json.get("shareUsers");
 		if(jsonUsers != null)
 		{
-			prisms.util.ArrayUtils.adjust(users,
+			org.qommons.ArrayUtils.adjust(users,
 				(JSONObject []) jsonUsers.toArray(new JSONObject [jsonUsers.size()]),
-				new prisms.util.ArrayUtils.DifferenceListener<User, JSONObject>()
+				new org.qommons.ArrayUtils.DifferenceListener<User, JSONObject>()
 				{
 					public boolean identity(User o1, JSONObject o2)
 					{

@@ -83,10 +83,10 @@ public class AutoPurgeEditor implements prisms.arch.AppPlugin
 		jsonPurger.put("size", Integer.valueOf(purger.getMaxSize()));
 		jsonPurger.put("minAge", Long.valueOf(logger.getMinConfiguredAge() / 1000));
 		jsonPurger.put("minAgeDisplay",
-			prisms.util.PrismsUtils.printTimeLength(logger.getMinConfiguredAge()));
+			org.qommons.QommonsUtils.printTimeLength(logger.getMinConfiguredAge()));
 		jsonPurger.put("maxAge", Long.valueOf(logger.getMaxConfiguredAge() / 1000));
 		jsonPurger.put("maxAgeDisplay",
-			prisms.util.PrismsUtils.printTimeLength(logger.getMaxConfiguredAge()));
+			org.qommons.QommonsUtils.printTimeLength(logger.getMaxConfiguredAge()));
 		jsonPurger.put("age", Long.valueOf(purger.getMaxAge() / 1000));
 		org.json.simple.JSONArray excludes = new org.json.simple.JSONArray();
 		jsonPurger.put("excludes", excludes);
@@ -98,7 +98,7 @@ public class AutoPurgeEditor implements prisms.arch.AppPlugin
 			if(str.length() > 102)
 				str = str.substring(0, 100) + "\\u2026";
 			exclude.put("display", str);
-			if(prisms.util.ArrayUtils.contains(logger.getPermanentExcludedSearches(), excl))
+			if(org.qommons.ArrayUtils.contains(logger.getPermanentExcludedSearches(), excl))
 				exclude.put("permanent", Boolean.TRUE);
 			excludes.add(exclude);
 		}
@@ -123,7 +123,7 @@ public class AutoPurgeEditor implements prisms.arch.AppPlugin
 		evt.put("plugin", theName);
 		evt.put("method", "setDSInfo");
 		if(times != null)
-			evt.put("oldestTime", prisms.util.PrismsUtils.print(times[0]));
+			evt.put("oldestTime", org.qommons.QommonsUtils.print(times[0]));
 		evt.put("entryCount", Integer.valueOf(size[0]));
 		evt.put("totalSize", Integer.valueOf(size[1]));
 		theSession.postOutgoingEvent(evt);

@@ -33,7 +33,7 @@ public abstract class AbstractSimpleTreeNode implements JsonTreeNode
 
 	/**
 	 * Creates a tree node
-	 * 
+	 *
 	 * @param mgr The manager managing this node and its relatives
 	 * @param parent This node's parent
 	 */
@@ -48,7 +48,7 @@ public abstract class AbstractSimpleTreeNode implements JsonTreeNode
 
 	/**
 	 * Creates a tree node
-	 * 
+	 *
 	 * @param mgr The manager managing this node and its relatives
 	 * @param id The ID for this node
 	 * @param parent This node's parent
@@ -62,6 +62,7 @@ public abstract class AbstractSimpleTreeNode implements JsonTreeNode
 		theActions = new Action [0];
 	}
 
+	@Override
 	public final String getID()
 	{
 		return theID;
@@ -81,44 +82,48 @@ public abstract class AbstractSimpleTreeNode implements JsonTreeNode
 
 	/**
 	 * Does not fire any listeners. Intended to be called when creating the entire tree hierarchy
-	 * 
+	 *
 	 * @param children The initial set of children for this node
 	 */
 	public void setChildren(DataTreeNode [] children)
 	{
 		DataTreeNode [] oldCh = children;
 		theChildren = children;
-		prisms.util.ArrayUtils.adjust(oldCh, children,
-			new prisms.util.ArrayUtils.DifferenceListener<DataTreeNode, DataTreeNode>()
+		org.qommons.ArrayUtils.adjust(oldCh, children,
+			new org.qommons.ArrayUtils.DifferenceListener<DataTreeNode, DataTreeNode>()
+		{
+			@Override
+			public boolean identity(DataTreeNode o1, DataTreeNode o2)
 			{
-				public boolean identity(DataTreeNode o1, DataTreeNode o2)
-				{
-					return o1.equals(o2);
-				}
+				return o1.equals(o2);
+			}
 
-				public DataTreeNode added(DataTreeNode o, int mIdx, int retIdx)
-				{
-					if(o instanceof AbstractSimpleTreeNode && o.getParent() == null)
-						((AbstractSimpleTreeNode) o).theParent = AbstractSimpleTreeNode.this;
-					else if(o.getParent() != AbstractSimpleTreeNode.this)
-						throw new IllegalStateException("Child " + o.getText() + " of node "
-							+ getText() + " has a different parent");
-					return null;
-				}
+			@Override
+			public DataTreeNode added(DataTreeNode o, int mIdx, int retIdx)
+			{
+				if(o instanceof AbstractSimpleTreeNode && o.getParent() == null)
+					((AbstractSimpleTreeNode) o).theParent = AbstractSimpleTreeNode.this;
+				else if(o.getParent() != AbstractSimpleTreeNode.this)
+					throw new IllegalStateException("Child " + o.getText() + " of node "
+						+ getText() + " has a different parent");
+				return null;
+			}
 
-				public DataTreeNode removed(DataTreeNode o, int oIdx, int incMod, int retIdx)
-				{
-					if(o instanceof AbstractSimpleTreeNode)
-						((AbstractSimpleTreeNode) o).removed();
-					return null;
-				}
+			@Override
+			public DataTreeNode removed(DataTreeNode o, int oIdx, int incMod, int retIdx)
+			{
+				if(o instanceof AbstractSimpleTreeNode)
+					((AbstractSimpleTreeNode) o).removed();
+				return null;
+			}
 
-				public DataTreeNode set(DataTreeNode o1, int idx1, int incMod, DataTreeNode o2,
-					int idx2, int retIdx)
-				{
-					return null;
-				}
-			});
+			@Override
+			public DataTreeNode set(DataTreeNode o1, int idx1, int incMod, DataTreeNode o2,
+				int idx2, int retIdx)
+			{
+				return null;
+			}
+		});
 	}
 
 	/** @return The tree manager managing this node and its relatives */
@@ -127,11 +132,13 @@ public abstract class AbstractSimpleTreeNode implements JsonTreeNode
 		return theMgr;
 	}
 
+	@Override
 	public DataTreeNode getParent()
 	{
 		return theParent;
 	}
 
+	@Override
 	public DataTreeNode [] getChildren()
 	{
 		return theChildren;
@@ -139,7 +146,7 @@ public abstract class AbstractSimpleTreeNode implements JsonTreeNode
 
 	/**
 	 * Adds a node
-	 * 
+	 *
 	 * @param node The node to add
 	 * @param index The child index to add the node at
 	 */
@@ -149,20 +156,20 @@ public abstract class AbstractSimpleTreeNode implements JsonTreeNode
 			((AbstractSimpleTreeNode) node).theParent = AbstractSimpleTreeNode.this;
 		else if(node.getParent() != AbstractSimpleTreeNode.this)
 			throw new IllegalStateException("Child " + node.getText() + " of node " + getText()
-				+ " has a different parent");
-		theChildren = prisms.util.ArrayUtils.add(theChildren, node, index);
+			+ " has a different parent");
+		theChildren = org.qommons.ArrayUtils.add(theChildren, node, index);
 		theMgr.nodeAdded(node, index);
 	}
 
 	/**
 	 * Removes a node
-	 * 
+	 *
 	 * @param index The index of the node to remove
 	 */
 	public void remove(int index)
 	{
 		DataTreeNode child = theChildren[index];
-		theChildren = prisms.util.ArrayUtils.remove(theChildren, index);
+		theChildren = org.qommons.ArrayUtils.remove(theChildren, index);
 		theMgr.nodeRemoved(child);
 		if(child instanceof AbstractSimpleTreeNode)
 			((AbstractSimpleTreeNode) child).removed();
@@ -171,21 +178,21 @@ public abstract class AbstractSimpleTreeNode implements JsonTreeNode
 	/**
 	 * Although this operation does not affect this node's children, it is included since the
 	 * implementation should be fairly standard
-	 * 
+	 *
 	 * @param recursive Whether this node's descendants have been changed as well
 	 */
 	public void changed(boolean recursive)
 	{
 		if(theParent == null && theMgr.getRoot() != this)
 			return;
-		if(theParent != null && !prisms.util.ArrayUtils.contains(theParent.getChildren(), this))
+		if(theParent != null && !org.qommons.ArrayUtils.contains(theParent.getChildren(), this))
 			return;
 		theMgr.nodeChanged(this, recursive);
 	}
 
 	/**
 	 * Moves a child node from one index to another.
-	 * 
+	 *
 	 * @param fromIdx The index of the node to move
 	 * @param toIdx The new index for the node
 	 */
@@ -211,16 +218,19 @@ public abstract class AbstractSimpleTreeNode implements JsonTreeNode
 				((AbstractSimpleTreeNode) child).removed();
 	}
 
+	@Override
 	public boolean isSelected()
 	{
 		return isSelected;
 	}
 
+	@Override
 	public void setSelected(boolean selected)
 	{
 		isSelected = selected;
 	}
 
+	@Override
 	public void userSetSelected(boolean selected)
 	{
 		boolean changed = isSelected != selected;
@@ -231,28 +241,28 @@ public abstract class AbstractSimpleTreeNode implements JsonTreeNode
 
 	/**
 	 * Adds an action to be available to the user for this node
-	 * 
+	 *
 	 * @param action The action to add
 	 */
 	public void addAction(Action action)
 	{
 		if(!(action.getValue(Action.NAME) instanceof String))
 			throw new IllegalArgumentException("Actions for tree nodes require a string value");
-		if(!prisms.util.ArrayUtils.contains(theActions, action))
-			theActions = prisms.util.ArrayUtils.add(theActions, action);
+		if(!org.qommons.ArrayUtils.contains(theActions, action))
+			theActions = org.qommons.ArrayUtils.add(theActions, action);
 	}
 
 	/**
 	 * Removes an action from availability for the user on this node
-	 * 
+	 *
 	 * @param action The action to remove
 	 * @return If an action was removed
 	 */
 	public boolean removeAction(Action action)
 	{
-		int idx = prisms.util.ArrayUtils.indexOf(theActions, action);
+		int idx = org.qommons.ArrayUtils.indexOf(theActions, action);
 		if(idx >= 0)
-			theActions = prisms.util.ArrayUtils.remove(theActions, action);
+			theActions = org.qommons.ArrayUtils.remove(theActions, action);
 		return idx >= 0;
 	}
 
@@ -262,6 +272,7 @@ public abstract class AbstractSimpleTreeNode implements JsonTreeNode
 		return theActions;
 	}
 
+	@Override
 	public NodeAction [] getActions()
 	{
 		Action [] actions = theActions;
@@ -284,7 +295,7 @@ public abstract class AbstractSimpleTreeNode implements JsonTreeNode
 				multi = false;
 			if(count == ret.length)
 			{
-				ret = prisms.util.ArrayUtils.add(ret,
+				ret = org.qommons.ArrayUtils.add(ret,
 					new NodeAction((String) actions[a].getValue(Action.NAME), multi));
 				count++;
 			}
@@ -294,6 +305,7 @@ public abstract class AbstractSimpleTreeNode implements JsonTreeNode
 		return ret;
 	}
 
+	@Override
 	public void doAction(String action)
 	{
 		Action [] actions = theActions;
@@ -309,11 +321,12 @@ public abstract class AbstractSimpleTreeNode implements JsonTreeNode
 				+ getText());
 		if(!toDo.isEnabled())
 			throw new IllegalArgumentException("Action " + action + " on node " + getText()
-				+ " is disabled");
+			+ " is disabled");
 		java.awt.event.ActionEvent evt = new java.awt.event.ActionEvent(this, 0, action);
 		toDo.actionPerformed(evt);
 	}
 
+	@Override
 	public JSONObject toJSON()
 	{
 		JSONObject ret = new JSONObject();
@@ -321,9 +334,9 @@ public abstract class AbstractSimpleTreeNode implements JsonTreeNode
 		ret.put("text", getText());
 		ret.put("icon", getIcon());
 		ret.put("description", getDescription());
-		ret.put("bgColor", prisms.util.ColorUtils.toHTML(getBackground()));
-		ret.put("textColor", prisms.util.ColorUtils.toHTML(getForeground()));
-		ret.put("actions", prisms.util.JsonUtils.serialize(getActions()));
+		ret.put("bgColor", org.qommons.ColorUtils.toHTML(getBackground()));
+		ret.put("textColor", org.qommons.ColorUtils.toHTML(getForeground()));
+		ret.put("actions", prisms.ui.UIUtil.serialize(getActions()));
 		return ret;
 	}
 }

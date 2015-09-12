@@ -3,7 +3,7 @@
  */
 package prisms.records;
 
-import prisms.util.ArrayUtils;
+import org.qommons.ArrayUtils;
 
 /**
  * Simply holds any kind of data in a hierarchy

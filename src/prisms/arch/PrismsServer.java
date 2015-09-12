@@ -12,6 +12,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.qommons.ArrayUtils;
+import org.qommons.ProgramTracker.TrackNode;
+import org.qommons.QommonsUtils;
 
 import prisms.arch.PrismsAuthenticator.RequestAuthenticator;
 import prisms.arch.ds.User;
@@ -19,9 +22,7 @@ import prisms.arch.ds.UserGroup;
 import prisms.arch.ds.UserSource;
 import prisms.arch.wms.PrismsWmsRequest;
 import prisms.arch.wms.WmsPlugin;
-import prisms.util.ArrayUtils;
 import prisms.util.PrismsUtils;
-import prisms.util.ProgramTracker.TrackNode;
 
 /**
  * This server is the root of the PRISMS architecture. It takes HTTP requests that conform to the PRISMS specification
@@ -869,7 +870,7 @@ public class PrismsServer extends javax.servlet.http.HttpServlet
 			} catch(java.io.NotSerializableException e)
 			{
 				JSONArray send = new JSONArray();
-				send.add(prisms.util.PrismsUtils.rEventProps("method", "error", "message",
+				send.add(org.qommons.QommonsUtils.rEventProps("method", "error", "message",
 					"Could not serialize return events"));
 				try
 				{
@@ -880,7 +881,7 @@ public class PrismsServer extends javax.servlet.http.HttpServlet
 				}
 			}
 			if(!request.client.isService() || compareVersions(request.version, "2.1.3") >= 0)
-				str = PrismsUtils.encodeUnicode(str);
+				str = QommonsUtils.encodeUnicode(str);
 			if(response.shouldEncrypt)
 				str = encrypt(reqAuth, request, str);
 			request.theResponse.setContentType(serializer.getContentType(response.toReturn));
@@ -940,7 +941,7 @@ public class PrismsServer extends javax.servlet.http.HttpServlet
 			}
 			if(evt == null)
 				return singleMessage(reqAuth, req,
-					PrismsUtils.rEventProps("method", "restart", "message", "You have been successfully logged out."),
+					QommonsUtils.rEventProps("method", "restart", "message", "You have been successfully logged out."),
 					false);
 			if(postInit)
 				evt.put("postAction", "callInit");
@@ -1893,9 +1894,9 @@ public class PrismsServer extends javax.servlet.http.HttpServlet
 						{
 							StringBuilder sb = new StringBuilder("Remote host ").append(host);
 							sb.append(" locked out for ").append(newHits).append(" hits in ");
-							PrismsUtils.printTimeLength(now - oStart, sb, false);
+							QommonsUtils.printTimeLength(now - oStart, sb, false);
 							sb.append(": Unlock set to ");
-							sb.append(PrismsUtils.TimePrecision.SECONDS.print(activity.unlockTime, true));
+							sb.append(QommonsUtils.TimePrecision.SECONDS.print(activity.unlockTime, true));
 							log.error(sb.toString());
 						}
 						activity.hitCount = 0;
@@ -1992,7 +1993,7 @@ public class PrismsServer extends javax.servlet.http.HttpServlet
 
 	final java.util.concurrent.ConcurrentHashMap<String, SessionEpitaph> theEpitaphs;
 
-	final prisms.util.DemandCache<String, ClientGovernor> theClientGovernors;
+	final org.qommons.DemandCache<String, ClientGovernor> theClientGovernors;
 
 	private RemoteEventSerializer theSerializer;
 
@@ -2038,8 +2039,8 @@ public class PrismsServer extends javax.servlet.http.HttpServlet
 		log.info("Loaded PRISMS");
 		theSessions = new java.util.concurrent.ConcurrentHashMap<String, HttpSession>(32);
 		theEpitaphs = new java.util.concurrent.ConcurrentHashMap<String, SessionEpitaph>();
-		theClientGovernors = new prisms.util.DemandCache<String, ClientGovernor>(
-			new prisms.util.DemandCache.Qualitizer<String, ClientGovernor>()
+		theClientGovernors = new org.qommons.DemandCache<String, ClientGovernor>(
+			new org.qommons.DemandCache.Qualitizer<String, ClientGovernor>()
 			{
 				@Override
 				public float quality(String key, ClientGovernor value)
@@ -2481,7 +2482,7 @@ public class PrismsServer extends javax.servlet.http.HttpServlet
 
 			PrismsConfig tracking = pConfig.subConfig("tracking");
 			if(tracking != null)
-				theEnv.setTrackConfigs(prisms.util.TrackerSet.parseTrackConfigs(tracking));
+				theEnv.setTrackConfigs(AppConfig.parseTrackConfigs(tracking));
 			PrismsConfig displayThresh = tracking.subConfig("display-thresholds");
 			if(displayThresh != null)
 			{
@@ -3169,7 +3170,7 @@ public class PrismsServer extends javax.servlet.http.HttpServlet
 		if(unlockTime >= 0)
 		{
 			events.add(error(ErrorCode.RequestInvalid, "Client activity constraint exceeded." + " Host " + rh
-				+ " may not access this server until " + PrismsUtils.TimePrecision.SECONDS.print(unlockTime, true)
+				+ " may not access this server until " + QommonsUtils.TimePrecision.SECONDS.print(unlockTime, true)
 				+ " server time"));
 			resp.setContentType("text/prisms-json");
 			java.io.PrintWriter out = resp.getWriter();
@@ -3408,7 +3409,7 @@ public class PrismsServer extends javax.servlet.http.HttpServlet
 
 	static JSONObject toEvent(String method, Object... params)
 	{
-		JSONObject ret = prisms.util.PrismsUtils.rEventProps(params);
+		JSONObject ret = org.qommons.QommonsUtils.rEventProps(params);
 		if(method != null)
 			ret.put("method", method);
 		return ret;
@@ -3573,7 +3574,7 @@ public class PrismsServer extends javax.servlet.http.HttpServlet
 
 		StackTraceElement [] theStack;
 
-		prisms.util.ProgramTracker.TrackNode[] theTracking;
+		org.qommons.ProgramTracker.TrackNode[] theTracking;
 	}
 
 	prisms.util.ResourcePool<RunawayCheck> theCheckPool;
@@ -3683,7 +3684,7 @@ public class PrismsServer extends javax.servlet.http.HttpServlet
 			else if(now - checks[t].lastChecked < freq)
 				continue;
 			checks[t].lastChecked = now;
-			prisms.util.ProgramTracker.TrackNode[] tracking = trans[t].getTracker().getData();
+			org.qommons.ProgramTracker.TrackNode[] tracking = trans[t].getTracker().getData();
 			for(int tn = 0; tn < tracking.length; tn++)
 				tracking[t] = tracking[tn].clone();
 			Exception stack = new Exception()
@@ -3702,8 +3703,8 @@ public class PrismsServer extends javax.servlet.http.HttpServlet
 			{
 				msg.append("Transaction ID#").append(trans[t].getID()).append(", thread ID ")
 					.append(trans[t].getThread().getId()).append(" still running (logged at ")
-					.append(PrismsUtils.print(checks[t].lastLogged)).append("), now at ");
-				PrismsUtils.printTimeLength(now - ct.getLatestStart(), msg, false);
+					.append(QommonsUtils.print(checks[t].lastLogged)).append("), now at ");
+				QommonsUtils.printTimeLength(now - ct.getLatestStart(), msg, false);
 				log.warn(msg.toString());
 				continue;
 			}
@@ -3714,9 +3715,9 @@ public class PrismsServer extends javax.servlet.http.HttpServlet
 			msg.append(trans[t].getID());
 			msg.append(':');
 			msg.append("\n\tTime (transaction, method): ");
-			PrismsUtils.printTimeLength(now - root.getFirstStart(), msg, false);
+			QommonsUtils.printTimeLength(now - root.getFirstStart(), msg, false);
 			msg.append(", ");
-			PrismsUtils.printTimeLength(now - ct.getLatestStart(), msg, false);
+			QommonsUtils.printTimeLength(now - ct.getLatestStart(), msg, false);
 			msg.append("\n\tApplication: ").append(trans[t].getApp() == null ? "Global" : trans[t].getApp().getName());
 			if(trans[t].getSession() != null)
 			{
@@ -3799,7 +3800,7 @@ public class PrismsServer extends javax.servlet.http.HttpServlet
 				}
 			}
 			msg.append("\n\tTracking Data:\n");
-			prisms.util.ProgramTracker.PrintConfig config = new prisms.util.ProgramTracker.PrintConfig();
+			org.qommons.ProgramTracker.PrintConfig config = new org.qommons.ProgramTracker.PrintConfig();
 			config.setAccentThreshold(12);
 			config.setAsync(true);
 			config.setTaskDisplayThreshold(100);

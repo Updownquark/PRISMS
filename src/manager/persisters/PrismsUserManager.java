@@ -129,7 +129,7 @@ public class PrismsUserManager extends prisms.util.persisters.PersistingProperty
 	@Override
 	public boolean isValueCorrect(prisms.arch.PrismsSession session, User [] val)
 	{
-		return prisms.util.ArrayUtils.equals(theUsers, val);
+		return org.qommons.ArrayUtils.equals(theUsers, val);
 	}
 
 	@Override

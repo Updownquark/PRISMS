@@ -79,7 +79,7 @@ public class UserActionAlerter implements prisms.arch.event.SessionMonitor
 				final prisms.arch.event.PrismsEvent toFire = getEventToFire(evt);
 				if(toFire == null)
 					return;
-				evt.setProperty("actions", prisms.util.ArrayUtils.add(
+				evt.setProperty("actions", org.qommons.ArrayUtils.add(
 					(javax.swing.Action[]) evt.getProperty("actions"),
 					new javax.swing.AbstractAction(theActionName)
 					{
@@ -107,7 +107,7 @@ public class UserActionAlerter implements prisms.arch.event.SessionMonitor
 			public String toString()
 			{
 				return getSession().getApp().getName() + "."
-					+ prisms.util.ArrayUtils.toString(getPlugins()) + " " + getActionName()
+					+ org.qommons.ArrayUtils.toString(getPlugins()) + " " + getActionName()
 					+ " Action Alerter";
 			}
 		});
@@ -142,7 +142,7 @@ public class UserActionAlerter implements prisms.arch.event.SessionMonitor
 	public prisms.arch.event.PrismsEvent getEventToFire(prisms.arch.event.PrismsEvent evt)
 	{
 		String plugin = (String) evt.getProperty("plugin");
-		if(!prisms.util.ArrayUtils.contains(thePlugins, plugin))
+		if(!org.qommons.ArrayUtils.contains(thePlugins, plugin))
 			return null;
 		Object [] props = new Object [theEventPropertiesIn.length * 2];
 		if(theEventPropertiesIn.length > 0)

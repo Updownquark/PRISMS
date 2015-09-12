@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.HashMap;
 
 import org.apache.log4j.Logger;
+import org.qommons.*;
 
 import prisms.arch.PrismsException;
 import prisms.util.*;
@@ -608,7 +609,7 @@ public class PrismsLogger implements
 				{
 					update = true;
 					log.warn("Persisted maximum log entry age "
-						+ PrismsUtils.printTimeLength(maxAge)
+						+ QommonsUtils.printTimeLength(maxAge)
 						+ " violates configured constraints. Using default.");
 				}
 				rs.close();
@@ -933,10 +934,10 @@ public class PrismsLogger implements
 		purger.seal();
 		if(purger.getMaxAge() < theMinConfiguredAge || purger.getMaxAge() > theMaxConfiguredAge)
 			throw new IllegalArgumentException("Configured age "
-				+ PrismsUtils.printTimeLength(purger.getMaxAge())
+				+ QommonsUtils.printTimeLength(purger.getMaxAge())
 				+ " is not within the valid range: "
-				+ PrismsUtils.printTimeLength(theMinConfiguredAge) + " to "
-				+ PrismsUtils.printTimeLength(theMaxConfiguredAge));
+				+ QommonsUtils.printTimeLength(theMinConfiguredAge) + " to "
+				+ QommonsUtils.printTimeLength(theMaxConfiguredAge));
 		if(purger.getMaxSize() < theMinConfiguredSize || purger.getMaxSize() > theMaxConfiguredSize)
 			throw new IllegalArgumentException("Configured size " + purger.getMaxSize()
 				+ " is not within the valid range: " + theMinConfiguredSize + " to "
@@ -1085,7 +1086,7 @@ public class PrismsLogger implements
 		prisms.arch.PrismsTransaction trans = theEnv.transact(null);
 		try
 		{
-			prisms.util.ProgramTracker.TrackNode track = trans.getTracker().start(
+			org.qommons.ProgramTracker.TrackNode track = trans.getTracker().start(
 				"Check New Loggers");
 			try
 			{
@@ -1213,7 +1214,7 @@ public class PrismsLogger implements
 				theDuplicateQuery.setLong(2, stCRC);
 				theDuplicateQuery.setLong(3, trackCRC);
 				int duplicate = -1;
-				prisms.util.ProgramTracker.TrackNode track = trans.getTracker().start(
+				org.qommons.ProgramTracker.TrackNode track = trans.getTracker().start(
 					"Check Duplicate");
 				try
 				{
@@ -1507,7 +1508,7 @@ public class PrismsLogger implements
 		return crc.getValue();
 	}
 
-	private String path(prisms.util.ProgramTracker.TrackNode track)
+	private String path(org.qommons.ProgramTracker.TrackNode track)
 	{
 		StringBuilder ret = new StringBuilder();
 		while(track != null)
@@ -2557,10 +2558,10 @@ public class PrismsLogger implements
 	{
 		if(purger.getMaxAge() < theMinConfiguredAge || purger.getMaxAge() > theMaxConfiguredAge)
 			throw new IllegalArgumentException("Configured age "
-				+ PrismsUtils.printTimeLength(purger.getMaxAge())
+				+ QommonsUtils.printTimeLength(purger.getMaxAge())
 				+ " is not within the valid range: "
-				+ PrismsUtils.printTimeLength(theMinConfiguredAge) + " to "
-				+ PrismsUtils.printTimeLength(theMaxConfiguredAge));
+				+ QommonsUtils.printTimeLength(theMinConfiguredAge) + " to "
+				+ QommonsUtils.printTimeLength(theMaxConfiguredAge));
 		if(purger.getMaxSize() < theMinConfiguredSize || purger.getMaxSize() > theMaxConfiguredSize)
 			throw new IllegalArgumentException("Configured size " + purger.getMaxSize()
 				+ " is not within the valid range: " + theMinConfiguredSize + " to "

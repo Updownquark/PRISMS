@@ -4,8 +4,7 @@
 package prisms.ui.list;
 
 import org.json.simple.JSONObject;
-
-import prisms.util.IntList;
+import org.qommons.IntList;
 
 /**
  * A subtype of {@link DataListMgrPlugin} that allows the user to filter the content by a string
@@ -186,7 +185,7 @@ public abstract class SearchableListPlugin<T> extends SelectableList<T>
 			return true;
 		}
 		final IntList indices = new IntList();
-		final prisms.util.FloatList ranks = new prisms.util.FloatList();
+		final org.qommons.FloatList ranks = new org.qommons.FloatList();
 		String [] filters = filter.split("\\s+");
 		for(int i = 0; i < getItemCount(); i++)
 		{
@@ -216,8 +215,8 @@ public abstract class SearchableListPlugin<T> extends SelectableList<T>
 				ranks.add(Float.POSITIVE_INFINITY);
 			}
 		}
-		prisms.util.ArrayUtils.sort(ranks.toObjectArray(),
-			new prisms.util.ArrayUtils.SortListener<Float>()
+		org.qommons.ArrayUtils.sort(ranks.toObjectArray(),
+			new org.qommons.ArrayUtils.SortListener<Float>()
 			{
 				public int compare(Float o1, Float o2)
 				{

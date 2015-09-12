@@ -72,7 +72,7 @@ public abstract class ParsedItem
 		ArrayList<ParseMatch> ret = new ArrayList<>();
 		for(ParseMatch match : matches()) {
 			String storeAs = match.config.get("storeAs");
-			if(storeAs != null && prisms.util.ArrayUtils.contains(names, storeAs))
+			if(storeAs != null && org.qommons.ArrayUtils.contains(names, storeAs))
 				ret.add(match);
 		}
 		return ret.toArray(new ParseMatch[ret.size()]);
@@ -121,12 +121,12 @@ public abstract class ParsedItem
 			public java.util.Iterator<ParseMatch> iterator() {
 				return new java.util.Iterator<ParseMatch>() {
 					private ArrayList<ParseMatch> thePath;
-					private prisms.util.IntList thePathChildIndex;
+					private org.qommons.IntList thePathChildIndex;
 					private ParseMatch theReturn;
 
 					{
 						thePath = new ArrayList<>();
-						thePathChildIndex = new prisms.util.IntList();
+						thePathChildIndex = new org.qommons.IntList();
 						theReturn = getMatch();
 						thePath.add(theReturn);
 						thePathChildIndex.add(0);
@@ -167,7 +167,7 @@ public abstract class ParsedItem
 								// body, etc. TODO This doesn't work.
 								// In certain cases, the config of the parent may be the same as that of the child (<op min="0">)
 								if(terminal.config == ret.config
-									|| prisms.util.ArrayUtils.contains(terminal.config.subConfigs(), ret.config)) {
+									|| org.qommons.ArrayUtils.contains(terminal.config.subConfigs(), ret.config)) {
 									thePath.add(ret);
 									thePathChildIndex.add(0);
 									return ret;

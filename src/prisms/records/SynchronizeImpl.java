@@ -209,7 +209,7 @@ public interface SynchronizeImpl
 	 * @throws java.io.IOException If an error occurs writing to the stream
 	 * @throws PrismsRecordException If an error occurs writing the data
 	 */
-	void writeItem(Object item, prisms.util.json.JsonSerialWriter jsonWriter,
+	void writeItem(Object item, org.qommons.json.JsonSerialWriter jsonWriter,
 		ItemWriter itemWriter, boolean justID) throws java.io.IOException, PrismsRecordException;
 
 	/**

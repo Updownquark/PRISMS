@@ -39,7 +39,7 @@ public class LogSearcher implements prisms.arch.AppPlugin
 					{
 						boolean found = false;
 						for(int i = 0; i < theSearchPaths.size(); i++)
-							if(prisms.util.ArrayUtils.equals(theSearchPaths.get(i),
+							if(org.qommons.ArrayUtils.equals(theSearchPaths.get(i),
 								evt.getNewValue()))
 							{
 								found = true;

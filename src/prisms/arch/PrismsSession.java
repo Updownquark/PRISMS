@@ -8,10 +8,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.qommons.ProgramTracker.TrackNode;
 
 import prisms.arch.ds.User;
 import prisms.arch.event.*;
-import prisms.util.ProgramTracker.TrackNode;
 
 /**
  * A PrismsSession serves as the core of the plugin architecture and the remote session for the
@@ -165,7 +165,7 @@ public class PrismsSession
 
 	private java.util.concurrent.ConcurrentHashMap<String, boolean []> theRunningTasks;
 
-	private final prisms.util.TrackerSet theTrackSet;
+	private final org.qommons.TrackerSet theTrackSet;
 
 	private long theAsyncWait;
 
@@ -197,7 +197,7 @@ public class PrismsSession
 		theELs = new ListenerManager<PrismsEventListener>(PrismsEventListener.class);
 		theTaskList = new java.util.concurrent.ConcurrentLinkedQueue<Runnable>();
 		theRunningTasks = new ConcurrentHashMap<String, boolean []>();
-		theTrackSet = new prisms.util.TrackerSet("Session: " + client + "/" + user, app
+		theTrackSet = new org.qommons.TrackerSet("Session: " + client + "/" + user, app
 			.getTrackSet().getConfigs());
 		theTrackSet.setConfigured();
 
@@ -307,7 +307,7 @@ public class PrismsSession
 	}
 
 	/** @return The track set that keeps track of performance for this session */
-	public prisms.util.TrackerSet getTrackSet()
+	public org.qommons.TrackerSet getTrackSet()
 	{
 		return theTrackSet;
 	}
@@ -408,7 +408,7 @@ public class PrismsSession
 		if(event.get("plugin") == null && "getEvents".equals(event.get("method"))
 			&& event.containsKey("taskID"))
 		{
-			prisms.util.ProgramTracker.TrackNode track = prisms.util.PrismsUtils.track(trans,
+			org.qommons.ProgramTracker.TrackNode track = prisms.util.PrismsUtils.track(trans,
 				"Check Running Tasks");
 			try
 			{
@@ -473,7 +473,7 @@ public class PrismsSession
 			 * allows progress bars to be shown to the user quickly while a long operation
 			 * progresses, as well as releasing the server thread to be reused by other requests.
 			 */
-			prisms.util.ProgramTracker.TrackNode track = prisms.util.PrismsUtils.track(trans,
+			org.qommons.ProgramTracker.TrackNode track = prisms.util.PrismsUtils.track(trans,
 				"Wait For Async Results");
 			long waitInc = theAsyncWait / 5;
 			if(waitInc < 50)
@@ -723,7 +723,7 @@ public class PrismsSession
 						toPrint.append("Initialized plugin ");
 						toPrint.append(p.getKey());
 						toPrint.append(" in ");
-						toPrint.append(prisms.util.PrismsUtils.printTimeLength(newTime - time));
+						toPrint.append(org.qommons.QommonsUtils.printTimeLength(newTime - time));
 						log.debug(toPrint.toString());
 					}
 				} catch(Throwable e)

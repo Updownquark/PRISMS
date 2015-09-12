@@ -105,7 +105,7 @@ public abstract class AllCentersList extends prisms.ui.list.SelectableList<Prism
 				String newName = newCenterName(allCenters);
 				PrismsCenter newCenter = new PrismsCenter(newName);
 				getSession().setProperty(theCentersProp,
-					prisms.util.ArrayUtils.add(allCenters, newCenter));
+					org.qommons.ArrayUtils.add(allCenters, newCenter));
 				getSession().setProperty(theSelectedCenterProp, newCenter);
 			}
 

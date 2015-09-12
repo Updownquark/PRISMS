@@ -3,9 +3,10 @@
  */
 package prisms.util.persisters;
 
+import org.qommons.ArrayUtils;
+
 import prisms.arch.PrismsApplication;
 import prisms.arch.ds.User;
-import prisms.util.ArrayUtils;
 
 /**
  * A key to an object that is shared between users. A user's access to the object is determined by

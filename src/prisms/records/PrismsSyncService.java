@@ -8,9 +8,9 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.qommons.json.SAJParser.ParseException;
 
 import prisms.arch.PrismsSession;
-import prisms.util.json.SAJParser.ParseException;
 
 /**
  * A service that allows synchronization service clients to retrieve synchronization data and upload
@@ -480,7 +480,7 @@ public abstract class PrismsSyncService implements prisms.arch.DownloadPlugin,
 			java.io.Writer writer = new java.io.OutputStreamWriter(
 				new java.io.BufferedOutputStream(stream));
 			if(DEBUG)
-				writer = new prisms.util.LoggingWriter(writer, null);
+				writer = new org.qommons.LoggingWriter(writer, null);
 			// "C:\\Documents and Settings\\Andrew\\Desktop\\temp\\SyncData.json");
 			try
 			{
@@ -515,9 +515,9 @@ public abstract class PrismsSyncService implements prisms.arch.DownloadPlugin,
 						+ event.get("centerID"));
 				}
 				PrismsSynchronizer sync = getSynchronizer();
-				stream = new prisms.util.ExportStream(stream);
+				stream = new org.qommons.ExportStream(stream);
 				java.io.OutputStreamWriter writer = new java.io.OutputStreamWriter(stream);
-				prisms.util.json.JsonStreamWriter jsw = new prisms.util.json.JsonStreamWriter(
+				org.qommons.json.JsonStreamWriter jsw = new org.qommons.json.JsonStreamWriter(
 					writer);
 				jsw.startObject();
 				jsw.startProperty("localCenterID");
@@ -621,10 +621,10 @@ public abstract class PrismsSyncService implements prisms.arch.DownloadPlugin,
 						log.error("Could not persist center's priority", e);
 					}
 				}
-				stream = new prisms.util.ExportStream(stream);
+				stream = new org.qommons.ExportStream(stream);
 				java.io.Writer writer = new java.io.OutputStreamWriter(stream);
 				if(DEBUG)
-					writer = new prisms.util.LoggingWriter(writer,
+					writer = new org.qommons.LoggingWriter(writer,
 						"C:\\Documents and Settings\\Andrew\\Desktop\\temp\\SyncData.json");
 				try
 				{
@@ -752,12 +752,12 @@ public abstract class PrismsSyncService implements prisms.arch.DownloadPlugin,
 		}
 		else if("uploadSyncRequest".equals(event.get("method")))
 		{
-			prisms.util.json.SAJParser.DefaultHandler handler;
-			handler = new prisms.util.json.SAJParser.DefaultHandler();
-			input = new prisms.util.ImportStream(input);
+			org.qommons.json.SAJParser.DefaultHandler handler;
+			handler = new org.qommons.json.SAJParser.DefaultHandler();
+			input = new org.qommons.ImportStream(input);
 			try
 			{
-				new prisms.util.json.SAJParser().parse(new java.io.InputStreamReader(input),
+				new org.qommons.json.SAJParser().parse(new java.io.InputStreamReader(input),
 					handler);
 			} catch(ParseException e)
 			{
@@ -797,7 +797,7 @@ public abstract class PrismsSyncService implements prisms.arch.DownloadPlugin,
 						+ event.get("centerID"));
 				}
 				SyncRequestMetadata metadata = theMetadatas.get(event.get("mdKey"));
-				input = new prisms.util.ImportStream(input);
+				input = new org.qommons.ImportStream(input);
 				PrismsSynchronizer sync = getSynchronizer();
 				java.io.Reader reader = new java.io.InputStreamReader(input);
 				SyncRecord syncRecord = sync.doSyncInput(center, SyncRecord.Type.FILE, reader, pi,

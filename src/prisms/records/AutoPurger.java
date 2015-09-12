@@ -8,8 +8,8 @@ import static prisms.util.DBUtils.toSQL;
 import java.sql.SQLException;
 
 import org.apache.log4j.Logger;
+import org.qommons.ArrayUtils;
 
-import prisms.util.ArrayUtils;
 import prisms.util.DBUtils;
 
 /**

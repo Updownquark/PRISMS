@@ -3,7 +3,7 @@
  */
 package prisms.records;
 
-import prisms.util.ObfuscatingStream;
+import org.qommons.ObfuscatingStream;
 
 /**
  * A utility to obfuscate and compress export data for download to the client and then read it on

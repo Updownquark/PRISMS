@@ -109,7 +109,7 @@ public class DataListManager implements Iterable<DataListNode>
 					if(i != getItemCount())
 					{
 						addNode(o, i + 1);
-						copy = prisms.util.ArrayUtils.add(copy, o, idx);
+						copy = org.qommons.ArrayUtils.add(copy, o, idx);
 						idx++;
 						return;
 					}
@@ -117,7 +117,7 @@ public class DataListManager implements Iterable<DataListNode>
 					if(idx == copy.length)
 					{
 						addNode(o, getItemCount());
-						copy = prisms.util.ArrayUtils.add(copy, o);
+						copy = org.qommons.ArrayUtils.add(copy, o);
 						idx++;
 						return;
 					}
@@ -128,12 +128,12 @@ public class DataListManager implements Iterable<DataListNode>
 					if(i != getItemCount())
 					{
 						addNode(o, i);
-						copy = prisms.util.ArrayUtils.add(copy, o, idx);
+						copy = org.qommons.ArrayUtils.add(copy, o, idx);
 						idx++;
 						return;
 					}
 					addNode(o, getItemCount());
-					copy = prisms.util.ArrayUtils.add(copy, o);
+					copy = org.qommons.ArrayUtils.add(copy, o);
 				}
 			}
 
@@ -149,7 +149,7 @@ public class DataListManager implements Iterable<DataListNode>
 
 				if(i != getItemCount())
 					removeNode(i);
-				copy = prisms.util.ArrayUtils.remove(copy, _idx);
+				copy = org.qommons.ArrayUtils.remove(copy, _idx);
 				idx--;
 			}
 

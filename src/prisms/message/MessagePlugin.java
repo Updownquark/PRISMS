@@ -55,7 +55,7 @@ public class MessagePlugin implements prisms.arch.AppPlugin
 		public String toString()
 		{
 			java.io.StringWriter writer = new java.io.StringWriter();
-			prisms.util.json.JsonStreamWriter jsw = new prisms.util.json.JsonStreamWriter(writer);
+			org.qommons.json.JsonStreamWriter jsw = new org.qommons.json.JsonStreamWriter(writer);
 			try
 			{
 				jsw.startObject();
@@ -130,7 +130,7 @@ public class MessagePlugin implements prisms.arch.AppPlugin
 
 	long theSnapshotTime;
 
-	prisms.util.LongList theSelectedIndices;
+	org.qommons.LongList theSelectedIndices;
 
 	private PreparedSearch<Field> theInboxSearch;
 
@@ -194,7 +194,7 @@ public class MessagePlugin implements prisms.arch.AppPlugin
 		theTable.setColumn(SUBJECT, "", false);
 		theTable.setColumn(ATTACH, "", false);
 		theTable.setColumn(TIME, "", false);
-		theSelectedIndices = new prisms.util.LongList();
+		theSelectedIndices = new org.qommons.LongList();
 
 		MessageSearch.ViewSearch noDelSearch = new MessageSearch.ViewSearch(theSession.getUser(),
 			null, null, Boolean.FALSE);
@@ -407,7 +407,7 @@ public class MessagePlugin implements prisms.arch.AppPlugin
 				theStart = 1;
 			java.util.Iterator<Long> selIter = theSelectedIndices.iterator();
 			while(selIter.hasNext())
-				if(!prisms.util.ArrayUtils.containsP(theSnapshot, selIter.next()))
+				if(!org.qommons.ArrayUtils.containsP(theSnapshot, selIter.next()))
 					selIter.remove();
 			int count = theCount;
 			if(count > theSnapshot.length - theStart + 1)
@@ -447,7 +447,7 @@ public class MessagePlugin implements prisms.arch.AppPlugin
 		for(int i = 0; i < theCurrentView.length; i++)
 		{
 			ConversationHolder c = theCurrentView[i];
-			JSONObject starLink = prisms.util.PrismsUtils.rEventProps("type", "starClicked",
+			JSONObject starLink = org.qommons.QommonsUtils.rEventProps("type", "starClicked",
 				"conversation", Long.toHexString(c.getConversation().getID()));
 			theTable
 				.row(i)
@@ -607,7 +607,7 @@ public class MessagePlugin implements prisms.arch.AppPlugin
 	public static int [] findLinks(String messageContent)
 	{
 		java.util.regex.Matcher matcher = linkMatcher(messageContent);
-		prisms.util.IntList ret = new prisms.util.IntList();
+		org.qommons.IntList ret = new org.qommons.IntList();
 		while(matcher.find())
 			ret.add(matcher.start());
 		return ret.toArray();
@@ -622,8 +622,8 @@ public class MessagePlugin implements prisms.arch.AppPlugin
 	{
 		java.util.ArrayList<Object> ret = new java.util.ArrayList<Object>();
 		java.io.StringReader reader = new java.io.StringReader(messageContent);
-		prisms.util.json.SAJParser.DefaultHandler handler;
-		handler = new prisms.util.json.SAJParser.DefaultHandler();
+		org.qommons.json.SAJParser.DefaultHandler handler;
+		handler = new org.qommons.json.SAJParser.DefaultHandler();
 		java.util.regex.Matcher matcher = linkMatcher(messageContent);
 		int lastEnd = 0;
 		while(matcher.find())
@@ -633,11 +633,11 @@ public class MessagePlugin implements prisms.arch.AppPlugin
 			try
 			{
 				reader.skip(matcher.start() - lastEnd);
-				new prisms.util.json.SAJParser().parse(reader, handler);
+				new org.qommons.json.SAJParser().parse(reader, handler);
 			} catch(java.io.IOException e)
 			{
 				throw new IllegalStateException("IOException from a StringReader?!!");
-			} catch(prisms.util.json.SAJParser.ParseException e)
+			} catch(org.qommons.json.SAJParser.ParseException e)
 			{
 				if(matcher.start() != lastEnd)
 					ret.remove(ret.size() - 1);

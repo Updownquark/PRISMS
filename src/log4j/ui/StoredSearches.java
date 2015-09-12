@@ -115,7 +115,7 @@ public class StoredSearches implements AppPlugin
 						if(!confirm)
 							return;
 						getSession().setProperty(log4j.app.Log4jProperties.searches,
-							prisms.util.ArrayUtils.remove(searches, fS));
+							org.qommons.ArrayUtils.remove(searches, fS));
 					}
 				});
 		}
@@ -167,7 +167,7 @@ public class StoredSearches implements AppPlugin
 												break;
 											}
 										if(!found2)
-											newSearches = prisms.util.ArrayUtils.add(newSearches,
+											newSearches = org.qommons.ArrayUtils.add(newSearches,
 												new NamedSearch(input, srch));
 										getSession().setProperty(
 											log4j.app.Log4jProperties.searches, newSearches);
@@ -176,7 +176,7 @@ public class StoredSearches implements AppPlugin
 						}
 						else
 						{
-							searches = prisms.util.ArrayUtils.add(searches, new NamedSearch(input,
+							searches = org.qommons.ArrayUtils.add(searches, new NamedSearch(input,
 								srch));
 							getSession().setProperty(log4j.app.Log4jProperties.searches, searches);
 						}

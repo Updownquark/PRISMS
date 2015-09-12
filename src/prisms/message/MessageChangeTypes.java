@@ -134,7 +134,7 @@ public class MessageChangeTypes
 				if(additivity != 0)
 					return null;
 				return "Sent time of message " + ((Message) majorSubject).getSubject()
-					+ " changed to " + prisms.util.PrismsUtils.print(((Long) after).longValue());
+					+ " changed to " + org.qommons.QommonsUtils.print(((Long) after).longValue());
 			case sent:
 				if(additivity != 0)
 					return null;
@@ -269,13 +269,13 @@ public class MessageChangeTypes
 					return null;
 				return "Message " + receipt.getMessage().getSubject() + " received by "
 					+ receipt.getUser() + " at "
-					+ prisms.util.PrismsUtils.print(((Long) after).longValue());
+					+ org.qommons.QommonsUtils.print(((Long) after).longValue());
 			case lastViewed:
 				if(additivity != 0)
 					return null;
 				return "Message " + receipt.getMessage().getSubject() + " viewed by "
 					+ receipt.getUser() + " at "
-					+ prisms.util.PrismsUtils.print(((Long) after).longValue());
+					+ org.qommons.QommonsUtils.print(((Long) after).longValue());
 			}
 			throw new IllegalStateException("Unrecognized change type " + name());
 		}

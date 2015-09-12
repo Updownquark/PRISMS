@@ -57,13 +57,13 @@ public interface UI extends prisms.arch.AppPlugin
 		EventObject(EventType aType, String message, Object L, Object... options)
 		{
 			type = aType;
-			id = prisms.util.PrismsUtils.getRandomString(16);
+			id = org.qommons.QommonsUtils.getRandomString(16);
 			listener = L;
 			event = new JSONObject();
 			event.put("plugin", "UI");
 			event.put("messageID", id);
 			event.put("method", type.display);
-			event.put("message", prisms.util.PrismsUtils.encodeUnicode(message));
+			event.put("message", org.qommons.QommonsUtils.encodeUnicode(message));
 			for(int arg = 0; arg < options.length; arg += 2)
 			{
 				Object val = options[arg + 1];
@@ -418,7 +418,7 @@ public interface UI extends prisms.arch.AppPlugin
 			prisms.arch.PrismsTransaction trans = theSession.getTransaction();
 			if("eventReturned".equals(evt.get("method")))
 			{
-				prisms.util.ProgramTracker.TrackNode track = prisms.util.PrismsUtils.track(trans,
+				org.qommons.ProgramTracker.TrackNode track = prisms.util.PrismsUtils.track(trans,
 					"eventReturned on " + prisms.util.PrismsUtils.taskToString(listener));
 				try
 				{
@@ -435,7 +435,7 @@ public interface UI extends prisms.arch.AppPlugin
 							throw new IllegalArgumentException(
 								"Input dialog requires string return value");
 						((InputListener) listener).inputed(value == null ? (String) value
-							: prisms.util.PrismsUtils.decodeUnicode((String) value));
+							: org.qommons.QommonsUtils.decodeUnicode((String) value));
 					}
 					else if(listener instanceof SelectListener)
 					{
@@ -443,7 +443,7 @@ public interface UI extends prisms.arch.AppPlugin
 							throw new IllegalArgumentException(
 								"Select dialog requires string return value");
 						((SelectListener) listener).selected(value == null ? (String) value
-							: prisms.util.PrismsUtils.decodeUnicode((String) value));
+							: org.qommons.QommonsUtils.decodeUnicode((String) value));
 					}
 					else if(listener instanceof ProgressInformer)
 						throw new IllegalArgumentException(
@@ -462,7 +462,7 @@ public interface UI extends prisms.arch.AppPlugin
 			}
 			else if("cancel".equals(evt.get("method")))
 			{
-				prisms.util.ProgramTracker.TrackNode track = prisms.util.PrismsUtils.track(trans,
+				org.qommons.ProgramTracker.TrackNode track = prisms.util.PrismsUtils.track(trans,
 					"cancel on " + prisms.util.PrismsUtils.taskToString(listener));
 				try
 				{
@@ -544,7 +544,7 @@ public interface UI extends prisms.arch.AppPlugin
 		public EventObject input(String message, String def, InputListener L)
 		{
 			if(def != null)
-				def = prisms.util.PrismsUtils.encodeUnicode(def);
+				def = org.qommons.QommonsUtils.encodeUnicode(def);
 			return addEvent(new EventObject(EventType.INPUT, message, L, "init", def));
 		}
 
@@ -552,7 +552,7 @@ public interface UI extends prisms.arch.AppPlugin
 		{
 			String [] copy = new String [options.length];
 			for(int i = 0; i < options.length; i++)
-				copy[i] = prisms.util.PrismsUtils.encodeUnicode(options[i]);
+				copy[i] = org.qommons.QommonsUtils.encodeUnicode(options[i]);
 			return addEvent(new EventObject(EventType.SELECT, message, L, "options", copy,
 				"initSelection", Integer.valueOf(init > 0 ? init : -1)));
 		}

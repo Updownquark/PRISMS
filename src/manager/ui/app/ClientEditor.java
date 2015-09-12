@@ -93,7 +93,7 @@ public class ClientEditor implements prisms.arch.AppPlugin
 		val.put("descrip", theClient.getDescription());
 		val.put("isService", Boolean.valueOf(theClient.isService()));
 		val.put("sessionTimeout",
-			prisms.util.PrismsUtils.printTimeLength(theClient.getSessionTimeout()));
+			org.qommons.QommonsUtils.printTimeLength(theClient.getSessionTimeout()));
 		val.put("allowAnonymous", Boolean.valueOf(theClient.allowsAnonymous()));
 		evt.put("value", val);
 		theSession.postOutgoingEvent(evt);

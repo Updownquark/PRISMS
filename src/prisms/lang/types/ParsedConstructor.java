@@ -90,7 +90,7 @@ public class ParsedConstructor extends ParsedItem {
 		if(theMethods != null)
 			for(ParsedFunctionDeclaration f : theMethods)
 				ret.add(f);
-		return prisms.util.ArrayUtils.add(theArguments, theType, 0);
+		return org.qommons.ArrayUtils.add(theArguments, theType, 0);
 	}
 
 	@Override

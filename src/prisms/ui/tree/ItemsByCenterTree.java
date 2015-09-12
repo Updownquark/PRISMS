@@ -6,10 +6,11 @@ package prisms.ui.tree;
 import java.awt.Color;
 import java.util.Map.Entry;
 
+import org.qommons.ArrayUtils;
+
 import prisms.arch.PrismsSession;
 import prisms.arch.event.PrismsEvent;
 import prisms.records.PrismsCenter;
-import prisms.util.ArrayUtils;
 
 /**
  * Displays a set of items to the user, organizing them by the center they were created at.

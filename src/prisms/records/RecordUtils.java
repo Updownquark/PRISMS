@@ -5,6 +5,8 @@ package prisms.records;
 
 import java.io.IOException;
 
+import org.qommons.json.SAJParser.ParseException;
+
 import prisms.arch.PrismsApplication;
 import prisms.arch.PrismsException;
 import prisms.arch.ds.Transactor;
@@ -12,7 +14,6 @@ import prisms.arch.ds.User;
 import prisms.records.ChangeSearch.ChangeFieldSearch.FieldType;
 import prisms.records.MemoryRecordKeeper.IDGetter;
 import prisms.util.Search;
-import prisms.util.json.SAJParser.ParseException;
 
 /** A set of utility methods useful in the prisms.records2 package */
 public class RecordUtils
@@ -163,7 +164,7 @@ public class RecordUtils
 		else
 			return new CenterStatus(CenterQuality.POOR,
 				"Center has not completed synchronization since "
-					+ prisms.util.PrismsUtils.print(lastImport.getSyncTime()));
+					+ org.qommons.QommonsUtils.print(lastImport.getSyncTime()));
 	}
 
 	/**
@@ -708,7 +709,7 @@ public class RecordUtils
 	 * @throws java.io.IOException If an error occurs writing to the stream
 	 */
 	public static void serializeCenterChanges(RecordKeeper keeper,
-		prisms.util.json.JsonSerialWriter jsw) throws PrismsRecordException, java.io.IOException
+		org.qommons.json.JsonSerialWriter jsw) throws PrismsRecordException, java.io.IOException
 	{
 		jsw.startArray();
 		int [] centerIDs = keeper.getAllCenterIDs();
@@ -772,10 +773,10 @@ public class RecordUtils
 		java.io.StringWriter writer = new java.io.StringWriter();
 		try
 		{
-			serializeCenterChanges(keeper, new prisms.util.json.JsonStreamWriter(writer));
-			return (org.json.simple.JSONArray) new prisms.util.json.SAJParser().parse(
+			serializeCenterChanges(keeper, new org.qommons.json.JsonStreamWriter(writer));
+			return (org.json.simple.JSONArray) new org.qommons.json.SAJParser().parse(
 				new java.io.StringReader(writer.toString()),
-				new prisms.util.json.SAJParser.DefaultHandler());
+				new org.qommons.json.SAJParser.DefaultHandler());
 		} catch(IOException e)
 		{
 			throw new PrismsRecordException("IO Exception???!!!", e);
@@ -906,14 +907,14 @@ public class RecordUtils
 				{
 					for(PrismsApplication app : apps)
 						app.setGlobalProperty(centerProp,
-							prisms.util.ArrayUtils.add(app.getGlobalProperty(centerProp), center),
+							org.qommons.ArrayUtils.add(app.getGlobalProperty(centerProp), center),
 							TRANSACTION_EVENT_PROP, trans);
 					recordKeeper.putCenter(center, trans);
 				}
 				else
 				{
 					for(PrismsApplication app : apps)
-						app.setGlobalProperty(centerProp, prisms.util.ArrayUtils.remove(
+						app.setGlobalProperty(centerProp, org.qommons.ArrayUtils.remove(
 							app.getGlobalProperty(centerProp), center), TRANSACTION_EVENT_PROP,
 							trans);
 					recordKeeper.removeCenter(center, trans);

@@ -5,6 +5,8 @@ package prisms.util;
 
 import java.util.Calendar;
 
+import org.qommons.ArrayUtils;
+
 /**
  * Implements an API for allowing containing APIs to provide greater retrieval functionality through
  * very specific search structures

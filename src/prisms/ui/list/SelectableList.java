@@ -163,8 +163,8 @@ public abstract class SelectableList<T> extends prisms.ui.list.DataListMgrPlugin
 		DataListNode [] nodes = new DataListNode [getItemCount()];
 		for(int i = 0; i < nodes.length; i++)
 			nodes[i] = getItem(i);
-		prisms.util.ArrayUtils.adjust(nodes, items,
-			new prisms.util.ArrayUtils.DifferenceListener<DataListNode, T>()
+		org.qommons.ArrayUtils.adjust(nodes, items,
+			new org.qommons.ArrayUtils.DifferenceListener<DataListNode, T>()
 			{
 				public boolean identity(DataListNode o1, T o2)
 				{
@@ -220,10 +220,10 @@ public abstract class SelectableList<T> extends prisms.ui.list.DataListMgrPlugin
 				continue;
 			boolean selected;
 			if(compareByIdentity)
-				selected = prisms.util.ArrayUtils.containsID(items,
+				selected = org.qommons.ArrayUtils.containsID(items,
 					((ItemNode) getItem(i)).getObject());
 			else
-				selected = prisms.util.ArrayUtils.contains(items,
+				selected = org.qommons.ArrayUtils.contains(items,
 					((ItemNode) getItem(i)).getObject());
 			if(selected)
 				newSelected.add((ItemNode) getItem(i));
@@ -258,7 +258,7 @@ public abstract class SelectableList<T> extends prisms.ui.list.DataListMgrPlugin
 				}
 				else
 				{
-					items = prisms.util.ArrayUtils.remove(items, a);
+					items = org.qommons.ArrayUtils.remove(items, a);
 					a--;
 				}
 			}

@@ -12,6 +12,8 @@ import java.util.Calendar;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.qommons.IntList;
+import org.qommons.QommonsUtils;
 
 import prisms.arch.PrismsException;
 
@@ -103,8 +105,8 @@ public class DBUtils
 			return "NULL";
 		else if(str.length() == 0)
 			return toSQL(EMPTY);
-		str = PrismsUtils.encodeUnicode(str);
-		return "'" + PrismsUtils.replaceAll(str, "'", "''") + "'";
+		str = QommonsUtils.encodeUnicode(str);
+		return "'" + QommonsUtils.replaceAll(str, "'", "''") + "'";
 	}
 
 	/**
@@ -120,7 +122,7 @@ public class DBUtils
 		else if(dbString.equals(EMPTY))
 			return "";
 		else
-			return PrismsUtils.decodeUnicode(dbString);
+			return QommonsUtils.decodeUnicode(dbString);
 	}
 
 	/**
@@ -141,38 +143,38 @@ public class DBUtils
 		{
 		case MSSQL:
 		case SYBASE:
-			str = PrismsUtils.replaceAll(str, "[", "[[]");
-			str = PrismsUtils.replaceAll(str, "]", "[]]");
+			str = QommonsUtils.replaceAll(str, "[", "[[]");
+			str = QommonsUtils.replaceAll(str, "]", "[]]");
 			//$FALL-THROUGH$
 		case HSQL:
 		case MYSQL:
 		case ORACLE:
 		case POSTGRES:
 		case INFORMIX:
-			str = PrismsUtils.replaceAll(str, "\\\\", "\\\\");
+			str = QommonsUtils.replaceAll(str, "\\\\", "\\\\");
 			if(!"%".equals(multi))
 			{
-				str = PrismsUtils.replaceAll(str, "%", "\\%");
-				str = PrismsUtils.replaceAll(str, multi, "%");
+				str = QommonsUtils.replaceAll(str, "%", "\\%");
+				str = QommonsUtils.replaceAll(str, multi, "%");
 			}
 			if(!"_".equals(single))
 			{
-				str = PrismsUtils.replaceAll(str, "_", "\\_");
-				str = PrismsUtils.replaceAll(str, single, "_");
+				str = QommonsUtils.replaceAll(str, "_", "\\_");
+				str = QommonsUtils.replaceAll(str, single, "_");
 			}
 
 			return toSQL(str) + " ESCAPE '\\'";
 		case UNKNOWN:
-			str = PrismsUtils.replaceAll(str, "\\\\", "\\\\");
+			str = QommonsUtils.replaceAll(str, "\\\\", "\\\\");
 			if(!"%".equals(multi))
 			{
-				str = PrismsUtils.replaceAll(str, "%", "\\%");
-				str = PrismsUtils.replaceAll(str, multi, "%");
+				str = QommonsUtils.replaceAll(str, "%", "\\%");
+				str = QommonsUtils.replaceAll(str, multi, "%");
 			}
 			if(!"_".equals(single))
 			{
-				str = PrismsUtils.replaceAll(str, "_", "\\_");
-				str = PrismsUtils.replaceAll(str, single, "_");
+				str = QommonsUtils.replaceAll(str, "_", "\\_");
+				str = QommonsUtils.replaceAll(str, single, "_");
 			}
 			return toSQL(str);
 		}

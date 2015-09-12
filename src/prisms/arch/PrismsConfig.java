@@ -268,7 +268,7 @@ public abstract class PrismsConfig implements Cloneable
 			PrismsConfig [][] ret = new PrismsConfig [pathEls.length] [];
 			for(int p = 0; p < pathEls.length; p++)
 				ret[p] = pathEls[p].subConfigs(type, props);
-			PrismsConfig [] ret2 = prisms.util.ArrayUtils.mergeInclusive(PrismsConfig.class, ret);
+			PrismsConfig [] ret2 = org.qommons.ArrayUtils.mergeInclusive(PrismsConfig.class, ret);
 			if(getClass() != PrismsConfig.class)
 			{
 				PrismsConfig [] ret3 = createConfigArray(ret2.length);
@@ -403,7 +403,7 @@ public abstract class PrismsConfig implements Cloneable
 
 	/**
 	 * Parses a time from an attribute of this config. This method uses
-	 * {@link prisms.util.PrismsUtils#parseEnglishTime(String)} to parse the time.
+	 * {@link org.qommons.QommonsUtils#parseEnglishTime(String)} to parse the time.
 	 *
 	 * @param key The name of the attribute to get the value of
 	 * @return The time parsed from the given attribute of this config, or -1 if the attribute is missing
@@ -413,12 +413,12 @@ public abstract class PrismsConfig implements Cloneable
 		String ret = get(key);
 		if(ret == null)
 			return -1;
-		return prisms.util.PrismsUtils.parseEnglishTime(ret);
+		return org.qommons.QommonsUtils.parseEnglishTime(ret);
 	}
 
 	/**
 	 * Parses a time interval from an attribute of this config. This method uses
-	 * {@link prisms.util.PrismsUtils#parseEnglishTime(String)} to parse the time.
+	 * {@link org.qommons.QommonsUtils#parseEnglishTime(String)} to parse the time.
 	 *
 	 * @param key The name of the attribute to get the value of
 	 * @param def The default value to return if the given key does not exist in this config
@@ -430,7 +430,7 @@ public abstract class PrismsConfig implements Cloneable
 		String ret = get(key);
 		if(ret == null)
 			return def;
-		return prisms.util.PrismsUtils.parseEnglishTime(ret);
+		return org.qommons.QommonsUtils.parseEnglishTime(ret);
 	}
 
 	/**
@@ -689,7 +689,7 @@ public abstract class PrismsConfig implements Cloneable
 			return location;
 		else if(relative.length > 0)
 		{
-			String resolvedRel = resolve(relative[0], prisms.util.ArrayUtils.remove(relative, 0));
+			String resolvedRel = resolve(relative[0], org.qommons.ArrayUtils.remove(relative, 0));
 			int protocolIdx = resolvedRel.indexOf(":/");
 			if(protocolIdx >= 0)
 			{
@@ -706,7 +706,7 @@ public abstract class PrismsConfig implements Cloneable
 				if(!resolvedRel.contains(":/"))
 				{
 					throw new java.io.IOException("Location " + location + " relative to "
-						+ prisms.util.ArrayUtils.toString(relative) + " is invalid");
+						+ org.qommons.ArrayUtils.toString(relative) + " is invalid");
 				}
 				return resolvedRel + "/" + newLocation;
 			}
@@ -852,7 +852,7 @@ public abstract class PrismsConfig implements Cloneable
 			loc = replace(loc, env);
 			String [] rel2 = relative;
 			if(location != null)
-				rel2 = prisms.util.ArrayUtils.add(relative, location);
+				rel2 = org.qommons.ArrayUtils.add(relative, location);
 			PrismsConfig referred;
 			try
 			{

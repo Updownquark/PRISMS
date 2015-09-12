@@ -3,18 +3,19 @@
  */
 package prisms.arch;
 
+import org.qommons.TrackerSet;
+
 import prisms.arch.ds.UserSource;
 import prisms.arch.event.PropertyManager;
-import prisms.util.TrackerSet;
 
 /** Represents an environment in which the PRISMS architecture is accessed */
-public class PrismsEnv implements prisms.util.Sealable
+public class PrismsEnv implements org.qommons.Sealable
 {
 	/**
-	 * An extension of {@link prisms.util.ProgramTracker.PrintConfig} with extra data used by
+	 * An extension of {@link org.qommons.ProgramTracker.PrintConfig} with extra data used by
 	 * transactions to determine how or if the data is printed
 	 */
-	public static class GlobalPrintConfig extends prisms.util.ProgramTracker.PrintConfig
+	public static class GlobalPrintConfig extends org.qommons.ProgramTracker.PrintConfig
 	{
 		private long thePrintThreshold;
 
@@ -260,7 +261,7 @@ public class PrismsEnv implements prisms.util.Sealable
 		theWorker = worker;
 	}
 
-	void setTrackConfigs(prisms.util.TrackerSet.TrackConfig[] trackConfigs)
+	void setTrackConfigs(org.qommons.TrackerSet.TrackConfig[] trackConfigs)
 	{
 		if(isSealed)
 			throw new IllegalStateException("Cannot set the tracking configuration after the"
@@ -387,8 +388,8 @@ public class PrismsEnv implements prisms.util.Sealable
 		}
 		else
 		{
-			managers = prisms.util.ArrayUtils.add(managers, manager);
-			configs = prisms.util.ArrayUtils.add(configs, config);
+			managers = org.qommons.ArrayUtils.add(managers, manager);
+			configs = org.qommons.ArrayUtils.add(configs, config);
 		}
 		theGlobalManagers.put(name, managers);
 		theGMConfigs.put(name, configs);
@@ -410,7 +411,7 @@ public class PrismsEnv implements prisms.util.Sealable
 		if(configs == null)
 			configs = new PrismsConfig [] {config};
 		else
-			configs = prisms.util.ArrayUtils.add(configs, config);
+			configs = org.qommons.ArrayUtils.add(configs, config);
 		theGEventConfigs.put(name, configs);
 	}
 
@@ -430,7 +431,7 @@ public class PrismsEnv implements prisms.util.Sealable
 		if(configs == null)
 			configs = new PrismsConfig [] {config};
 		else
-			configs = prisms.util.ArrayUtils.add(configs, config);
+			configs = org.qommons.ArrayUtils.add(configs, config);
 		theGMonitorConfigs.put(name, configs);
 	}
 
@@ -598,7 +599,7 @@ public class PrismsEnv implements prisms.util.Sealable
 	/** @return The IDs of all users that have used PRISMS since deployment */
 	public long [] getCpuUsers()
 	{
-		prisms.util.LongList ret = new prisms.util.LongList();
+		org.qommons.LongList ret = new org.qommons.LongList();
 		for(Long userID : theUserCPU.keySet())
 			ret.add(userID.longValue());
 		return ret.toArray();

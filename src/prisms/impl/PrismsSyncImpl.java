@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.sql.Statement;
 
 import org.json.simple.JSONObject;
+import org.qommons.json.JsonSerialWriter;
 
 import prisms.arch.Permission;
 import prisms.arch.PrismsApplication;
@@ -15,7 +16,6 @@ import prisms.arch.ds.User;
 import prisms.arch.ds.UserGroup;
 import prisms.arch.event.PrismsProperty;
 import prisms.records.*;
-import prisms.util.json.JsonSerialWriter;
 
 /** Implements record-keeping and synchronization for users in PRISMS */
 public class PrismsSyncImpl implements RecordPersister, SynchronizeImpl, ScaleImpl
@@ -600,8 +600,8 @@ public class PrismsSyncImpl implements RecordPersister, SynchronizeImpl, ScaleIm
 			UserGroup [] groups = new UserGroup [jsonGroups.size()];
 			for(int p = 0; p < groups.length; p++)
 				groups[p] = (UserGroup) reader.read((JSONObject) jsonGroups.get(p));
-			prisms.util.ArrayUtils.adjust(user.getGroups(), groups,
-				new prisms.util.ArrayUtils.DifferenceListener<UserGroup, UserGroup>()
+			org.qommons.ArrayUtils.adjust(user.getGroups(), groups,
+				new org.qommons.ArrayUtils.DifferenceListener<UserGroup, UserGroup>()
 				{
 					public boolean identity(UserGroup o1, UserGroup o2)
 					{
@@ -661,8 +661,8 @@ public class PrismsSyncImpl implements RecordPersister, SynchronizeImpl, ScaleIm
 			Permission [] perms = new Permission [jsonPerms.size()];
 			for(int p = 0; p < perms.length; p++)
 				perms[p] = (Permission) reader.read((JSONObject) jsonPerms.get(p));
-			prisms.util.ArrayUtils.adjust(group.getPermissions().getAllPermissions(), perms,
-				new prisms.util.ArrayUtils.DifferenceListener<Permission, Permission>()
+			org.qommons.ArrayUtils.adjust(group.getPermissions().getAllPermissions(), perms,
+				new org.qommons.ArrayUtils.DifferenceListener<Permission, Permission>()
 				{
 					public boolean identity(Permission o1, Permission o2)
 					{

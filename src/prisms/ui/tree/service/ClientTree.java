@@ -10,12 +10,12 @@ import java.util.ArrayList;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.qommons.ArrayUtils;
 
 import prisms.arch.PrismsSession;
 import prisms.arch.ds.IDGenerator.PrismsInstance;
 import prisms.ui.list.NodeAction;
 import prisms.ui.tree.DataTreeNode;
-import prisms.util.ArrayUtils;
 
 /**
  * A ClientTree is the front-end of one or more instances of {@link ServiceTree}. A ClientTree, by
@@ -179,7 +179,7 @@ public class ClientTree extends prisms.ui.tree.DataTreeMgrPlugin
 			if(conn == null)
 				connect();
 			sendEvents();
-			params = prisms.util.ArrayUtils.addAll(params, "clientID", theClientID, "user",
+			params = org.qommons.ArrayUtils.addAll(params, "clientID", theClientID, "user",
 				getSession().getUser().getName(), "lastCheck", Long.valueOf(theLastCheck));
 			final Object [] fParams = params;
 			conn.getResultsAsync(getServicePlugin(), method,
@@ -200,7 +200,7 @@ public class ClientTree extends prisms.ui.tree.DataTreeMgrPlugin
 								+ instance.location, e);
 							theError = e;
 						}
-						JSONObject event = prisms.util.PrismsUtils.rEventProps(fParams);
+						JSONObject event = org.qommons.QommonsUtils.rEventProps(fParams);
 						event.put("method", method);
 						synchronized(theEventQueue)
 						{
@@ -236,7 +236,7 @@ public class ClientTree extends prisms.ui.tree.DataTreeMgrPlugin
 			if(conn == null)
 				connect();
 			sendEvents();
-			params = prisms.util.ArrayUtils.addAll(params, "clientID", theClientID, "user",
+			params = org.qommons.ArrayUtils.addAll(params, "clientID", theClientID, "user",
 				getSession().getUser().getName(), "lastCheck", Long.valueOf(theLastCheck));
 			JSONArray events;
 			try
@@ -250,7 +250,7 @@ public class ClientTree extends prisms.ui.tree.DataTreeMgrPlugin
 					log.error("Could not call method " + method + " at " + instance.location, e);
 					theError = e;
 				}
-				JSONObject event = prisms.util.PrismsUtils.rEventProps(params);
+				JSONObject event = org.qommons.QommonsUtils.rEventProps(params);
 				event.put("method", method);
 				synchronized(theEventQueue)
 				{
@@ -278,7 +278,7 @@ public class ClientTree extends prisms.ui.tree.DataTreeMgrPlugin
 			if(conn == null)
 				connect();
 			sendEvents();
-			params = prisms.util.ArrayUtils.addAll(params, "clientID", theClientID, "user",
+			params = org.qommons.ArrayUtils.addAll(params, "clientID", theClientID, "user",
 				getSession().getUser().getName(), "lastCheck", Long.valueOf(theLastCheck));
 			final Object [] fParams = params;
 			conn.getResultsAsync(getServicePlugin(), method,
@@ -308,7 +308,7 @@ public class ClientTree extends prisms.ui.tree.DataTreeMgrPlugin
 								+ instance.location, e);
 							theError = e;
 						}
-						JSONObject event = prisms.util.PrismsUtils.rEventProps(fParams);
+						JSONObject event = org.qommons.QommonsUtils.rEventProps(fParams);
 						event.put("method", method);
 						synchronized(theEventQueue)
 						{
@@ -333,7 +333,7 @@ public class ClientTree extends prisms.ui.tree.DataTreeMgrPlugin
 			if(conn == null)
 				connect();
 			sendEvents();
-			params = prisms.util.ArrayUtils.addAll(params, "clientID", theClientID, "user",
+			params = org.qommons.ArrayUtils.addAll(params, "clientID", theClientID, "user",
 				getSession().getUser().getName(), "lastCheck", Long.valueOf(theLastCheck));
 			JSONArray events;
 			try
@@ -347,7 +347,7 @@ public class ClientTree extends prisms.ui.tree.DataTreeMgrPlugin
 					log.error("Could not call method " + method + " at " + instance.location, e);
 					theError = e;
 				}
-				JSONObject event = prisms.util.PrismsUtils.rEventProps(params);
+				JSONObject event = org.qommons.QommonsUtils.rEventProps(params);
 				event.put("method", method);
 				synchronized(theEventQueue)
 				{
@@ -891,7 +891,7 @@ public class ClientTree extends prisms.ui.tree.DataTreeMgrPlugin
 			PrismsInstance local = getSession().getApp().getEnvironment().getIDs()
 				.getLocalInstance();
 			if(local != null)
-				instances = prisms.util.ArrayUtils.add(instances, local, 0);
+				instances = org.qommons.ArrayUtils.add(instances, local, 0);
 		} catch(prisms.arch.PrismsException e)
 		{
 			log.error("Could not get enterprise instances", e);
@@ -1355,8 +1355,8 @@ public class ClientTree extends prisms.ui.tree.DataTreeMgrPlugin
 			String text = (String) content.get("text");
 			String desc = (String) content.get("description");
 			String icon = (String) content.get("icon");
-			Color bg = prisms.util.ColorUtils.fromHTML((String) content.get("bgColor"));
-			Color fg = prisms.util.ColorUtils.fromHTML((String) content.get("textColor"));
+			Color bg = org.qommons.ColorUtils.fromHTML((String) content.get("bgColor"));
+			Color fg = org.qommons.ColorUtils.fromHTML((String) content.get("textColor"));
 
 			final boolean [] changed = new boolean [1];
 			if(!theText.equals(text))

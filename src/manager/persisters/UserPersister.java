@@ -30,7 +30,7 @@ public class UserPersister extends prisms.util.persisters.ListPersister<User>
 		prisms.arch.event.PrismsProperty<User []> property)
 	{
 		super.configure(config, app, property);
-		theApps = prisms.util.ArrayUtils.add(theApps, app);
+		theApps = org.qommons.ArrayUtils.add(theApps, app);
 		if(app.getEnvironment().isManager(app))
 			theManager = app;
 		else if(theManager == null)
@@ -79,7 +79,7 @@ public class UserPersister extends prisms.util.persisters.ListPersister<User>
 		User [] oldVal = getValue();
 		super.setValue(session, value, evt);
 		User [] newVal = getValue();
-		if(prisms.util.ArrayUtils.equals(oldVal, newVal))
+		if(org.qommons.ArrayUtils.equals(oldVal, newVal))
 			return;
 		for(PrismsApplication app : theApps)
 			if(session != null && app != session.getApp())
