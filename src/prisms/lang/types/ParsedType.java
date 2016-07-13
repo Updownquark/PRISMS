@@ -40,20 +40,18 @@ public class ParsedType extends prisms.lang.ParsedItem {
 			}
 			theName = name;
 		}
-		if("wildcard type".equals(match.config.get("name"))) {
+		if(getStored("wildcard") != null) {
 			isBounded = true;
-			if(getStored("wildcard") != null)
-				isUpperBound = true;
-			else if(getStored("bound") != null) {
+			prisms.lang.ParseMatch boundType = getStored("bound-type");
+			isUpperBound = boundType == null || boundType.text.equals("extends");
+			if(getStored("bound") != null)
 				theBound = (ParsedType) parser.parseStructures(this, getStored("bound"))[0];
-				isUpperBound = getStored("extendsBound") != null;
-			} else
+			else
 				setup(parser, parent, getStored("type"));
-		} else {
-			ParsedItem [] pts = parser.parseStructures(this, getAllStored("paramType"));
-			theParamTypes = new ParsedType[pts.length];
-			System.arraycopy(pts, 0, theParamTypes, 0, pts.length);
 		}
+		ParsedItem [] pts = parser.parseStructures(this, getAllStored("paramType"));
+		theParamTypes = new ParsedType[pts.length];
+		System.arraycopy(pts, 0, theParamTypes, 0, pts.length);
 		theArrayDimension = getAllStored("array").length;
 	}
 

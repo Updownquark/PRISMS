@@ -627,8 +627,8 @@
 	<entity name="wildcard type" priority="-1" impl="prisms.lang.types.ParsedType">
 		<select>
 			<option>
-				<literal>?</literal>
-				<select>
+				<literal storeAs="wildcard">?</literal>
+				<select storeAs="bound-type">
 					<option>
 						<literal storeAs="superBound">super</literal>
 					</option>
