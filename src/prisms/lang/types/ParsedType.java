@@ -8,6 +8,8 @@ public class ParsedType extends prisms.lang.ParsedItem {
 
 	private int theArrayDimension;
 
+	private boolean isParameterized;
+
 	private ParsedType [] theParamTypes;
 
 	private boolean isBounded;
@@ -50,6 +52,7 @@ public class ParsedType extends prisms.lang.ParsedItem {
 				setup(parser, parent, getStored("type"));
 		}
 		ParsedItem [] pts = parser.parseStructures(this, getAllStored("paramType"));
+		isParameterized = pts.length > 0 || getStored("parameterized") != null;
 		theParamTypes = new ParsedType[pts.length];
 		System.arraycopy(pts, 0, theParamTypes, 0, pts.length);
 		theArrayDimension = getAllStored("array").length;
@@ -75,6 +78,14 @@ public class ParsedType extends prisms.lang.ParsedItem {
 	/** Increases the array dimension of this type by 1 */
 	public void addArrayDimension() {
 		theArrayDimension++;
+	}
+
+	/**
+	 * @return Whether this type is parameterized. This may be true even if {@link #getParameterTypes()} is zero-length in the case of the
+	 *         use of the diamond operator.
+	 */
+	public boolean isParameterized() {
+		return isParameterized;
 	}
 
 	/** @return The parameter types of this generic type */
