@@ -327,8 +327,15 @@ public class PrismsParser {
 		case "select":
 			if(config.subConfigs().length == 0)
 				throw new IllegalArgumentException("No options for select");
-			if(config.subConfigs().length != config.subConfigs("option").length)
-				throw new IllegalArgumentException("select may only have option contents");
+			for(PrismsConfig sub : config.subConfigs()) {
+				switch (sub.getName()) {
+				case "option":
+				case "storeAs":
+					break;
+				default:
+					throw new IllegalArgumentException("select may only have option or storeAs contents");
+				}
+			}
 			for(PrismsConfig sub : config.subConfigs())
 				validateParseStructure(sub);
 			break;
@@ -789,7 +796,7 @@ public class PrismsParser {
 				break;
 			default:
 				throw new IllegalStateException("Unrecognized configuration: \"" + sub.getName() + "\" in " + op.getName()
-					+ (op.get("name") == null ? "" : " " + op.get("name")) + ":\n" + op);
+				+ (op.get("name") == null ? "" : " " + op.get("name")) + ":\n" + op);
 			}
 			if(match == null || (!match.isComplete() && match.text.length() == 0)) {
 				if(badOption != null)
