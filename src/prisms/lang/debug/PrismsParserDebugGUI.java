@@ -205,6 +205,13 @@ public class PrismsParserDebugGUI extends JPanel implements PrismsParserDebugger
 
 	/** @return The parsed config file */
 	protected MutableConfig getConfig() {
+		if(!theConfigFile.exists()) {
+			try (java.io.FileOutputStream cfgOut = new java.io.FileOutputStream(theConfigFile)) {
+				MutableConfig.writeAsXml(new MutableConfig("prisms-debug"), cfgOut);
+			} catch(IOException e) {
+				e.printStackTrace();
+			}
+		}
 		try {
 			return new MutableConfig(null, PrismsConfig.fromXml(null, theConfigFile.toURI().toString()));
 		} catch(java.io.IOException e) {
@@ -241,7 +248,7 @@ public class PrismsParserDebugGUI extends JPanel implements PrismsParserDebugger
 				breakpoint.setEnabled(breakpointConfig.is("enabled", true));
 				theBreakpoints.add(breakpoint);
 				((javax.swing.table.DefaultTableModel) theBreakpointList.getModel()).addRow(new Object[] {breakpoint, breakpoint,
-					breakpoint, breakpoint});
+						breakpoint, breakpoint});
 			}
 		}
 	}
@@ -257,11 +264,11 @@ public class PrismsParserDebugGUI extends JPanel implements PrismsParserDebugger
 		}
 		for(PrismsParserBreakpoint bp : theBreakpoints) {
 			MutableConfig bpConfig = breakpoints.addSubConfig(new MutableConfig("breakpoint")
-			.set("pre", bp.getPreCursorText() == null ? null : bp.getPreCursorText().pattern().substring(2))
-			.set(
-				"post",
-				bp.getPostCursorText() == null ? null : bp.getPostCursorText().pattern()
-					.substring(0, bp.getPostCursorText().pattern().length() - 2)).set("enabled", "" + bp.isEnabled()));
+				.set("pre", bp.getPreCursorText() == null ? null : bp.getPreCursorText().pattern().substring(2))
+				.set(
+					"post",
+					bp.getPostCursorText() == null ? null : bp.getPostCursorText().pattern()
+						.substring(0, bp.getPostCursorText().pattern().length() - 2)).set("enabled", "" + bp.isEnabled()));
 			if(bp.getOpName() != null)
 				bpConfig.set("operator", bp.getOpName());
 		}
@@ -288,7 +295,7 @@ public class PrismsParserDebugGUI extends JPanel implements PrismsParserDebugger
 		PrismsParserBreakpoint breakpoint = new PrismsParserBreakpoint();
 		theBreakpoints.add(breakpoint);
 		((javax.swing.table.DefaultTableModel) theBreakpointList.getModel()).addRow(new Object[] {breakpoint, breakpoint, breakpoint,
-			breakpoint});
+				breakpoint});
 		writeConfig();
 	}
 
